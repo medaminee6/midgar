@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique - Midgar</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+                <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+                <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+                <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+                <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+                <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+            </svg>
+            Midgar
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/">Accueil</a></li>
+                <li><a href="/discover">Découvrir</a></li>
+                <li><a href="/universes">Univers</a></li>
+                <li><a href="/oeuvre">Œuvre</a></li>
+                <li><a href="/shop">Boutique</a></li>
+                <li><a href="/challenges">Défis</a></li>
+            </ul>
+        </nav>
+        <div class="auth-buttons">
+            <a href="/login" class="btn btn-secondary btn-sm">Connexion</a>
+            <a href="/register" class="btn btn-primary btn-sm">S'inscrire</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h1>Boutique Midgar</h1>
+                    <span style="background-color: #1A1F1E; padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid #18E3A4;">🛒 Panier: 3 articles</span>
+                </div>
+
+                <div class="grid grid-4">
+                    <!-- PRODUCT 1 -->
+                    <div class="card">
+                        <div class="card-image" style="font-size: 3rem; background: linear-gradient(135deg, #2A4D3F, #1A1F1E);">📜</div>
+                        <div class="card-body">
+                            <h3 class="card-title">Grimoire Ancestral</h3>
+                            <p style="color: #18E3A4; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.5rem;">29,99 €</p>
+                            <p class="card-text">Guide complet de création de systèmes magiques cohérents pour vos univers</p>
+                            <div class="card-tags mb-2">
+                                <span class="tag">Guide</span>
+                                <span class="tag">Magie</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="width: 100%;">Ajouter au panier</button>
+                        </div>
+                    </div>
+
+                    <!-- PRODUCT 2 -->
+                    <div class="card">
+                        <div class="card-image" style="font-size: 3rem; background: linear-gradient(135deg, #3D2D4D, #1A1F1E);">🎭</div>
+                        <div class="card-body">
+                            <h3 class="card-title">Kit Personnage Pro</h3>
+                            <p style="color: #18E3A4; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.5rem;">39,99 €</p>
+                            <p class="card-text">Templates et outils pour créer des personnages complexes et mémorables</p>
+                            <div class="card-tags mb-2">
+                                <span class="tag">Outils</span>
+                                <span class="tag">Personnages</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="width: 100%;">Ajouter au panier</button>
+                        </div>
+                    </div>
+
+                    <!-- PRODUCT 3 -->
+                    <div class="card">
+                        <div class="card-image" style="font-size: 3rem; background: linear-gradient(135deg, #2D4D3D, #1A1F1E);">🗺️</div>
+                        <div class="card-body">
+                            <h3 class="card-title">Cartographe Atlas</h3>
+                            <p style="color: #18E3A4; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.5rem;">49,99 €</p>
+                            <p class="card-text">Outils avancés pour créer et cartographier des mondes détaillés</p>
+                            <div class="card-tags mb-2">
+                                <span class="tag">Cartographie</span>
+                                <span class="tag">Logiciel</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="width: 100%;">Ajouter au panier</button>
+                        </div>
+                    </div>
+
+                    <!-- PRODUCT 4 -->
+                    <div class="card">
+                        <div class="card-image" style="font-size: 3rem; background: linear-gradient(135deg, #4D3D2D, #1A1F1E);">🎨</div>
+                        <div class="card-body">
+                            <h3 class="card-title">Pack Artiste Complet</h3>
+                            <p style="color: #18E3A4; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.5rem;">199,99 €</p>
+                            <p class="card-text">Suite complète pour créateurs visuels - Tous les outils inclus</p>
+                            <div class="card-tags mb-2">
+                                <span class="tag">Bundle</span>
+                                <span class="tag">Art</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="width: 100%;">Ajouter au panier</button>
+                        </div>
+                    </div>
+
+                    <!-- PRODUCT 5 -->
+                    <div class="card">
+                        <div class="card-image" style="font-size: 3rem;">📖</div>
+                        <div class="card-body">
+                            <h3 class="card-title">Écriture Épique</h3>
+                            <p style="color: #18E3A4; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.5rem;">34,99 €</p>
+                            <p class="card-text">Cours complet sur la narration et la création narrative épique</p>
+                            <div class="card-tags mb-2">
+                                <span class="tag">Cours</span>
+                                <span class="tag">Écriture</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="width: 100%;">Ajouter au panier</button>
+                        </div>
+                    </div>
+
+                    <!-- PRODUCT 6 -->
+                    <div class="card">
+                        <div class="card-image" style="font-size: 3rem;">✨</div>
+                        <div class="card-body">
+                            <h3 class="card-title">Effets Magiques Pro</h3>
+                            <p style="color: #18E3A4; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.5rem;">44,99 €</p>
+                            <p class="card-text">Bibliothèque d'effets spéciaux et d'animation pour illustrations</p>
+                            <div class="card-tags mb-2">
+                                <span class="tag">Ressources</span>
+                                <span class="tag">VFX</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="width: 100%;">Ajouter au panier</button>
+                        </div>
+                    </div>
+
+                    <!-- PRODUCT 7 -->
+                    <div class="card">
+                        <div class="card-image" style="font-size: 3rem;">🐉</div>
+                        <div class="card-body">
+                            <h3 class="card-title">Bestiaire Créatures</h3>
+                            <p style="color: #18E3A4; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.5rem;">24,99 €</p>
+                            <p class="card-text">Encyclopédie complète de créatures fantastiques avec stats</p>
+                            <div class="card-tags mb-2">
+                                <span class="tag">Référence</span>
+                                <span class="tag">Créatures</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="width: 100%;">Ajouter au panier</button>
+                        </div>
+                    </div>
+
+                    <!-- PRODUCT 8 -->
+                    <div class="card">
+                        <div class="card-image" style="font-size: 3rem;">⚔️</div>
+                        <div class="card-body">
+                            <h3 class="card-title">Arsenal Complet</h3>
+                            <p style="color: #18E3A4; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.5rem;">39,99 €</p>
+                            <p class="card-text">Collection de 500+ armes et armures historiques et fantastiques</p>
+                            <div class="card-tags mb-2">
+                                <span class="tag">Assets</span>
+                                <span class="tag">Équipement</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="width: 100%;">Ajouter au panier</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>À propos</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">À propos de Midgar</a></li>
+                        <li><a href="#">Notre mission</a></li>
+                        <li><a href="#">Équipe</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Ressources</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Aide & Support</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Légal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Conditions d'utilisation</a></li>
+                        <li><a href="#">Politique de confidentialité</a></li>
+                        <li><a href="#">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
