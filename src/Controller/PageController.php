@@ -14,7 +14,7 @@ class PageController extends AbstractController
         return $this->render('index.html.twig');
     }
 
-    #[Route('/{page}', name: 'page', requirements: ['page' => '[a-z0-9\-\.\/]+'])]
+    #[Route('/{page}', name: 'page', requirements: ['page' => '(?!shop)([a-z0-9\-\.\/]+)'])]
     public function show(string $page): Response
     {
         $template = $page . '.html.twig';

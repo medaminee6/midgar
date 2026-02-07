@@ -1,0 +1,91 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ commande.referenceCommande }} - Détails de commande{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #0d1117 0%, #1a1f1e 100%); min-height: 80vh; padding: 3rem 0;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb" style="background:transparent; padding:0; margin-bottom:1rem;">
+                        <li class="breadcrumb-item"><a href="{{ path('shop_commandes') }}">Commandes</a></li>
+                        <li class="breadcrumb-item active">{{ commande.referenceCommande }}</li>
+                    </ol>
+                </nav>
+
+                <div style="background:#0d1117; padding:1rem; border-radius:8px; border:1px solid #222; margin-bottom:1rem; color:#ddd;">
+                    <h5 style="color:#fff;">Informations de commande</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p>
+                                <strong>Référence:</strong> {{ commande.referenceCommande }}
+                            </p>
+                            <p>
+                                <strong>Acheteur:</strong> {{ commande.acheteur }}
+                            </p>
+                            <p>
+                                <strong>Date:</strong> {{ commande.dateCommande|date('d/m/Y H:i') }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>
+                                <strong>État:</strong>
+                                <span class="badge {{ commande.etat.getBadgeClass() }}">
+                                    {{ commande.etat.getLabel() }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background:#0d1117; padding:1rem; border-radius:8px; border:1px solid #222; margin-bottom:1rem; color:#ddd;">
+                    <h5 style="color:#fff;">Détails du produit</h5>
+                    <table class="table table-sm" style="color:#ddd;">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Type</th>
+                                <th>Prix unitaire</th>
+                                <th>Quantité</th>
+                                <th>Sous-total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong style="color:#fff;">{{ commande.produit.nomProduit }}</strong><br>
+                                    <small style="color:#999;">{{ commande.produit.description|slice(0, 100) }}...</small>
+                                </td>
+                                <td>{{ commande.produit.typeProduit }}</td>
+                                <td>{{ commande.produit.prix }}€</td>
+                                <td>{{ commande.quantite }}</td>
+                                <td><strong>{{ commande.prixTotal }}€</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="background:#0d1117; padding:1rem; border-radius:8px; border:1px solid #222; margin-bottom:1rem; color:#ddd;">
+                    <h5 style="color:#fff;">Total</h5>
+                    <h3 style="color: #18E3A4;">Total TTC: {{ commande.prixTotal }}€</h3>
+                </div>
+
+                <div class="mt-4" style="display:flex; gap:0.5rem;">
+                    <a href="{{ path('shop_commandes') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour aux commandes
+                    </a>
+                    <a href="{{ path('shop_commande_edit', {id: commande.id}) }}" class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    <form action="{{ path('shop_commande_delete', {id: commande.id}) }}" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande?');">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
