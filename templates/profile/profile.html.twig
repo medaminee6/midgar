@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil - Midgar</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        /* MODAL STYLES */
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #0B0F0E;
+            margin: 10% auto; 
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            color: #fff;
+        }
+
+        .close {
+            color: #18E3A4;
+            float: right;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+            <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+            <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+            <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+            <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+            <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+        </svg>
+        Midgar
+    </div>
+
+    <nav>
+        <ul>
+            <li><a href="{{ path('home') }}">Accueil</a></li>
+            <li><a href="/discover">Découvrir</a></li>
+            <li><a href="/universes">Univers</a></li>
+            <li><a href="/oeuvre">Œuvre</a></li>
+            <li><a href="/shop">Boutique</a></li>
+            <li><a href="/challenges">Défis</a></li>
+        </ul>
+    </nav>
+
+    <div class="auth-buttons">
+        {% if app.user %}
+            {% if is_granted('ROLE_ADMIN') %}
+              <a href="{{ path('admin_users') }}" class="btn btn-warning btn-sm" style="margin-top:1rem;">Dashboard Admin</a>
+            {% endif %}
+
+            <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm">Déconnexion</a>
+        {% else %}
+            <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm">Connexion</a>
+            <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm">S'inscrire</a>
+        {% endif %}
+    </div>
+</header>
+
+<main>
+{% if app.user %}
+<section class="section">
+    <div class="container">
+        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 2rem; margin-bottom: 3rem;">
+            <!-- SIDEBAR -->
+            <div>
+                <div class="card">
+                    <div class="card-body" style="text-align: center;">
+<div style="
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #18E3A4, #0DCF92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+">
+    {% if app.user.avatar %}
+        <img
+            src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}"
+            alt="Avatar de {{ app.user.username }}"
+            style="
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            "
+        >
+    {% else %}
+        <span style="font-size: 3rem;">🧙</span>
+    {% endif %}
+</div>
+                        <h3 style="margin-bottom: 0.5rem;">{{ app.user.username }}</h3>
+                        <p style="color: #B0B9B6; margin-bottom: 1rem;">{{ '@' ~ app.user.username|lower }}</p>
+                        <p style="color: #B0B9B6; margin-bottom: 1rem;">{{ app.user.email }}</p>
+                        <button class="btn btn-secondary btn-sm" style="width: 100%; margin-bottom: 1rem;" onclick="openModal('editProfileModal')">Éditer le Profil</button>
+                        <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="openModal('settingsModal')">Paramètres</button>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1rem;">
+                    <div class="card-body">
+                        <h4 style="color: #18E3A4; margin-bottom: 1rem;">Statistiques</h4>
+                        <div style="margin-bottom: 1.5rem;">
+                            <p style="color: #B0B9B6; font-size: 0.9rem; margin-bottom: 0.3rem;">Univers créés</p>
+                            <p style="font-size: 1.8rem; color: #18E3A4; font-weight: 700;">12</p>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <p style="color: #B0B9B6; font-size: 0.9rem; margin-bottom: 0.3rem;">Œuvres publiées</p>
+                            <p style="font-size: 1.8rem; color: #18E3A4; font-weight: 700;">28</p>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <p style="color: #B0B9B6; font-size: 0.9rem; margin-bottom: 0.3rem;">Partisans</p>
+                            <p style="font-size: 1.8rem; color: #18E3A4; font-weight: 700;">342</p>
+                        </div>
+                        <div>
+                            <p style="color: #B0B9B6; font-size: 0.9rem; margin-bottom: 0.3rem;">Défis complétés</p>
+                            <p style="font-size: 1.8rem; color: #18E3A4; font-weight: 700;">7</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT -->
+            <div>
+                <!-- MES UNIVERS -->
+                <div style="margin-bottom: 3rem;">
+                    <h2 style="color: #18E3A4; margin-bottom: 1.5rem;">Mes Univers</h2>
+                    <div class="grid grid-2">
+                        <div class="card">
+                            <div class="card-image" style="font-size: 3rem;">🌙</div>
+                            <div class="card-body">
+                                <h3 class="card-title">Nuit Éternelle</h3>
+                                <p class="card-text">Un monde plongé dans une nuit perpétuelle</p>
+                                <div class="card-tags mb-2">
+                                    <span class="tag">Sombre</span>
+                                    <span class="tag">Mystère</span>
+                                </div>
+                                <p style="color: #18E3A4; font-size: 0.9rem; margin-bottom: 1rem;">📊 1,240 favoris</p>
+                                <a href="#" class="btn btn-primary btn-sm" style="width: 100%;">Voir</a>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-image" style="font-size: 3rem;">🏰</div>
+                            <div class="card-body">
+                                <h3 class="card-title">Châteaux Flottants</h3>
+                                <p class="card-text">Des forteresses dans les nuages</p>
+                                <div class="card-tags mb-2">
+                                    <span class="tag">Épic</span>
+                                    <span class="tag">Magie</span>
+                                </div>
+                                <p style="color: #18E3A4; font-size: 0.9rem; margin-bottom: 1rem;">📊 892 favoris</p>
+                                <a href="#" class="btn btn-primary btn-sm" style="width: 100%;">Voir</a>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/universes" class="btn btn-secondary" style="margin-top: 1rem;">Voir tous mes univers (12)</a>
+                </div>
+
+                <!-- MES ŒUVRES -->
+                <div style="margin-bottom: 3rem;">
+                    <h2 style="color: #18E3A4; margin-bottom: 1.5rem;">Mes Œuvres Récentes</h2>
+                    <div class="grid grid-3">
+                        <div class="card">
+                            <div class="card-image" style="font-size: 2rem;">📖</div>
+                            <div class="card-body">
+                                <h3 class="card-title" style="font-size: 1.1rem;">Le Grimoire Perdu</h3>
+                                <p class="card-text" style="font-size: 0.9rem;">Une histoire de magie ancienne</p>
+                                <small style="color: #B0B9B6;">il y a 3 jours</small>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-image" style="font-size: 2rem;">🎨</div>
+                            <div class="card-body">
+                                <h3 class="card-title" style="font-size: 1.1rem;">Reine Noctelle</h3>
+                                <p class="card-text" style="font-size: 0.9rem;">Illustration numérique</p>
+                                <small style="color: #B0B9B6;">il y a 5 jours</small>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-image" style="font-size: 2rem;">⚔️</div>
+                            <div class="card-body">
+                                <h3 class="card-title" style="font-size: 1.1rem;">L'Épée Légendaire</h3>
+                                <p class="card-text" style="font-size: 0.9rem;">Conception d'artefact</p>
+                                <small style="color: #B0B9B6;">il y a 1 semaine</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MODAL ÉDITER PROFIL -->
+<div id="editProfileModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('editProfileModal')">&times;</span>
+        <h2>Éditer votre profil</h2>
+        {{ form_start(profileForm) }}
+            {{ form_row(profileForm.username) }}
+            {{ form_row(profileForm.email) }}
+            {{ form_row(profileForm.avatar) }}
+            <button class="btn btn-primary">Enregistrer</button>
+        {{ form_end(profileForm) }}
+    </div>
+</div>
+
+<!-- MODAL PARAMÈTRES -->
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('settingsModal')">&times;</span>
+        <h2>Paramètres</h2>
+
+        <!-- Bouton changement mot de passe -->
+        <button class="btn btn-primary" onclick="document.getElementById('passwordForm').style.display='block'">
+            Changer le mot de passe
+        </button>
+
+        <div id="passwordForm" style="display:none; margin-top:1rem;">
+            {{ form_start(passwordForm) }}
+                {{ form_row(passwordForm.oldPassword) }}
+                {{ form_row(passwordForm.newPassword) }}
+                {{ form_row(passwordForm.confirmPassword) }}
+                <button class="btn btn-success">Modifier</button>
+            {{ form_end(passwordForm) }}
+        </div>
+
+        <!-- Supprimer compte -->
+        <button class="btn btn-danger" onclick="document.getElementById('deleteForm').style.display='block'">
+            Supprimer mon compte
+        </button>
+
+        <div id="deleteForm" style="display:none; margin-top:1rem;">
+            <form action="{{ path('profile_delete') }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer votre compte ?');">
+                <label>Confirmez avec votre mot de passe :</label>
+                <input type="password" name="password" required class="form-control" style="margin-bottom:1rem;">
+                <button class="btn btn-danger">Supprimer</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% else %}
+<p style="text-align:center; margin-top: 3rem;">Vous devez être connecté pour accéder à votre profil. <a href="{{ path('app_login') }}">Se connecter</a></p>
+{% endif %}
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-section">
+                <h4>À propos</h4>
+                <ul class="footer-links">
+                    <li><a href="#">À propos de Midgar</a></li>
+                    <li><a href="#">Notre mission</a></li>
+                    <li><a href="#">Équipe</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Ressources</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Aide & Support</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Légal</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Conditions d'utilisation</a></li>
+                    <li><a href="#">Politique de confidentialité</a></li>
+                    <li><a href="#">Cookies</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+function openModal(id) {
+    document.getElementById(id).style.display = 'block';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+// Fermer si clic en dehors de la modal
+window.onclick = function(event) {
+    const modals = ['editProfileModal','settingsModal'];
+    modals.forEach(id => {
+        const modal = document.getElementById(id);
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
+</script>
+<script src="/js/main.js"></script>
+</body>
+</html>

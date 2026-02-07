@@ -3,3 +3,37 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+app_register:
+    path: /register
+    controller: App\Controller\RegistrationController::register
+
+app_login:
+    path: /login
+    controller: App\Controller\SecurityController::login
+
+
+page:
+    path: /pages/{page}       # <-- IMPORTANT: ajouter "pages" ici
+    controller: App\Controller\PageController::show
+
+profile:
+    path: /profile
+    controller: App\Controller\ProfileController::index
+
+profile_edit:
+    path: /profile/edit
+    controller: App\Controller\ProfileController::edit
+
+profile_avatar_update:
+    path: /profile/avatar
+    controller: App\Controller\ProfileController::updateAvatar
+    methods: [POST]
+
+profile_settings:
+    path: /profile/settings
+    controller: App\Controller\ProfileController::settings
+
+user_search:
+    path: /profile/search
+    controller: App\Controller\ProfileController::search
