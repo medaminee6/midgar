@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Midgar</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        .admin-layout { display: grid; grid-template-columns: 250px 1fr; gap: 0; min-height: 100vh; }
+        .admin-sidebar { background-color: #1A1F1E; border-right: 1px solid #2A3139; padding: 2rem 0; position: fixed; left: 0; top: 0; width: 250px; height: 100vh; overflow-y: auto; }
+        .admin-sidebar .logo { padding: 1rem 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid #2A3139; }
+        .admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+        .admin-sidebar nav li { margin: 0; }
+        .admin-sidebar nav a { display: block; padding: 12px 1.5rem; color: #B0B9B6; text-decoration: none; border-left: 3px solid transparent; transition: all 0.3s; }
+        .admin-sidebar nav a:hover { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; }
+        .admin-sidebar nav a.active { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; font-weight: 600; }
+        .admin-content { margin-left: 250px; padding: 2rem; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #2A3139; }
+        .admin-header h1 { margin: 0; color: #18E3A4; }
+        .admin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 3rem; }
+        .admin-stat { background-color: #1A1F1E; padding: 1.5rem; border-radius: 6px; border-left: 3px solid #18E3A4; }
+        .admin-stat .stat-label { color: #B0B9B6; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .admin-stat .stat-value { font-size: 2rem; font-weight: 700; color: #18E3A4; }
+        .recent-table { background-color: #1A1F1E; border-radius: 6px; overflow: hidden; }
+        .recent-table table { width: 100%; border-collapse: collapse; }
+        .recent-table th { background-color: #0B0F0E; padding: 1rem 1.5rem; text-align: left; color: #18E3A4; font-weight: 600; border-bottom: 1px solid #2A3139; }
+        .recent-table td { padding: 1rem 1.5rem; border-bottom: 1px solid #2A3139; color: #E6FFF6; }
+        .recent-table tr:hover { background-color: #252A29; }
+        .badge-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .badge-active { background-color: rgba(24, 227, 164, 0.2); color: #18E3A4; }
+        .badge-inactive { background-color: rgba(176, 185, 182, 0.2); color: #B0B9B6; }
+    </style>
+</head>
+<body style="margin: 0;">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="logo" style="color: #18E3A4; font-weight: 700; font-size: 1.2rem;">⚙️ Admin</div>
+            <nav>
+                <ul>
+                    <li><a href="/admin/dashboard" class="active">📊 Tableau de Bord</a></li>
+                    <li><a href="/admin/users">👥 Utilisateurs</a></li>
+                    <li><a href="/admin/oeuvres">📖 Œuvres</a></li>
+                    <li><a href="/admin/artefacts">⚔️ Artefacts</a></li>
+                    <li><a href="/admin/univers">🌍 Univers</a></li>
+                    <li><a href="/admin/personnages">👹 Personnages</a></li>
+                    <li><a href="/admin/produits">🛍️ Produits</a></li>
+                    <li><a href="/admin/commandes">📦 Commandes</a></li>
+                    <li><a href="/admin/challenges">🎯 Défis</a></li>
+                    <li><a href="/admin/submissions">📤 Soumissions</a></li>
+                    <li><a href="/admin/quiz-questions">❓ Questions Quiz</a></li>
+                    <li><a href="/admin/quiz-reponses">✅ Réponses Quiz</a></li>
+                    <li><a href="/admin/preferences">⚙️ Préférences</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div class="admin-content">
+            <div class="admin-header">
+                <h1>Tableau de Bord</h1>
+                <div style="text-align: right;">
+                    <p style="margin: 0; color: #B0B9B6;">Admin • <a href="/" style="color: #18E3A4;">Retour au site</a></p>
+                </div>
+            </div>
+
+            <div class="admin-grid">
+                <div class="admin-stat">
+                    <div class="stat-label">Utilisateurs Total</div>
+                    <div class="stat-value">1,247</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="stat-label">Univers Créés</div>
+                    <div class="stat-value">342</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="stat-label">Œuvres Publiées</div>
+                    <div class="stat-value">2,156</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="stat-label">Revenus (€)</div>
+                    <div class="stat-value">12,480</div>
+                </div>
+            </div>
+
+            <h2 style="color: #18E3A4; margin-bottom: 1.5rem;">Utilisateurs Récents</h2>
+            <div class="recent-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Univers</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Léa Mage</td>
+                            <td>lea.mage@example.com</td>
+                            <td>12</td>
+                            <td><span class="badge-status badge-active">Actif</span></td>
+                            <td>2026-02-02</td>
+                        </tr>
+                        <tr>
+                            <td>Alexis Shadowborn</td>
+                            <td>alex.shadow@example.com</td>
+                            <td>7</td>
+                            <td><span class="badge-status badge-active">Actif</span></td>
+                            <td>2026-02-01</td>
+                        </tr>
+                        <tr>
+                            <td>Marie Étoile</td>
+                            <td>marie.etoile@example.com</td>
+                            <td>5</td>
+                            <td><span class="badge-status badge-inactive">Inactif</span></td>
+                            <td>2026-01-28</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
