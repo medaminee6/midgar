@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page introuvable | Midgar</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        :root { --accent: #18E3A4; --muted: #B0B9B6; --bg-dark: #0B0F0E; --border: #2A3139; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0B0F0E 0%, #1A1F1E 100%);
+            color: #E6FFF6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+        .code { font-size: 6rem; font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: 0.5rem; text-shadow: 0 0 30px rgba(24, 227, 164, 0.3); }
+        h1 { font-size: 1.5rem; color: var(--accent); margin-bottom: 1rem; }
+        p { color: var(--muted); margin-bottom: 1.5rem; max-width: 400px; }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: var(--bg-dark);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover { background: #16D49A; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="code">404</div>
+    <h1>Page introuvable</h1>
+    <p>La page{% if requestedPage is defined and requestedPage %} « {{ requestedPage }} »{% endif %} n'existe pas ou a été déplacée.</p>
+    <a href="{{ path('home') }}" class="btn">Retour à l'accueil</a>
+</body>
+</html>

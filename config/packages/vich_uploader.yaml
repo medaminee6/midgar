@@ -1,0 +1,13 @@
+vich_uploader:
+    db_driver: orm
+    metadata:
+        type: attribute
+    mappings:
+        defi_image:
+            uri_prefix: /uploads/defis
+            upload_destination: '%kernel.project_dir%/public/uploads/defis'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+        participation_image:
+            uri_prefix: /uploads/participations
+            upload_destination: '%kernel.project_dir%/public/uploads/participations'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer

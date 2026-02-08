@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participation #{{ participation.id }} | Midgar</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        :root { --accent: #18E3A4; --muted: #B0B9B6; --bg-dark: #0B0F0E; --bg-darker: #080A0A; --border: #2A3139; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(135deg, #0B0F0E 0%, #1A1F1E 100%); color: #E6FFF6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; }
+        header { background: rgba(26, 31, 30, 0.95); border-bottom: 2px solid var(--border); padding: 1.5rem 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--accent); text-decoration: none; order: 2; margin-left: 1rem; }
+        nav { order: 1; display:flex; justify-content:center; gap: 1rem; }
+        nav a { color: var(--muted); text-decoration: none; margin: 0 1rem; transition: color 0.3s ease; }
+        nav a:hover { color: var(--accent); }
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; display: inline-block; }
+        .btn-primary { background: var(--accent); color: var(--bg-dark); }
+        .btn-secondary { background: transparent; color: var(--muted); border: 2px solid var(--muted); }
+        .btn-secondary:hover { color: var(--accent); border-color: var(--accent); }
+        .btn-danger { background: #c62828; color: #fff; }
+        .btn-danger:hover { background: #b71c1c; }
+        main { max-width: 720px; margin: 0 auto; padding: 2rem; }
+        .back-link { color: var(--muted); text-decoration: none; margin-bottom: 1.5rem; display: inline-block; }
+        .back-link:hover { color: var(--accent); }
+        .card { background: linear-gradient(135deg, #1A1F1E 0%, #252A29 100%); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .card h2 { color: var(--accent); font-size: 1.25rem; margin-bottom: 1rem; }
+        .card p, .card .muted { color: var(--muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 0.5rem; }
+        .card .value { color: #E6FFF6; }
+        .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        .badge-en_attente { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .badge-valide { background: rgba(24, 227, 164, 0.2); color: var(--accent); }
+        .actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+        .actions form { display: inline; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">Midgar</a>
+            <nav>
+                <a href="/challenges">Défis</a>
+                <a href="/participations">Participations</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <a href="{{ path('participation_index') }}" class="back-link">← Liste des participations</a>
+
+        <div class="card">
+            <h2>Participation #{{ participation.id }}</h2>
+            {% if participation.imageFileName %}
+                <div style="margin-bottom: 1rem;">
+                    <p class="muted">Image</p>
+                    <img src="{{ vich_uploader_asset(participation, 'imageFile') }}" alt="Participation" style="max-width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px;">
+                </div>
+            {% endif %}
+            <p class="muted">Défi</p>
+            <p class="value">{{ participation.defi ? participation.defi.titre : '—' }}</p>
+            <p class="muted" style="margin-top: 1rem;">Description</p>
+            <p class="value">{{ participation.description }}</p>
+            <p class="muted" style="margin-top: 1rem;">Utilisateur ID / Artwork ID</p>
+            <p class="value">{{ participation.userId }} / {{ participation.artworkId ?? '—' }}</p>
+            <p class="muted" style="margin-top: 1rem;">Statut</p>
+            <p><span class="badge badge-{{ participation.statut.value|lower }}">{{ participation.statut.value }}</span></p>
+            <p class="muted" style="margin-top: 1rem;">Date de soumission</p>
+            <p class="value">{{ participation.dateSoumission ? participation.dateSoumission|date('d/m/Y H:i') : '—' }}</p>
+
+            <div class="actions">
+                <a href="{{ path('participation_edit', { id: participation.id }) }}" class="btn btn-primary">Modifier</a>
+                <form method="post" action="{{ path('participation_delete', { id: participation.id }) }}" onsubmit="return confirm('Supprimer cette participation ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participation.id) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

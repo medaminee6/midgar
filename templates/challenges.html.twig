@@ -10,7 +10,7 @@
     {% include '_navbar.html.twig' %}
 
                 <!-- ACTIVE CHALLENGES -->
-                <h2 style="color: #18E3A4; margin-bottom: 2rem;">🔥 Défis Actifs ({{ active_defis|length }})</h2>
+                <h2 style="color: #18E3A4; margin-bottom: 2rem;">🔥 Défis Actifs</h2>
                 {% set active_defis = defis|filter(defi => defi.statut.value == 'OUVERT') %}
                 {% if active_defis|length > 0 %}
                     <div class="grid grid-2 mb-4">
@@ -24,12 +24,12 @@
                                     {% endif %}
                                     </div>
                                 <div class="card-body">
-                                                    <h3 class="card-title">{{ defi.titre }}</h3>
-                                                    <p class="card-text">{{ defi.description[:150] }}{{ defi.description|length > 150 ? '...' : '' }}</p>
-                                                    <div class="card-tags mb-2">
-                                                        <span class="tag">{{ defi.theme }}</span>
-                                                        <span class="tag" style="background:#18E3A4;color:#08100f;padding:0.25rem 0.6rem;border-radius:999px;font-weight:700;">Actif</span>
-                                                    </div>
+                                    <h3 class="card-title">{{ defi.titre }}</h3>
+                                    <p class="card-text">{{ defi.description[:150] }}{{ defi.description|length > 150 ? '...' : '' }}</p>
+                                    <div class="card-tags mb-2">
+                                        <span class="tag">{{ defi.theme }}</span>
+                                        <span class="tag">Actif</span>
+                                    </div>
                                     <div style="margin: 1rem 0; color: #18E3A4; font-weight: 600;">📅 {{ defi.dateDebut|date('d/m/Y') }} → {{ defi.dateFin|date('d/m/Y') }}</div>
                                     <a href="{{ path('challenges_participate', { id: defi.id }) }}" class="btn btn-primary btn-sm" style="width: 100%;">Participer</a>
                                 </div>

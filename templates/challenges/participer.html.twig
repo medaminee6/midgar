@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participer - {{ defi.titre }} | Midgar</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        :root {
+            --accent: #18E3A4;
+            --muted: #B0B9B6;
+            --bg-dark: #0B0F0E;
+            --bg-darker: #080A0A;
+            --border: #2A3139;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0B0F0E 0%, #1A1F1E 100%);
+            color: #E6FFF6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        header {
+            background: rgba(26, 31, 30, 0.95);
+            border-bottom: 2px solid var(--border);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo { order: 2; margin-left: 1rem; }
+        nav { order: 1; display:flex; justify-content:center; gap: 1rem; }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+        }
+        nav a {
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        nav a:hover { color: var(--accent); }
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg-dark);
+        }
+        .btn-primary:hover {
+            background: #16D49A;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(24, 227, 164, 0.3);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--muted);
+            border: 2px solid var(--muted);
+        }
+        .btn-secondary:hover { color: var(--accent); border-color: var(--accent); }
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover { color: var(--accent); }
+        .defi-card {
+            background: linear-gradient(135deg, #1A1F1E 0%, #252A29 100%);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .defi-card h2 {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .defi-card .theme {
+            display: inline-block;
+            background: rgba(24, 227, 164, 0.15);
+            color: var(--accent);
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+        .defi-card p {
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .form-card {
+            background: linear-gradient(135deg, #1A1F1E 0%, #252A29 100%);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+        .form-card h3 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-darker);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: #E6FFF6;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(24, 227, 164, 0.2);
+        }
+        .form-input::placeholder { color: #5a6562; }
+        textarea.form-input { resize: vertical; min-height: 120px; }
+        .form-errors {
+            color: #e57373;
+            font-size: 0.85rem;
+            margin-top: 0.35rem;
+        }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .form-actions .btn { min-width: 140px; }
+        .flash-success {
+            background: rgba(24, 227, 164, 0.15);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+        .flash-error {
+            background: rgba(229, 115, 115, 0.15);
+            color: #e57373;
+            border: 1px solid #e57373;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">Midgar</a>
+            <nav>
+                <a href="/challenges">Défis</a>
+                <a href="/">Accueil</a>
+            </nav>
+            <a href="/challenges" class="btn btn-secondary">Retour aux défis</a>
+        </div>
+    </header>
+
+    <main>
+        <a href="{{ path('challenges_index') }}" class="back-link">← Retour aux défis</a>
+
+        {% for message in app.flashes('success') %}
+            <div class="flash-success">{{ message }}</div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="flash-error">{{ message }}</div>
+        {% endfor %}
+
+        <div class="defi-card">
+            {% if defi.imageCover %}
+                <div style="margin-bottom: 1rem; border-radius: 6px; overflow: hidden;">
+                    <img src="{{ vich_uploader_asset(defi, 'imageCoverFile') }}" alt="{{ defi.titre }}" style="width: 100%; max-height: 200px; object-fit: cover;">
+                </div>
+            {% endif %}
+            <h2>{{ defi.titre }}</h2>
+            <span class="theme">{{ defi.theme }}</span>
+            <p>{{ defi.description }}</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">📅 Du {{ defi.dateDebut|date('d/m/Y') }} au {{ defi.dateFin|date('d/m/Y') }}</p>
+        </div>
+
+        <div class="form-card">
+            <h3>Participer à ce défi</h3>
+            <p class="muted" style="margin-bottom: 1rem; font-size: 0.9rem;">Indiquez l'ID d'une œuvre déjà en ligne ou <a href="{{ path('challenges_peindre', {'id': defi.id}) }}">peignez une œuvre</a> dans l'éditeur.</p>
+            {{ form_start(form, { 'attr': { 'class': 'participation-form', 'enctype': 'multipart/form-data' } }) }}
+                <div class="form-group">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description) }}
+                    {{ form_errors(form.description) }}
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <p style="color:var(--muted); font-size:0.95rem;">Vous avez deux options :</p>
+                    <ul style="color:var(--muted); margin-left:1rem; margin-bottom:0.5rem;">
+                        <li>Utiliser une œuvre déjà en ligne en indiquant son ID ci-dessous.</li>
+                        <li>Ou <strong>peindre une nouvelle œuvre</strong> dans l'éditeur en ligne.</li>
+                    </ul>
+                    <a href="{{ path('challenges_peindre', {'id': defi.id}) }}" class="btn btn-secondary" style="margin-right:1rem;">Peindre une œuvre</a>
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.artworkId) }}
+                    {{ form_widget(form.artworkId) }}
+                    {{ form_errors(form.artworkId) }}
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Envoyer ma participation</button>
+                    <a href="{{ path('challenges_index') }}" class="btn btn-secondary">Annuler</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </main>
+</body>
+</html>
