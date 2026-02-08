@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tous les Artefacts - Midgar</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        .universes-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .filter-sidebar {
+            background-color: #1A1F1E;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border: 1px solid #2A3139;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .filter-group {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #2A3139;
+        }
+
+        .filter-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .filter-group h4 {
+            color: #18E3A4;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            margin-top: 0;
+        }
+
+        .filter-option {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            align-items: center;
+        }
+
+        .filter-option input[type="checkbox"],
+        .filter-option input[type="radio"] {
+            cursor: pointer;
+            accent-color: #18E3A4;
+            width: 18px;
+            height: 18px;
+        }
+
+        .filter-option label {
+            cursor: pointer;
+            color: #E6FFF6;
+            font-size: 0.9rem;
+            margin: 0;
+            flex: 1;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            background-color: #0B0F0E;
+            border: 1px solid #2A3139;
+            border-radius: 4px;
+            color: #E6FFF6;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-box::placeholder { color: #B0B9B6; }
+        .search-box:focus {
+            outline: none;
+            border-color: #18E3A4;
+            box-shadow: 0 0 10px rgba(24, 227, 164, 0.2);
+        }
+
+        .filter-reset {
+            width: 100%;
+            padding: 10px;
+            background-color: #2A3139;
+            color: #18E3A4;
+            border: 1px solid #18E3A4;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .filter-reset:hover {
+            background-color: #18E3A4;
+            color: #0B0F0E;
+        }
+
+        .universes-section { flex: 1; }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title { margin: 0; }
+
+        .create-cta {
+            padding: 12px 24px;
+            background-color: #18E3A4;
+            color: #0B0F0E;
+            border: none;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .create-cta:hover { background-color: #0DCF92; }
+
+        .universes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .universe-card {
+            background-color: #1A1F1E;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #2A3139;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .universe-card:hover {
+            border-color: #18E3A4;
+            box-shadow: 0 0 20px rgba(24, 227, 164, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .card-banner {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #18E3A4, #0DCF92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            overflow: hidden;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #E6FFF6;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.3;
+        }
+
+        .card-genre-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .genre-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background-color: #0B0F0E;
+            border: 1px solid #18E3A4;
+            color: #18E3A4;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .card-description {
+            font-size: 0.85rem;
+            color: #B0B9B6;
+            margin-bottom: 1rem;
+            flex: 1;
+            line-height: 1.5;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #B0B9B6;
+            padding-top: 1rem;
+            border-top: 1px solid #2A3139;
+        }
+
+        .card-stats {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .creator-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .creator-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #18E3A4, #0DCF92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .results-count { color: #B0B9B6; font-size: 0.9rem; }
+
+        .load-more { display: flex; justify-content: center; margin-top: 2rem; }
+
+        .load-more-btn {
+            padding: 12px 40px;
+            background-color: #18E3A4;
+            color: #0B0F0E;
+            border: none;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .load-more-btn:hover { background-color: #0DCF92; }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #B0B9B6;
+        }
+
+        .empty-state p { font-size: 1.1rem; margin-bottom: 1rem; }
+
+        @media (max-width: 1024px) {
+            .universes-container { grid-template-columns: 1fr; }
+            .filter-sidebar { position: static; }
+        }
+
+        @media (max-width: 768px) {
+            .universes-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+                <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+                <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+                <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+                <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+                <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+            </svg>
+            Midgar
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/">Accueil</a></li>
+                <li><a href="/discover">Découvrir</a></li>
+                <li><a href="/universes">Univers</a></li>
+                <li><a href="/oeuvre">Œuvre</a></li>
+                <li><a href="/artefact">Artefacts</a></li>
+                <li><a href="/shop">Boutique</a></li>
+                <li><a href="/challenges">Défis</a></li>
+            </ul>
+        </nav>
+        <div class="auth-buttons">
+            <a href="/login" class="btn btn-secondary btn-sm">Connexion</a>
+            <a href="/register" class="btn btn-primary btn-sm">S'inscrire</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div>
+                        <h1 style="margin-bottom: 0.5rem;">Tous les Artefacts</h1>
+                        <p style="color: #B0B9B6; margin: 0;">Explorez les artefacts créés par notre communauté</p>
+                    </div>
+                    
+                </div>
+
+                <div class="universes-container">
+                    <div class="filter-sidebar">
+                        <div class="filter-group">
+                            <input type="text" class="search-box" id="searchInput" placeholder="Chercher...">
+                        </div>
+
+                        <div class="filter-group">
+    <h4>Type</h4>
+
+    <div class="filter-option">
+        <input type="checkbox" id="type-weapon" value="Arme" class="type-filter">
+        <label for="type-weapon">Arme</label>
+    </div>
+
+    <div class="filter-option">
+        <input type="checkbox" id="type-armor" value="Armure" class="type-filter">
+        <label for="type-armor">Armure</label>
+    </div>
+
+    <div class="filter-option">
+        <input type="checkbox" id="type-jewelry" value="Bijoux" class="type-filter">
+        <label for="type-jewelry">Bijoux</label>
+    </div>
+
+    <div class="filter-option">
+        <input type="checkbox" id="type-relic" value="Relique" class="type-filter">
+        <label for="type-relic">Relique</label>
+    </div>
+
+    <div class="filter-option">
+        <input type="checkbox" id="type-magic-tool" value="Outil Magique" class="type-filter">
+        <label for="type-magic-tool">Outil Magique</label>
+    </div>
+</div>
+
+
+                        <div class="filter-group">
+                            <h4>Tri</h4>
+                            <div class="filter-option">
+                                <input type="radio" id="sort-newest" name="sort" value="newest" class="sort-filter" checked>
+                                <label for="sort-newest">Récent</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="radio" id="sort-oldest" name="sort" value="oldest" class="sort-filter">
+                                <label for="sort-oldest">Plus ancien</label>
+                            </div>
+                        </div>
+
+                        <button class="filter-reset" id="resetFilters">Réinitialiser</button>
+                    </div>
+
+                    <div class="universes-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #2A3139;">
+                            <h2 style="margin: 0; color: #E6FFF6;">Artefacts</h2>
+                            <div class="results-count">
+                                <span id="displayedCount">0</span> / <span id="totalCount">0</span>
+                            </div>
+                        </div>
+
+                        <div class="universes-grid" id="universesGrid"></div>
+
+                        <div class="load-more" id="loadMoreContainer" style="display: none;">
+                            <button class="load-more-btn" id="loadMoreBtn">Charger Plus</button>
+                        </div>
+
+                        <div class="empty-state" id="emptyState" style="display: none;">
+                            <p>😔 Aucun artefact ne correspond à vos critères</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>À propos</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">À propos de Midgar</a></li>
+                        <li><a href="#">Notre mission</a></li>
+                        <li><a href="#">Équipe</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Ressources</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Aide & Support</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Légal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Conditions d'utilisation</a></li>
+                        <li><a href="#">Politique de confidentialité</a></li>
+                        <li><a href="#">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const mockArtefacts = [];
+
+        let filtered = [...mockArtefacts];
+        let displayedItems = 12;
+        let currentSort = 'newest';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderArtefacts();
+            attachListeners();
+        });
+
+        function attachListeners(){
+            document.querySelectorAll('.type-filter').forEach(cb => cb.addEventListener('change', filterAndSortArtefacts));
+            document.querySelectorAll('.sort-filter').forEach(r => r.addEventListener('change', filterAndSortArtefacts));
+            document.getElementById('searchInput').addEventListener('input', filterAndSortArtefacts);
+            document.getElementById('resetFilters').addEventListener('click', () => {
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                document.getElementById('sort-newest').checked = true;
+                document.getElementById('searchInput').value = '';
+                currentSort = 'newest';
+                filtered = [...mockArtefacts];
+                displayedItems = 12;
+                renderArtefacts();
+            });
+            document.getElementById('loadMoreBtn')?.addEventListener('click', () => { displayedItems += 12; renderArtefacts(); });
+        }
+
+        function filterAndSortArtefacts(){
+            const types = Array.from(document.querySelectorAll('.type-filter:checked')).map(cb => cb.value);
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            currentSort = document.querySelector('.sort-filter:checked').value;
+
+            filtered = mockArtefacts.filter(item => {
+                if(types.length > 0 && !types.includes(item.type)) return false;
+                if(search && !item.name.toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            // Appliquer le tri
+            if(currentSort === 'newest') {
+                filtered.sort((a,b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
+            } else {
+                filtered.sort((a,b) => new Date(a.createdAt || a.date) - new Date(b.createdAt || b.date));
+            }
+
+            displayedItems = 12;
+            renderArtefacts();
+        }
+
+        function renderArtefacts(){
+            const grid = document.getElementById('universesGrid');
+            const empty = document.getElementById('emptyState');
+            const more = document.getElementById('loadMoreContainer');
+
+            grid.innerHTML = '';
+            if(filtered.length === 0) { empty.style.display = 'block'; more.style.display = 'none'; }
+            else {
+                empty.style.display = 'none';
+                filtered.slice(0, displayedItems).forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'universe-card';
+                    card.innerHTML = `
+                        <div class="card-banner">${item.banner}</div>
+                        <div class="card-content">
+                            <h3 class="card-title">${item.name}</h3>
+                            <div class="card-genre-tags"><span class="genre-tag">${item.type}</span></div>
+                            <p class="card-description">${item.desc}</p>
+                            <div class="card-footer">
+                                <div class="card-stats"><div class="stat">Power ${item.power}</div><div class="stat">Rarity ${item.rarity}</div></div>
+                                <div class="creator-info"><div class="creator-avatar">${item.avatar}</div><span>${item.creator}</span></div>
+                            </div>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => window.location.href = `/artifact-detail?id=${item.id}`);
+                    grid.appendChild(card);
+                });
+                more.style.display = filtered.length > displayedItems ? 'flex' : 'none';
+            }
+            document.getElementById('displayedCount').textContent = Math.min(displayedItems, filtered.length);
+            document.getElementById('totalCount').textContent = filtered.length;
+        }
+    </script>
+</body>
+</html>
