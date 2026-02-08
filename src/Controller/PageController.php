@@ -14,17 +14,16 @@ class PageController extends AbstractController
         return $this->render('index.html.twig');
     }
 
-    #[Route('/{page}', name: 'page', requirements: ['page' => '[a-z0-9\-\.\/]+'])]
+    #[Route('/{page}', name: 'page', requirements: ['page' => '[a-z0-9\-\.\/]+'], priority: -100)]
     public function show(string $page): Response
     {
         $template = $page . '.html.twig';
-        
-        try {
-            return $this->render($template);
-        } catch (\Exception $e) {
-            return $this->render('404.html.twig', [
-                'requestedPage' => $page
-            ], new Response('', Response::HTTP_NOT_FOUND));
+
+        $twig = $this->container->get('twig');
+        if (!$twig->getLoader()->exists($template)) {
+            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
         }
+
+        return $this->render($template);
     }
 }
