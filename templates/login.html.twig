@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Midgar</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+</head>
+<body style="background-color: #0B0F0E; display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column;">
+    <header style="width: 100%; position: static;">
+        <div class="logo">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+                <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+                <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+                <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+                <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+                <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+            </svg>
+            Midgar
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/">Accueil</a></li>
+                <li><a href="/discover">Découvrir</a></li>
+                <li><a href="/universes">Univers</a></li>
+                <li><a href="/oeuvre">Œuvre</a></li>
+                <li><a href="/shop">Boutique</a></li>
+                <li><a href="/challenges">Défis</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center; width: 100%;">
+        <div class="card" style="width: 100%; max-width: 400px; margin: 2rem;">
+            <div class="card-body">
+                <h2 class="card-title" style="text-align: center; margin-bottom: 2rem;">Connexion à Midgar</h2>
+
+                <form>
+                    <div class="form-group">
+                        <label for="email" style="color: #E6FFF6; font-weight: 600;">Email ou Nom d'utilisateur</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            placeholder="votre.email@exemple.com"
+                            style="width: 100%; padding: 10px; background-color: #1A1F1E; border: 1px solid #2A3139; border-radius: 4px; color: #E6FFF6; font-size: 0.95rem; margin-bottom: 1rem;"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" style="color: #E6FFF6; font-weight: 600;">Mot de passe</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password"
+                            placeholder="••••••••"
+                            style="width: 100%; padding: 10px; background-color: #1A1F1E; border: 1px solid #2A3139; border-radius: 4px; color: #E6FFF6; font-size: 0.95rem; margin-bottom: 1rem;"
+                            required>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <label style="color: #B0B9B6; font-size: 0.9rem;">
+                            <input type="checkbox" name="remember" style="margin-right: 6px;">
+                            Se souvenir de moi
+                        </label>
+                        <a href="#" style="color: #18E3A4; text-decoration: none; font-size: 0.9rem;">Mot de passe oublié?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Se Connecter</button>
+                </form>
+
+                <hr style="border: none; border-top: 1px solid #2A3139; margin: 2rem 0;">
+
+                <p style="text-align: center; color: #B0B9B6; margin-bottom: 1rem;">Pas encore de compte?</p>
+                <a href="/register" class="btn btn-secondary" style="width: 100%; text-align: center; display: block;">Créer un Compte</a>
+            </div>
+        </div>
+    </div>
+
+    <footer style="width: 100%; margin-top: auto;">
+        <div class="container">
+            <div style="text-align: center; padding: 2rem 0; border-top: 1px solid #2A3139;">
+                <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
