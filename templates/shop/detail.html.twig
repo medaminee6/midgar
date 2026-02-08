@@ -1,0 +1,84 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ produit.nomProduit }} - Fantasy Store{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #0d1117 0%, #1a1f1e 100%); min-height: 80vh; padding: 3rem 0;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb" style="background:transparent; padding:0; margin-bottom:1rem;">
+                        <li class="breadcrumb-item"><a href="{{ path('shop_index') }}">Boutique</a></li>
+                        <li class="breadcrumb-item active">{{ produit.nomProduit }}</li>
+                    </ol>
+                </nav>
+
+                <div style="background:#0d1117; padding:1rem; border-radius:8px; border:1px solid #222;">
+                    <h1 style="color:#fff;">{{ produit.nomProduit }}</h1>
+                    <div class="product-meta mb-3">
+                        <p>
+                            <span style="background:#18E3A4; color:#000; padding:0.25rem 0.6rem; border-radius:20px; font-weight:600;">{{ produit.typeProduit }}</span>
+                        </p>
+                    </div>
+
+                    <div class="product-price mb-3">
+                        <h2 style="color: #18E3A4;">{{ produit.prix }}€</h2>
+                    </div>
+
+                    <div class="product-description mb-3">
+                        <h5 style="color:#ddd;">Description</h5>
+                        <p style="color:#bbb;">{{ produit.description }}</p>
+                    </div>
+
+                    <div class="product-availability mb-3">
+                        <h5 style="color:#ddd;">Disponibilité</h5>
+                        {% if produit.quantiteDisponible > 0 %}
+                            <p style="color:#18E3A4;">
+                                <i class="fas fa-check-circle"></i> En stock ({{ produit.quantiteDisponible }} disponible(s))
+                            </p>
+                        {% else %}
+                            <p style="color:#d64545;">
+                                <i class="fas fa-times-circle"></i> Rupture de stock
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    {% if produit.quantiteDisponible > 0 %}
+                        <div class="product-action mb-3">
+                            <form action="{{ path('shop_cart_add', {id: produit.id}) }}" method="POST">
+                                <div style="display:flex; gap:0.5rem; align-items:center; width:300px;">
+                                    <input type="number" name="quantity" value="1" class="form-control">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-shopping-cart"></i> Ajouter
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    {% endif %}
+
+                    <div class="product-info">
+                        <p style="color:#999;">
+                            <small>Date d'ajout: {{ produit.dateAjout|date('d/m/Y H:i') }}</small>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-4" style="display:flex; gap:0.5rem;">
+                    <a href="{{ path('shop_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour à la boutique
+                    </a>
+                    <a href="{{ path('shop_produit_edit', {id: produit.id}) }}" class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    <form action="{{ path('shop_produit_delete', {id: produit.id}) }}" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit?');">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

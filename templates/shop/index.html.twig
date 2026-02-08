@@ -1,0 +1,145 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Boutique - Midgar{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #0d1117 0%, #1a1f1e 100%); min-height: 100vh; padding: 3rem 0;">
+    <div class="container">
+        <!-- HEADER SECTION -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem;">
+            <div>
+                <h1 style="color: white; font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem;">BOUTIQUE</h1>
+                <p style="color: #999; font-size: 1.1rem;">Découvrez nos produits fantastiques</p>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items:center;">
+                <a href="{{ path('shop_produit_create') }}" class="btn btn-primary">
+                    + Ajouter un produit
+                </a>
+                <a href="{{ path('shop_cart') }}" class="btn btn-primary">
+                    🛒 Panier
+                </a>
+                <a href="{{ path('shop_commandes') }}" class="btn btn-secondary" title="Voir mes commandes">
+                    <i class="fas fa-list"></i> Mes commandes
+                </a>
+            </div>
+        </div>
+
+        <!-- SEARCH & FILTERS -->
+        <div style="display: flex; gap: 2rem; margin-bottom: 3rem;">
+            <!-- SIDEBAR -->
+            <div style="flex: 0 0 300px;">
+                <div style="background: #1a1f1e; padding: 1.5rem; border-radius: 8px; border: 1px solid #333;">
+                    <form method="GET" action="{{ path('shop_index') }}" style="display:flex; flex-direction:column; gap:1rem;">
+                        <!-- Search Input -->
+                        <input type="text" name="search" placeholder="Chercher..." value="{{ search }}" style="width: 100%; padding: 0.75rem; border: none; border-radius: 4px; background: #2a2f2e; color: white; margin-bottom: 0.5rem;">
+                        
+                        <!-- Type Filter -->
+                        <div>
+                            <h6 style="color: #18E3A4; font-weight: bold; margin: 0 0 0.75rem 0;">TYPE DE PRODUIT</h6>
+                            <select name="type" style="width:100%; padding:0.5rem; border:none; border-radius:4px; background:#2a2f2e; color:white;">
+                                <option value="">Tous les types</option>
+                                {% for type in types %}
+                                    <option value="{{ type }}" {% if selectedType == type %}selected{% endif %}>{{ type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Sort -->
+                        <div>
+                            <h6 style="color: #18E3A4; font-weight: bold; margin: 0 0 0.75rem 0;">TRI</h6>
+                            <select name="sort" style="width:100%; padding:0.5rem; border:none; border-radius:4px; background:#2a2f2e; color:white;">
+                                <option value="date" {% if sortBy == 'date' %}selected{% endif %}>Récent</option>
+                                <option value="price_asc" {% if sortBy == 'price_asc' %}selected{% endif %}>Prix (bas → haut)</option>
+                                <option value="price_desc" {% if sortBy == 'price_desc' %}selected{% endif %}>Prix (haut → bas)</option>
+                                <option value="name" {% if sortBy == 'name' %}selected{% endif %}>Nom (A-Z)</option>
+                                <option value="stock" {% if sortBy == 'stock' %}selected{% endif %}>Stock (plus disponible)</option>
+                            </select>
+                        </div>
+
+                        <!-- Buttons -->
+                        <button type="submit" style="width:100%; padding:0.75rem; background:#18E3A4; color:#000; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">
+                            🔍 Rechercher
+                        </button>
+                        <a href="{{ path('shop_index') }}" style="width:100%; padding:0.75rem; background:#333; color:#18E3A4; border:1px solid #18E3A4; border-radius:4px; text-align:center; font-weight:bold; cursor:pointer; text-decoration:none;">
+                            ✕ Réinitialiser
+                        </a>
+                    </form>
+                </div>
+            </div>
+
+            <!-- PRODUCTS GRID -->
+            <div style="flex: 1;">
+                <h3 style="color: white; margin-bottom: 2rem;">PRODUITS</h3>
+                
+                {% if produits %}
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+                        {% for produit in produits %}
+                            <div style="background: #18E3A4; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 16px rgba(24, 227, 164, 0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                                <!-- Product Image Area -->
+                                <div style="height: 180px; background: linear-gradient(135deg, #18E3A4, #10c985); display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                                    🎁
+                                </div>
+                                
+                                <!-- Product Info -->
+                                <div style="padding: 1.5rem; background: #0d1117; color: white; flex: 1; display: flex; flex-direction: column;">
+                                    <h5 style="margin: 0 0 0.5rem 0; color: white; font-weight: bold;">{{ produit.nomProduit }}</h5>
+                                    
+                                    <p style="margin: 0 0 1rem 0; color: #999; font-size: 0.9rem; flex: 1;">
+                                        {{ produit.description|length > 80 ? produit.description|slice(0, 80) ~ '...' : produit.description }}
+                                    </p>
+                                    
+                                    <div style="margin-bottom: 1rem;">
+                                        <span style="background: #18E3A4; color: #000; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: inline-block;">
+                                            {{ produit.typeProduit }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div style="margin-bottom: 1rem; border-top: 1px solid #333; padding-top: 1rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <h3 style="margin: 0; color: #18E3A4; font-size: 1.5rem;">{{ produit.prix }}€</h3>
+                                            <small style="color: #999;">Stock: {{ produit.quantiteDisponible }}</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <a href="{{ path('shop_detail', {id: produit.id}) }}" style="flex: 1; padding: 0.5rem; background: #18E3A4; color: #000; border: none; border-radius: 4px; text-decoration: none; text-align: center; font-weight: 600; cursor: pointer;">
+                                            Voir
+                                        </a>
+                                        {% if produit.quantiteDisponible > 0 %}
+                                            <form action="{{ path('shop_cart_add', {id: produit.id}) }}" method="POST" style="flex: 1;">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" style="width: 100%; padding: 0.5rem; background: #18E3A4; color: #000; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
+                                                    Ajouter
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <button disabled style="flex: 1; padding: 0.5rem; background: #666; color: #999; border: none; border-radius: 4px; cursor: not-allowed;">
+                                                Rupture
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div style="margin-top: 1rem; border-top: 1px solid #333; padding-top: 1rem; display: flex; gap: 0.5rem;">
+                                        <a href="{{ path('shop_produit_edit', {id: produit.id}) }}" style="flex: 1; padding: 0.5rem; background: #333; color: #18E3A4; border: 1px solid #18E3A4; border-radius: 4px; text-decoration: none; text-align: center; font-size: 0.9rem; cursor: pointer;">
+                                            ✏️
+                                        </a>
+                                        <form action="{{ path('shop_produit_delete', {id: produit.id}) }}" method="POST" style="flex: 1; onsubmit="return confirm('Êtes-vous sûr?');">
+                                            <button type="submit" style="width: 100%; padding: 0.5rem; background: #d64545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="background: #1a1f1e; padding: 3rem; border-radius: 8px; text-align: center; border: 1px solid #333;">
+                        <p style="color: #999; font-size: 1.1rem;">Aucun produit disponible pour le moment.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

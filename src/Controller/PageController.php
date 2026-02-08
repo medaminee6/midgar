@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\ProduitRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,11 +21,43 @@ class PageController extends AbstractController
         return $this->render('discover.html.twig');
     }
 
-    #[Route('/{page}', name: 'page', requirements: ['page' => '(?!admin/(quiz-questions|quiz-reponses)|quiz).*[a-z0-9\-\.\/]+'])]
+    #[Route('/admin/users', name: 'admin_users', methods: ['GET'])]
+    public function adminUsers(): Response
+    {
+        return $this->render('admin/users.html.twig');
+    }
+
+    #[Route('/admin/challenges', name: 'admin_challenges', methods: ['GET'])]
+    public function adminChallenges(): Response
+    {
+        return $this->render('admin/challenges.html.twig');
+    }
+
+    #[Route('/admin/produits', name: 'admin_produits', methods: ['GET'])]
+    public function adminProduits(ProduitRepository $produitRepo): Response
+    {
+        $produits = $produitRepo->findAll();
+
+        return $this->render('admin/produits.html.twig', [
+            'produits' => $produits,
+        ]);
+    }
+
+    /**
+     * Catch-all static pages
+     * EXCLUDES admin, quiz, shop routes
+     */
+    #[Route(
+        '/{page}',
+        name: 'page',
+        requirements: [
+            'page' => '(?!admin|quiz|shop).*'
+        ]
+    )]
     public function show(string $page): Response
     {
         $template = $page . '.html.twig';
-        
+
         try {
             return $this->render($template);
         } catch (\Exception $e) {
