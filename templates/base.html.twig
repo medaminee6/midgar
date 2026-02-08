@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Midgar - Plateforme de Création Fantasy{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0d1117 0%, #0b0f10 100%);
+            color: #ddd;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0b0f10 0%, #071011 100%);
+            color: white;
+            padding: 0.6rem 0;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.35);
+        }
+        
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Nav links styling to match Midgar header */
+        header nav a {
+            color: #18E3A4;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: opacity 0.15s, transform 0.15s;
+            font-size: 0.95rem;
+        }
+
+        header nav a:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        /* Header nav list */
+        header nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+
+        header nav ul li a {
+            color: #18E3A4;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: opacity 0.15s, transform 0.15s;
+            font-size: 0.95rem;
+        }
+
+        header nav ul li a:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 800;
+            color: #18E3A4;
+            font-size: 1.25rem;
+        }
+
+        .logo svg {
+            width: 36px;
+            height: 36px;
+            display: block;
+        }
+
+        .auth-buttons a.btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+        }
+        
+        footer {
+            background: linear-gradient(180deg, #0b0f10 0%, #0d1117 100%);
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            color: #999;
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .btn-primary {
+            background: #18E3A4;
+            border: none;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #10c985;
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #18E3A4;
+            color: #18E3A4;
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(24,227,164,0.06);
+            color: #18E3A4;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="container-fluid" style="padding: 0.6rem 1rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div class="logo">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+                        <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+                        <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+                        <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+                        <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+                        <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+                    </svg>
+                    Midgar
+                </div>
+
+                <nav>
+                    <ul>
+                        <li><a href="/">Accueil</a></li>
+                        <li><a href="/discover">Découvrir</a></li>
+                        <li><a href="/universes">Univers</a></li>
+                        <li><a href="/oeuvre">Œuvre</a></li>
+                        <li><a href="/shop">Boutique</a></li>
+                        <li><a href="/challenges">Défis</a></li>
+                    </ul>
+                </nav>
+
+                <div class="auth-buttons" style="display:flex; gap:1rem;">
+                    <a href="/login" class="btn btn-secondary btn-sm">Connexion</a>
+                    <a href="/register" class="btn btn-primary btn-sm">S'inscrire</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('warning') %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>À propos de Midgar</h6>
+                    <p>La plateforme ultime pour créer, partager et explorer des univers fantasy uniques.</p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Navigation</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/" style="color: #667eea; text-decoration: none;">Accueil</a></li>
+                        <li><a href="/shop" style="color: #667eea; text-decoration: none;">Boutique</a></li>
+                        <li><a href="/universes" style="color: #667eea; text-decoration: none;">Univers</a></li>
+                        <li><a href="/challenges" style="color: #667eea; text-decoration: none;">Défis</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contact</h6>
+                    <p>
+                        <i class="fas fa-envelope"></i> contact@midgar.com<br>
+                        <i class="fas fa-phone"></i> +33 (0) 1 23 45 67 89
+                    </p>
+                </div>
+            </div>
+            <hr>
+            <p class="text-center text-muted mb-0">
+                © 2026 Midgar - Plateforme de Création Fantasy. Tous droits réservés.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

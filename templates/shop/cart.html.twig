@@ -1,0 +1,91 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Panier - Fantasy Store{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #0d1117 0%, #1a1f1e 100%); min-height: 80vh; padding: 3rem 0;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="mb-4" style="color: white;">
+                    <i class="fas fa-shopping-cart"></i> Votre panier
+                </h1>
+
+            {% if cartData %}
+                <div style="background: #0d1117; padding: 1rem; border-radius: 8px; border: 1px solid #222;">
+                <table class="table table-hover table-sm" style="color: #ddd;">
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Prix unitaire</th>
+                            <th>Quantité</th>
+                            <th>Sous-total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cartData %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.produit.nomProduit }}</strong><br>
+                                    <small class="text-muted">{{ item.produit.typeProduit }}</small>
+                                </td>
+                                <td>{{ item.produit.prix }}€</td>
+                                <td>
+                                    <form action="{{ path('shop_cart_update', {id: item.produit.id}) }}" method="POST" style="display: inline;">
+                                        <div class="input-group input-group-sm" style="width: 100px;">
+                                            <input type="number" name="quantity" value="{{ item.quantity }}" class="form-control">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fas fa-sync"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </td>
+                                <td><strong>{{ item.subtotal }}€</strong></td>
+                                <td>
+                                    <form action="{{ path('shop_cart_remove', {id: item.produit.id}) }}" method="POST" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+
+                <div class="mt-4" style="display:flex; gap:1rem; align-items:center; justify-content:space-between;">
+                    <div>
+                        <h5 style="color: #ddd; margin:0 0 0.5rem 0;">Résumé du panier</h5>
+                        <p style="color:#999; margin:0;">Nombre d'articles: <strong style="color:#fff;">{{ cartCount }}</strong></p>
+                    </div>
+                    <div style="text-align:right">
+                        <h3 style="color: #18E3A4; margin:0;">Total: <strong>{{ total }}€</strong></h3>
+                        <div style="margin-top:0.5rem; display:flex; gap:0.5rem; justify-content:flex-end;">
+                            <a href="{{ path('shop_index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Continuer vos achats
+                            </a>
+                            <a href="{{ path('shop_commandes') }}" class="btn btn-secondary">
+                                <i class="fas fa-list"></i> Mes commandes
+                            </a>
+                            <a href="{{ path('shop_checkout') }}" class="btn btn-primary">
+                                <i class="fas fa-credit-card"></i> Procéder au paiement
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info" style="background:#1a1f1e; color:#ccc; border:1px solid #222;">
+                    <h4 style="color:#fff;">Votre panier est vide</h4>
+                    <p style="color:#999;">Commencez à ajouter des produits pour remplir votre panier.</p>
+                    <a href="{{ path('shop_index') }}" class="btn btn-primary">
+                        <i class="fas fa-shopping-bag"></i> Aller à la boutique
+                    </a>
+                </div>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

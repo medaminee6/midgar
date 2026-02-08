@@ -168,30 +168,26 @@
                 </tr>
                 </thead>
                 <tbody>
+                {% for produit in produits %}
                 <tr>
-                    <td>Grimoire Ancestral</td>
-                    <td>Recueil de sorts rares</td>
-                    <td>29,99€</td>
-                    <td>Livre</td>
-                    <td>124</td>
-                    <td>2025-05-12</td>
+                    <td>{{ produit.nomProduit }}</td>
+                    <td>{{ produit.description }}</td>
+                    <td>{{ produit.prix }}€</td>
+                    <td>{{ produit.typeProduit }}</td>
+                    <td>{{ produit.quantiteDisponible }}</td>
+                    <td>{{ produit.dateAjout ? produit.dateAjout|date('Y-m-d') : 'N/A' }}</td>
                     <td class="action-buttons">
-                        <a href="#" class="btn-edit">Éditer</a>
-                        <a href="#" class="btn-delete">Supprimer</a>
+                        <a href="{{ path('admin_produits_edit', {id: produit.id}) }}" class="btn-edit">Éditer</a>
+                        <form method="POST" action="{{ path('admin_produits_delete', {id: produit.id}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr?')">
+                            <button type="submit" class="btn-delete" style="border:none;cursor:pointer;padding:4px 12px;">Supprimer</button>
+                        </form>
                     </td>
                 </tr>
+                {% else %}
                 <tr>
-                    <td>Kit Personnage Pro</td>
-                    <td>Assets complets de création</td>
-                    <td>39,99€</td>
-                    <td>Pack</td>
-                    <td>8</td>
-                    <td>2025-08-01</td>
-                    <td class="action-buttons">
-                        <a href="#" class="btn-edit">Éditer</a>
-                        <a href="#" class="btn-delete">Supprimer</a>
-                    </td>
+                    <td colspan="7" style="text-align:center;">Aucun produit trouvé</td>
                 </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -200,30 +196,34 @@
         <section class="mt-4">
             <h2>Ajouter un produit</h2>
 
-            <div class="mb-2">
-                <label>Nom produit</label>
-                <input class="form-control" type="text">
-            </div>
+            <form method="POST" action="{{ path('admin_produits_create') }}">
+                <div class="mb-2">
+                    <label>Nom produit</label>
+                    <input class="form-control" type="text" name="nom_produit" required>
+                </div>
 
-            <div class="mb-2">
-                <label>Description</label>
-                <textarea class="form-control" rows="3"></textarea>
-            </div>
+                <div class="mb-2">
+                    <label>Description</label>
+                    <textarea class="form-control" name="description" rows="3"></textarea>
+                </div>
 
-            <div class="mb-2">
-                <label>Prix</label>
-                <input class="form-control" type="text">
-            </div>
+                <div class="mb-2">
+                    <label>Prix</label>
+                    <input class="form-control" type="number" name="prix" step="0.01" required>
+                </div>
 
-            <div class="mb-2">
-                <label>Type</label>
-                <input class="form-control" type="text">
-            </div>
+                <div class="mb-2">
+                    <label>Type</label>
+                    <input class="form-control" type="text" name="type_produit" required>
+                </div>
 
-            <div class="mb-2">
-                <label>Quantité</label>
-                <input class="form-control" type="number">
-            </div>
+                <div class="mb-2">
+                    <label>Quantité</label>
+                    <input class="form-control" type="number" name="quantite_disponible" required>
+                </div>
+
+                <button type="submit" style="background-color: var(--accent); color: #0B0F0E; padding: 8px 16px; border: none; border-radius: 3px; cursor: pointer; font-weight: 600;">Ajouter</button>
+            </form>
         </section>
 
     </main>

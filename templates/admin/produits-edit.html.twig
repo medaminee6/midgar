@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éditer Produit - Admin</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-bg: #1A1F1E;
+            --accent: #18E3A4;
+            --muted: #B0B9B6;
+            --panel-bg: #0B0F0E;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid #2A3139;
+            padding: 2rem 0;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .admin-sidebar .logo {
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #2A3139;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+
+        .admin-sidebar nav a {
+            display: block;
+            padding: 12px 1.5rem;
+            color: var(--muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .admin-sidebar nav a:hover,
+        .admin-sidebar nav a.active {
+            background-color: #0B0F0E;
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #2A3139;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            color: var(--accent);
+        }
+
+        .form-section {
+            background-color: #1A1F1E;
+            border-radius: 6px;
+            padding: 2rem;
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #0B0F0E;
+            border: 1px solid #2A3139;
+            color: #E6FFF6;
+            border-radius: 3px;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(24, 227, 164, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: #0B0F0E;
+        }
+
+        .btn-secondary {
+            background-color: #2A3139;
+            color: #E6FFF6;
+        }
+
+        .mb-2 { margin-bottom: 1rem; }
+    </style>
+</head>
+
+<body>
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="logo">Admin</div>
+        <nav>
+            <ul>
+                <li><a href="/admin/dashboard">Tableau de bord</a></li>
+                <li><a href="/admin/users">Utilisateurs</a></li>
+                <li><a href="/admin/quiz-questions">Quiz</a></li>
+                <li><a href="/admin/produits" class="active">Shop</a></li>
+                <li><a href="/admin/challenges">Défis</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="admin-content">
+
+        <div class="admin-header">
+            <h1>Éditer Produit</h1>
+        </div>
+
+        <div class="form-section">
+            <form method="POST" action="{{ path('admin_produits_edit', {id: produit.id}) }}">
+                <div class="form-group">
+                    <label>Nom produit</label>
+                    <input type="text" name="nom_produit" value="{{ produit.nomProduit }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="4">{{ produit.description }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Prix</label>
+                    <input type="number" name="prix" step="0.01" value="{{ produit.prix }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Type</label>
+                    <input type="text" name="type_produit" value="{{ produit.typeProduit }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Quantité disponible</label>
+                    <input type="number" name="quantite_disponible" value="{{ produit.quantiteDisponible }}" required>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <a href="{{ path('admin_produits') }}" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

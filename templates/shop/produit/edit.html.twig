@@ -1,0 +1,57 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Modifier {{ produit.nomProduit }} - Fantasy Store{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #0d1117 0%, #1a1f1e 100%); min-height: 80vh; padding: 3rem 0;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h1 class="mb-4" style="color:white;">Modifier le produit: {{ produit.nomProduit }}</h1>
+
+                <div style="background:#0d1117; padding:1.25rem; border-radius:8px; border:1px solid #222;">
+                    <form method="POST" class="needs-validation">
+                        <div class="mb-3">
+                            <label for="nom_produit" class="form-label" style="color:#ddd;">Nom du produit</label>
+                            <input type="text" class="form-control" id="nom_produit" name="nom_produit" value="{{ produit.nomProduit }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label" style="color:#ddd;">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4">{{ produit.description }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="prix" class="form-label" style="color:#ddd;">Prix (€)</label>
+                            <input type="number" class="form-control" id="prix" name="prix" step="0.01" value="{{ produit.prix }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="type_produit" class="form-label" style="color:#ddd;">Type de produit</label>
+                            <select class="form-control" id="type_produit" name="type_produit">
+                                <option value="">Sélectionnez un type</option>
+                                <option value="Artefact" {% if produit.typeProduit == 'Artefact' %}selected{% endif %}>Artefact</option>
+                                <option value="Oeuvre" {% if produit.typeProduit == 'Oeuvre' %}selected{% endif %}>Oeuvre</option>
+                                <option value="Personnage" {% if produit.typeProduit == 'Personnage' %}selected{% endif %}>Personnage</option>
+                                <option value="Livre" {% if produit.typeProduit == 'Livre' %}selected{% endif %}>Livre</option>
+                                <option value="Collection" {% if produit.typeProduit == 'Collection' %}selected{% endif %}>Collection</option>
+                                <option value="Autre" {% if produit.typeProduit == 'Autre' %}selected{% endif %}>Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="quantite_disponible" class="form-label" style="color:#ddd;">Quantité disponible</label>
+                            <input type="number" class="form-control" id="quantite_disponible" name="quantite_disponible" value="{{ produit.quantiteDisponible }}">
+                        </div>
+
+                        <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                            <a href="{{ path('shop_index') }}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Sauvegarder</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Passer la commande - Fantasy Store{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #0d1117 0%, #1a1f1e 100%); min-height: 80vh; padding: 3rem 0;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="mb-4" style="color:white;">Confirmer votre commande</h1>
+
+                <div style="background:#0d1117; padding:1rem; border-radius:8px; border:1px solid #222; margin-bottom:1rem;">
+                    <h5 style="color:#fff; margin-bottom:0.5rem;">Résumé de commande</h5>
+                    <div>
+                        <table class="table table-sm" style="color:#ddd;">
+                            <thead>
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Prix</th>
+                                    <th>Quantité</th>
+                                    <th>Sous-total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cartData %}
+                                    <tr>
+                                        <td><strong style="color:#fff;">{{ item.produit.nomProduit }}</strong></td>
+                                        <td>{{ item.produit.prix }}€</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>{{ item.subtotal }}€</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3">Total TTC</th>
+                                    <th style="color: #18E3A4; font-size: 1.2em;">{{ total }}€</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="background:#0d1117; padding:1rem; border-radius:8px; border:1px solid #222;">
+                    <h5 style="color:#fff; margin-bottom:0.5rem;">Informations d'acheteur</h5>
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="acheteur" class="form-label" style="color:#ddd;">Nom de l'acheteur</label>
+                            <input type="text" class="form-control" id="acheteur" name="acheteur">
+                        </div>
+
+                        <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                            <a href="{{ path('shop_cart') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Modifier le panier
+                            </a>
+                            <a href="{{ path('shop_commandes') }}" class="btn btn-secondary">
+                                <i class="fas fa-list"></i> Mes commandes
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check-circle"></i> Placer la commande
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

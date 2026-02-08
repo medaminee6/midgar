@@ -1,0 +1,51 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Modifier {{ commande.referenceCommande }}{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #0d1117 0%, #1a1f1e 100%); min-height: 80vh; padding: 3rem 0;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h1 class="mb-4" style="color:white;">Modifier la commande: {{ commande.referenceCommande }}</h1>
+
+                <div style="background:#0d1117; padding:1.25rem; border-radius:8px; border:1px solid #222;">
+                    <form method="POST" class="needs-validation">
+                        <div class="mb-3">
+                            <label for="acheteur" class="form-label" style="color:#ddd;">Nom de l'acheteur</label>
+                            <input type="text" class="form-control" id="acheteur" name="acheteur" value="{{ commande.acheteur }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="etat" class="form-label" style="color:#ddd;">État de la commande</label>
+                            <select class="form-control" id="etat" name="etat">
+                                {% for etat in etats %}
+                                    <option value="{{ etat.value }}" {% if commande.etat == etat %}selected{% endif %}>
+                                        {{ etat.getLabel() }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.03); padding:0.75rem; border-radius:6px; margin-bottom:1rem; color:#ddd;">
+                            <strong>Infos de la commande:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Référence: {{ commande.referenceCommande }}</li>
+                                <li>Produit: {{ commande.produit.nomProduit }}</li>
+                                <li>Quantité: {{ commande.quantite }}</li>
+                                <li>Prix total: {{ commande.prixTotal }}€</li>
+                                <li>Date: {{ commande.dateCommande|date('d/m/Y H:i') }}</li>
+                            </ul>
+                        </div>
+
+                        <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                            <a href="{{ path('shop_commandes') }}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Sauvegarder</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
