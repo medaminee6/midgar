@@ -7,33 +7,7 @@
     <link rel="stylesheet" href="/css/midgar.css">
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
-                <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
-                <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
-                <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
-                <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
-                <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
-            </svg>
-            Midgar
-        </div>
-        <nav>
-            <ul>
-                <li><a href="/">Accueil</a></li>
-                <li><a href="/discover">Découvrir</a></li>
-                <li><a href="/universes">Univers</a></li>
-                <li><a href="/oeuvre">Œuvre</a></li>
-                <li><a href="/shop">Boutique</a></li>
-                <li><a href="/challenges">Défis</a></li>
-            </ul>
-        </nav>
-        <div class="auth-buttons">
-            <a href="/login" class="btn btn-secondary btn-sm">Connexion</a>
-            <a href="/register" class="btn btn-primary btn-sm">S'inscrire</a>
-        </div>
-    </header>
+    {% include '_navbar.html.twig' %}
 
     <main>
         <section class="section">
