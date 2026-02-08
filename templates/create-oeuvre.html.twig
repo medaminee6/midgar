@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer une Œuvre - Midgar</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        .creation-container { display: grid; grid-template-columns: 250px 1fr; gap: 2rem; min-height: 100vh; }
+        .sidebar { position: sticky; top: 0; height: 100vh; background-color: var(--bg-secondary); border-right: 2px solid var(--border-color); overflow-y: auto; padding: 2rem 1.5rem; }
+        .sidebar-title { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; color: var(--accent-primary); margin-bottom: 1.5rem; letter-spacing: 1px; }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 0.75rem; }
+        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: 4px; transition: all 0.3s; font-size: 0.9rem; }
+        .sidebar-link:hover, .sidebar-link.active { background-color: rgba(24, 227, 164, 0.1); color: var(--accent-primary); border-left: 3px solid var(--accent-primary); padding-left: calc(1rem - 3px); }
+        .sidebar-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+        .main-content { padding: 3rem; }
+        .form-container { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 2.5rem; max-width: 700px; }
+        .form-title { font-size: 2.2rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        .form-subtitle { color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; color: var(--text-primary); }
+        .form-input, .form-textarea, .form-select { width: 100%; padding: 0.875rem; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: inherit; font-size: 0.95rem; transition: all 0.3s; }
+        .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 12px var(--shadow-color); }
+        .form-textarea { resize: vertical; min-height: 120px; }
+        .file-upload { position: relative; }
+        .file-label { display: block; padding: 2rem; border: 2px dashed var(--border-color); border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s; background-color: rgba(24, 227, 164, 0.05); }
+        .file-label:hover { border-color: var(--accent-primary); background-color: rgba(24, 227, 164, 0.1); }
+        .file-icon { width: 48px; height: 48px; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; background-color: rgba(24, 227, 164, 0.15); border-radius: 8px; }
+        .file-text { font-weight: 600; margin-bottom: 0.25rem; color: var(--accent-primary); }
+        .file-hint { font-size: 0.85rem; color: var(--text-secondary); }
+        #fileInput { display: none; }
+        .form-actions { display: flex; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 0.875rem 2rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s; font-size: 0.9rem; }
+        .btn-primary { background-color: var(--accent-primary); color: var(--bg-primary); }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+        .btn-secondary { background-color: var(--border-color); color: var(--text-primary); border: 1px solid var(--accent-primary); }
+        .btn-secondary:hover { background-color: rgba(24, 227, 164, 0.1); }
+        @media (max-width: 1024px) { .creation-container { grid-template-columns: 1fr; } .sidebar { position: static; height: auto; border-right: none; border-bottom: 2px solid var(--border-color); } .sidebar-nav { flex-direction: row; gap: 1rem; overflow-x: auto; } }
+    </style>
+</head>
+<body>
+    <header style="background-color: var(--bg-secondary); border-bottom: 2px solid var(--border-color); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-primary);">◆ Midgar</div>
+        <nav style="display: flex; gap: 2rem;">
+            <a href="/" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Accueil</a>
+            <a href="/discover" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Découvrir</a>
+            <a href="/universes" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Univers</a>
+            <a href="/oeuvre" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Œuvre</a>
+            <a href="/shop" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Boutique</a>
+            <a href="/challenges" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Défis</a>
+        </nav>
+        <div style="display: flex; gap: 0.75rem;">
+            <a href="/login" style="padding: 0.6rem 1.2rem; border: 1px solid var(--accent-primary); color: var(--accent-primary); text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 0.85rem;">Se connecter</a>
+        </div>
+    </header>
+
+    <div class="creation-container">
+        <aside class="sidebar">
+            <div class="sidebar-title">◇ Créer du Contenu</div>
+            <nav class="sidebar-nav">
+                <a href="/create-oeuvre" class="sidebar-link active">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4h16v12H4z"/>
+                    </svg>
+                    Œuvre
+                </a>
+                <a href="/create-artifact" class="sidebar-link">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3.5 10h10.5l-8.5 6 3 9.5L12 21l-8.5 6 3-9.5-8.5-6h10.5z"/>
+                    </svg>
+                    Artefact
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="form-container">
+                <h1 class="form-title">Créer une Œuvre</h1>
+                <p class="form-subtitle">Partagez votre création littéraire ou artistique</p>
+                
+                <form id="oeuvreForm">
+                    <div class="form-group">
+                        <label class="form-label">Titre de l'Œuvre *</label>
+                        <input type="text" class="form-input" placeholder="Ex: La Chute de la Tour Céleste" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Type d'Œuvre *</label>
+                        <select class="form-select" required>
+                            <option value="">Sélectionner un type</option>
+                            <option value="novel">Roman</option>
+                            <option value="short-story">Nouvelle</option>
+                            <option value="poetry">Poésie</option>
+                            <option value="artwork">Illustration</option>
+                            <option value="music">Musique</option>
+                            <option value="other">Autre</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Univers Associé (optionnel)</label>
+                        <select class="form-select">
+                            <option value="">Sélectionner un univers</option>
+                            <option value="universe-1">Royaumes de Cristal</option>
+                            <option value="universe-2">Les Terres Oubliées</option>
+                            <option value="universe-3">Chroniques du Noir</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description *</label>
+                        <textarea class="form-textarea" placeholder="Décrivez votre œuvre, son contexte, ses inspirations..." required></textarea>
+                    </div>
+
+                    <div class="form-group file-upload">
+                        <label class="form-label">Couverture ou Image *</label>
+                        <label class="file-label" for="fileInput">
+                            <div class="file-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 28px; height: 28px;">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                                </svg>
+                            </div>
+                            <div class="file-text">Déposer une image ou cliquer</div>
+                            <div class="file-hint">PNG, JPG jusqu'à 5MB</div>
+                        </label>
+                        <input type="file" id="fileInput" accept="image/*" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Auteur/Artiste</label>
+                        <input type="text" class="form-input" placeholder="Votre nom ou pseudonyme">
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="/discover" class="btn btn-secondary">Annuler</a>
+                        <button type="submit" class="btn btn-primary">Publier l'Œuvre</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('fileInput')?.addEventListener('change', (e) => {
+            const label = document.querySelector('.file-label');
+            if(e.target.files.length) {
+                label.innerHTML = `<div class="file-icon" style="background-color: rgba(24, 227, 164, 0.2);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 28px; height: 28px; stroke: var(--accent-primary);">
+                    <polyline points="20 6 9 17 4 12"/></svg></div><div class="file-text" style="color: var(--accent-primary);">✓ ${e.target.files[0].name}</div>`;
+            }
+        });
+        document.querySelector('.file-label').addEventListener('click', (e) => {
+            if(e.target.closest('.file-label')) document.getElementById('fileInput').click();
+        });
+        document.getElementById('oeuvreForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Œuvre créée! (Fonctionnalité de démonstration)');
+            // After creating (demo) show only Œuvre and Artefact in the sidebar
+            try {
+                const nav = document.querySelector('.sidebar-nav');
+                if(nav) {
+                    nav.querySelectorAll('.sidebar-link').forEach(link => {
+                        const href = link.getAttribute('href') || '';
+                        if(!href.includes('create-oeuvre') && !href.includes('create-artifact')) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'flex';
+                        }
+                    });
+                }
+            } catch(err) { /* no-op for demo */ }
+        });
+    </script>
+</body>
+</html>
