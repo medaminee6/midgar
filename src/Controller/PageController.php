@@ -27,12 +27,6 @@ class PageController extends AbstractController
         return $this->render('admin/users.html.twig');
     }
 
-    #[Route('/admin/challenges', name: 'admin_challenges', methods: ['GET'])]
-    public function adminChallenges(): Response
-    {
-        return $this->render('admin/challenges.html.twig');
-    }
-
     #[Route('/admin/produits', name: 'admin_produits', methods: ['GET'])]
     public function adminProduits(ProduitRepository $produitRepo): Response
     {

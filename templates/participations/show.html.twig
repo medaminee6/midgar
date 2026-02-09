@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Participation #{{ participation.id }} | Midgar{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{{ path('participation_index') }}" class="btn btn-secondary mb-4" style="display: inline-flex; align-items: center; gap: 0.5rem;">← Liste des participations</a>
+
+    <div class="card">
+        <div class="card-body">
+            <h2 style="color: #18E3A4; margin-bottom: 1rem;">Participation #{{ participation.id }}</h2>
+            {% if participation.imageFileName %}
+                <div style="margin-bottom: 1rem;">
+                    <p class="text-muted">Image</p>
+                    <img src="{{ vich_uploader_asset(participation, 'imageFile') }}" alt="Participation" style="max-width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px;">
+                </div>
+            {% endif %}
+            <p class="text-muted">Défi</p>
+            <p>{{ participation.defi ? participation.defi.titre : '—' }}</p>
+            <p class="text-muted mt-3">Description</p>
+            <p>{{ participation.description }}</p>
+            <p class="text-muted mt-3">Utilisateur ID / Artwork ID</p>
+            <p>{{ participation.userId }} / {{ participation.artworkId ?? '—' }}</p>
+            <p class="text-muted mt-3">Statut</p>
+            <p><span class="badge {% if participation.statut.value == 'EN_ATTENTE' %}bg-warning{% else %}bg-success{% endif %}">{{ participation.statut.value }}</span></p>
+            <p class="text-muted mt-3">Date de soumission</p>
+            <p>{{ participation.dateSoumission ? participation.dateSoumission|date('d/m/Y H:i') : '—' }}</p>
+
+            <div class="mt-4">
+                <a href="{{ path('participation_edit', { id: participation.id }) }}" class="btn btn-primary">Modifier</a>
+                <form method="post" action="{{ path('participation_delete', { id: participation.id }) }}" style="display: inline;" onsubmit="return confirm('Supprimer cette participation ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participation.id) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

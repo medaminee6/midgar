@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le statut | Midgar Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{{ path('admin_participations', { id: participation.defi.id }) }}" class="btn btn-secondary mb-4" style="display: inline-flex; align-items: center; gap: 0.5rem;">← Retour aux participations</a>
+
+    <div class="card">
+        <div class="card-body">
+            <h2 style="color: #18E3A4; margin-bottom: 1.5rem;">Modifier le statut de la participation #{{ participation.id }}</h2>
+
+            <div class="mb-4">
+                <p class="text-muted">Défi</p>
+                <p>{{ participation.defi.titre }}</p>
+            </div>
+
+            <div class="mb-4">
+                <p class="text-muted">Image</p>
+                {% if participation.imageFileName %}
+                    <img src="{{ vich_uploader_asset(participation, 'imageFile') }}" alt="Participation" style="max-width: 300px; max-height: 200px; object-fit: contain; border-radius: 8px;">
+                {% else %}
+                    <p>Aucune image</p>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <p class="text-muted">Description</p>
+                <p>{{ participation.description }}</p>
+            </div>
+
+            {{ form_start(form) }}
+                <div class="mb-3">
+                    {{ form_label(form.statut) }}
+                    {{ form_widget(form.statut, { 'attr': { 'class': 'form-select' } }) }}
+                    {{ form_errors(form.statut) }}
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

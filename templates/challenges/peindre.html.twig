@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Peindre - {{ defi.titre }} | Midgar{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: #0b0f0e; }
+    .canvas-wrap { background: #fff; border-radius:8px; padding:8px; }
+    canvas { background: #ffffff; display:block; width:100%; height:600px; touch-action: none; }
+    label { color: #B0B9B6; }
+    textarea { width:100%; min-height:70px; margin-top:0.5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{{ path('challenges_participate', {'id': defi.id}) }}" class="btn btn-secondary mb-3">← Retour</a>
+    <h2 style="color:#18E3A4; margin-bottom:1rem;">Peindre — {{ defi.titre }}</h2>
+    <p class="text-muted mb-3">Utilisez l'éditeur ci-dessous pour créer votre œuvre. Cliquez sur <strong>Enregistrer et envoyer</strong> pour soumettre votre peinture.</p>
+
+    <div class="toolbar mb-3" style="display:flex; gap:1rem; align-items:center;">
+        <div class="controls">
+            <label for="color">Couleur</label>
+            <input id="color" type="color" value="#000000" style="width:48px; height:36px;">
+            <label for="size" class="ms-2">Taille</label>
+            <input id="size" type="range" min="1" max="50" value="4" style="width:100px;">
+            <button id="clear" class="btn btn-secondary ms-2">Effacer</button>
+        </div>
+        <div style="margin-left:auto;">
+            <button id="save" class="btn btn-primary">Enregistrer et envoyer</button>
+        </div>
+    </div>
+
+    <div class="canvas-wrap mb-3">
+        <canvas id="paintCanvas" width="1200" height="800"></canvas>
+    </div>
+
+    <div class="mb-3">
+        <label for="description">Description (optionnel)</label>
+        <textarea id="description" class="form-control" placeholder="Décrivez votre œuvre..."></textarea>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    const canvas = document.getElementById('paintCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    let lastX = 0, lastY = 0;
+
+    function resizeCanvasToDisplaySize(canvas) {
+        const ratio = window.devicePixelRatio || 1;
+        const w = canvas.clientWidth * ratio;
+        const h = canvas.clientHeight * ratio;
+        if (canvas.width !== w || canvas.height !== h) {
+            const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+            canvas.width = w;
+            canvas.height = h;
+            ctx.putImageData(imgData,0,0);
+        }
+    }
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        if (e.touches && e.touches.length) {
+            return { x: (e.touches[0].clientX - rect.left) * (canvas.width / rect.width), y: (e.touches[0].clientY - rect.top) * (canvas.height / rect.height) };
+        }
+        return { x: (e.clientX - rect.left) * (canvas.width / rect.width), y: (e.clientY - rect.top) * (canvas.height / rect.height) };
+    }
+
+    canvas.addEventListener('pointerdown', (e) => { drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; });
+    canvas.addEventListener('pointerup', () => drawing = false);
+    canvas.addEventListener('pointercancel', () => drawing = false);
+    canvas.addEventListener('pointermove', (e) => {
+        if (!drawing) return;
+        const p = getPos(e);
+        ctx.strokeStyle = document.getElementById('color').value;
+        ctx.lineWidth = document.getElementById('size').value * (canvas.width / canvas.clientWidth);
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        lastX = p.x; lastY = p.y;
+    });
+
+    document.getElementById('clear').addEventListener('click', () => {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+    });
+
+    document.getElementById('save').addEventListener('click', () => {
+        const description = document.getElementById('description').value || 'Peinture digitale';
+        const dataUrl = canvas.toDataURL('image/png');
+        fetch('{{ path('challenges_peindre_save', {'id': defi.id}) }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'imageData=' + encodeURIComponent(dataUrl) + '&description=' + encodeURIComponent(description)
+        }).then(r => {
+            if (r.redirected) {
+                window.location = r.url;
+            } else {
+                return r.text().then(t => alert('Réponse: ' + t));
+            }
+        }).catch(e => alert('Erreur lors de l\'envoi: ' + e.message));
+    });
+</script>
+{% endblock %}
+{% endblock %}
