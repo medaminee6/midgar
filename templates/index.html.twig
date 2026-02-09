@@ -7,33 +7,64 @@
     <link rel="stylesheet" href="/css/midgar.css">
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
-                <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
-                <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
-                <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
-                <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
-                <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
-            </svg>
-            Midgar
-        </div>
-        <nav>
-            <ul>
-                <li><a href="/">Accueil</a></li>
-                <li><a href="/discover">Découvrir</a></li>
-                <li><a href="/universes">Univers</a></li>
-                <li><a href="/oeuvre">Œuvre</a></li>
-                <li><a href="/shop">Boutique</a></li>
-                <li><a href="/challenges">Défis</a></li>
-            </ul>
-        </nav>
-        <div class="auth-buttons">
-            <a href="/login" class="btn btn-secondary btn-sm">Connexion</a>
-            <a href="/register" class="btn btn-primary btn-sm">S'inscrire</a>
-        </div>
-    </header>
+<header style="display:flex; justify-content:space-between; align-items:center; padding:1rem 2rem; background:#121818; border-bottom:1px solid #2A3139;">
+    <!-- Logo -->
+    <div class="logo" style="display:flex; align-items:center; gap:10px; color:#18E3A4; font-weight:700; font-size:1.5rem;">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:40px; height:40px;">
+            <!-- SVG logo -->
+        </svg>
+        Midgar
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <ul style="display:flex; list-style:none; gap:1.5rem; margin:0; padding:0;">
+            <li><a href="{{ path('home') }}" style="color:#E6FFF6; text-decoration:none;">Accueil</a></li>
+            {#<li><a href="{{ path('discover') }}" style="color:#E6FFF6; text-decoration:none;">Découvrir</a></li>#}
+            {#<li><a href="{{ path('universes') }}" style="color:#E6FFF6; text-decoration:none;">Univers</a></li>#}
+            <li>
+                {% if app.user %}
+                    <a href="{{ path('oeuvre_index') }}" style="color:#E6FFF6; text-decoration:none;">Œuvre</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" style="color:#E6FFF6; text-decoration:none;">Œuvre</a>
+                {% endif %}
+            </li>
+            <li>
+                {% if app.user %}
+                    <a href="{{ path('artefact_index') }}" style="color:#E6FFF6; text-decoration:none;">Artefact</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" style="color:#E6FFF6; text-decoration:none;">Artefact</a>
+                {% endif %}
+            </li>
+            {#<li><a href="{{ path('shop') }}" style="color:#E6FFF6; text-decoration:none;">Boutique</a></li>#}
+           {# <li><a href="{{ path('challenges_index') }}" style="color:#E6FFF6; text-decoration:none;">Défis</a></li>#}
+        </ul>
+    </nav>
+
+    <!-- Auth Buttons + Avatar -->
+    <div class="auth-buttons" style="display:flex; align-items:center; gap:10px;">
+        {% if app.user %}
+            <!-- Avatar + Username -->
+            <a href="{{ path('profile') }}" title="Mon profil" style="display:flex; align-items:center; gap:5px; text-decoration:none;">
+                <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; border:2px solid #18E3A4;">
+                    {% if app.user.avatar %}
+                        <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}" style="width:100%; height:100%; object-fit:cover;">
+                    {% else %}
+                        <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}" style="width:100%; height:100%; object-fit:cover;">
+                    {% endif %}
+                </div>
+                <span style="color:#E6FFF6; font-weight:500;">{{ app.user.username }}</span>
+            </a>
+            <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm" style="color:#0B0F0E; background:#18E3A4; padding:6px 12px; border-radius:4px; text-decoration:none;">Déconnexion</a>
+        {% else %}
+            <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm" style="color:#0B0F0E; background:#B0B9B6; padding:6px 12px; border-radius:4px; text-decoration:none;">Connexion</a>
+            <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm" style="color:#0B0F0E; background:#18E3A4; padding:6px 12px; border-radius:4px; text-decoration:none;">S'inscrire</a>
+        {% endif %}
+    </div>
+</header>
+
+
+
 
     <main>
         <!-- HERO SECTION -->
@@ -248,7 +279,8 @@
             <div class="container text-center">
                 <h2>Prêt à créer votre léggende?</h2>
                 <p style="font-size: 1.1rem; margin: 1.5rem 0; color: #B0B9B6;">Rejoignez des milliers de créateurs qui façonnent des univers extraordinaires</p>
-                <a href="/register" class="btn btn-primary">Commencer Gratuitement</a>
+                <a href="{{ path('app_register') }}" class="btn btn-primary">Commencer Gratuitement</a>
+
             </div>
         </section>
     </main>

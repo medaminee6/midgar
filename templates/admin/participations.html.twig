@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participations - Admin Défis</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --sidebar-bg: linear-gradient(135deg, #1A1F1E 0%, #0F1312 100%);
+            --accent: #18E3A4;
+            --muted: #B0B9B6;
+            --danger: #BD3B44;
+            --panel-bg: #0B0F0E;
+            --border: #2A3139;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #080A0A; color: #E6FFF6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .admin-layout { display: flex; min-height: 100vh; }
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            border-right: 2px solid var(--border);
+            padding: 1.5rem 0;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .admin-sidebar .logo { padding: 1.5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border); color: var(--accent); font-weight: 700; font-size: 1.3rem; }
+        .admin-sidebar nav ul { list-style: none; }
+        .admin-sidebar nav li { margin: 0.5rem 0; }
+        .admin-sidebar nav a {
+            display: flex; align-items: center; gap: 0.8rem;
+            padding: 0.8rem 1.5rem;
+            color: var(--muted);
+            text-decoration: none;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .admin-sidebar nav a:hover { background: rgba(24, 227, 164, 0.1); color: var(--accent); border-left-color: var(--accent); }
+        .admin-sidebar nav a.active { background: rgba(24, 227, 164, 0.15); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+        .admin-content { margin-left: var(--sidebar-width); padding: 2rem; min-height: 100vh; flex: 1; }
+        .admin-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .admin-header h1 { margin: 0; color: var(--accent); font-size: 2rem; display: flex; align-items: center; gap: 1rem; }
+        .alert { padding: 1rem 1.5rem; margin-bottom: 1.5rem; border-radius: 6px; border-left: 4px solid var(--accent); background: rgba(24, 227, 164, 0.1); color: var(--accent); }
+        .table-wrapper {
+            background: linear-gradient(135deg, #1A1F1E 0%, #252A29 100%);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: linear-gradient(135deg, var(--panel-bg) 0%, #151819 100%); padding: 1rem 1.5rem; text-align: left; color: var(--accent); font-weight: 700; border-bottom: 2px solid var(--border); font-size: 0.9rem; }
+        td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); color: #E6FFF6; vertical-align: middle; }
+        tr:hover { background: rgba(24, 227, 164, 0.05); }
+        .badge { display: inline-block; padding: 0.35rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .badge-en_attente { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .badge-valide { background: rgba(24, 227, 164, 0.2); color: var(--accent); }
+        .action-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .btn-edit, .btn-delete {
+            padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;
+            text-decoration: none; font-weight: 600; font-size: 0.85rem;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all 0.3s ease;
+        }
+        .btn-edit { background: rgba(24, 227, 164, 0.2); color: var(--accent); border: 1px solid var(--accent); }
+        .btn-edit:hover { background: var(--accent); color: var(--panel-bg); }
+        .btn-delete { background: rgba(189, 59, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-delete:hover { background: var(--danger); color: white; }
+        .btn-back { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; background: transparent; color: var(--muted); border: 2px solid var(--border); border-radius: 4px; text-decoration: none; font-weight: 600; margin-bottom: 1rem; transition: all 0.3s ease; }
+        .btn-back:hover { color: var(--accent); border-color: var(--accent); }
+        .empty-state { text-align: center; padding: 3rem 2rem; color: var(--muted); }
+        .desc-cell { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .delete-form { display: inline; }
+        @media (max-width: 768px) { .admin-sidebar { width: 0; overflow: hidden; } .admin-content { margin-left: 0; } }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="logo">⚙️ Admin Panel</div>
+        <nav>
+            <ul>
+                <li><a href="/admin/dashboard">📊 Tableau de bord</a></li>
+                <li><a href="/admin/users">👥 Utilisateurs</a></li>
+                <li><a href="/admin/quiz-questions">❓ Quiz</a></li>
+                <li><a href="/admin/produits">🛍️ Shop</a></li>
+                <li><a href="/admin/challenges">⚔️ Défis</a></li>
+                <li><a href="{{ path('admin_participations') }}" class="active">📋 Participations</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="admin-content">
+        <a href="{{ path('admin_challenges') }}" class="btn-back">← Retour aux défis</a>
+
+        <div class="admin-header">
+            <h1>📋 Toutes les participations</h1>
+            <div>{{ participations|length }} participation{{ participations|length != 1 ? 's' : '' }}</div>
+        </div>
+
+        <!-- FILTER BY USER ID -->
+        <div style="background: rgba(24, 227, 164, 0.1); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: flex-end;">
+            <form method="GET" action="{{ path('admin_participations') }}" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; flex: 1;">
+                <div style="flex: 0 0 auto;">
+                    <label for="userId" style="display: block; color: var(--muted); margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem;">Filtrer par User ID</label>
+                    <input type="number" id="userId" name="userId" value="{{ filteredUserId ?? '' }}" placeholder="ID utilisateur..." style="padding: 0.6rem 1rem; background: linear-gradient(135deg, #0F1312 0%, #1A1F1E 100%); border: 1px solid var(--border); border-radius: 4px; color: #E6FFF6; width: 200px;">
+                </div>
+                <button type="submit" class="btn-edit" style="padding: 0.6rem 1.2rem;">🔍 Filtrer</button>
+                <a href="{{ path('admin_participations') }}" style="padding: 0.6rem 1.2rem; color: var(--muted); text-decoration: none; border: 1px solid var(--border); border-radius: 4px; display: inline-flex; align-items: center; transition: all 0.3s ease;">↺ Réinitialiser</a>
+            </form>
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+
+        <div class="table-wrapper">
+            {% if participations|length > 0 %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Image</th>
+                            <th>Défi</th>
+                            <th>Description</th>
+                            <th>User ID</th>
+                            <th>Artwork ID</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in participations %}
+                            <tr>
+                                <td>{{ p.id }}</td>
+                                <td>
+                                    {% if p.imageFileName %}
+                                        <img src="{{ vich_uploader_asset(p, 'imageFile') }}" alt="Participation" style="max-width: 60px; max-height: 50px; object-fit: cover; border-radius: 4px;">
+                                    {% else %}
+                                        <span class="muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ p.defi ? p.defi.titre : '—' }}</td>
+                                <td class="desc-cell" title="{{ p.description }}">{{ p.description|slice(0, 50) }}{{ p.description|length > 50 ? '…' : '' }}</td>
+                                <td>{{ p.userId }}</td>
+                                <td>{{ p.artworkId ?? '—' }}</td>
+                                <td>
+                                    <span class="badge badge-{{ p.statut.value|lower }}">{{ p.statut.value }}</span>
+                                </td>
+                                <td>{{ p.dateSoumission ? p.dateSoumission|date('d/m/Y H:i') : '—' }}</td>
+                                <td class="action-buttons">
+                                    <a href="{{ path('admin_participation_edit_statut', { id: p.id }) }}" class="btn-edit">✏️ Modifier statut</a>
+                                    <form method="post" action="{{ path('admin_participation_delete', { id: p.id }) }}" class="delete-form" onsubmit="return confirm('Supprimer cette participation ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('admin_delete_participation' ~ p.id) }}">
+                                        <button type="submit" class="btn-delete">🗑️ Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <p>Aucune participation pour le moment.</p>
+                    <p><a href="{{ path('admin_challenges') }}" style="color: var(--accent);">Retour aux défis</a></p>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+</body>
+</html>

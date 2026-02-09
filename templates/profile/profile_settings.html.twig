@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paramètres - Midgar{% endblock %}
+
+{% block body %}
+<h1>Changer votre mot de passe</h1>
+
+{{ form_start(form) }}
+    {{ form_row(form.plainPassword) }}
+    <button class="btn btn-primary">Modifier le mot de passe</button>
+{{ form_end(form) }}
+
+<form action="{{ path('profile_delete') }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer votre compte ?');">
+    <button class="btn btn-danger" type="submit">Supprimer mon compte</button>
+</form>
+
+<p>
+    <a href="{{ path('profile') }}">Retour au profil</a>
+</p>
+{% endblock %}

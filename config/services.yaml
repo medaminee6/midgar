@@ -4,6 +4,10 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+     avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+     uploads_directory: '%kernel.project_dir%/public/uploads'
+
+
 
 services:
     # default configuration for services in *this* file
@@ -20,5 +24,15 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # --- Added services ---
+    # Validator for password strength (implement class at src/Validator/PasswordStrengthValidator.php)
+    App\Validator\PasswordStrengthValidator:
+        tags: ['validator.constraint_validator']
+
+    # Voters to enforce that only creators can edit/delete their Artefact/Oeuvre
+    # Implement classes at src/Security/ArtefactVoter.php and src/Security/OeuvreVoter.php
+    App\Security\ArtefactVoter:
+        tags: ['security.voter']
+
+    App\Security\OeuvreVoter:
+        tags: ['security.voter']
