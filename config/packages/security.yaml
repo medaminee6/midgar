@@ -21,7 +21,6 @@ security:
 
             custom_authenticators:
                 - App\Security\LoginFormAuthenticator
-                - App\Security\GoogleAuthenticator
 
             logout:
                 path: app_logout

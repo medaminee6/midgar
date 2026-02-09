@@ -64,65 +64,86 @@
             </div>
 
             <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th>Email</th>
-                            <th>Username</th>
-                            <th>Rôle</th>
-                            <th>Statut</th>
-                            <th>Créé le</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                        <tr>
-                            <td>#{{ user.id }}</td>
-                            <td>{{ user.lastName|default('') }}</td>
-                            <td>{{ user.firstName|default('') }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.username }}</td>
-                            <td>
-                                {% if user.isAdmin() %}
-                                    <span class="badge badge-active">Admin</span>
-                                {% else %}
-                                    <span class="badge badge-inactive">User</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if user.isBlocked %}
-                                    <span class="badge badge-inactive">Bloqué</span>
-                                {% else %}
-                                    <span class="badge badge-active">Actif</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ user.createdAt|date('Y-m-d') }}</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <form method="post" action="{{ path('admin_user_toggle_role', {'id': user.id}) }}">
-                                        <button class="btn-edit" type="submit">Changer rôle</button>
-                                    </form>
-                                    <form method="post" action="{{ path('admin_user_block', {'id': user.id}) }}">
-                                        <button class="btn-edit" type="submit">{{ user.isBlocked ? 'Débloquer' : 'Bloquer' }}</button>
-                                    </form>
-                                    <form method="post" action="{{ path('admin_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Supprimer cet utilisateur ?');">
-                                        <button class="btn-delete" type="submit">Supprimer</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="9" style="text-align:center;">Aucun utilisateur trouvé.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    <a href="{{ path('admin_users', app.request.query.all|merge({'sort':'id','direction': sort == 'id' and direction == 'ASC' ? 'DESC' : 'ASC'})) }}">
+                        ID {% if sort=='id' %}{{ direction == 'ASC' ? '▲' : '▼' }}{% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ path('admin_users', app.request.query.all|merge({'sort':'nom','direction': sort == 'nom' and direction == 'ASC' ? 'DESC' : 'ASC'})) }}">
+                        Nom {% if sort=='nom' %}{{ direction == 'ASC' ? '▲' : '▼' }}{% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ path('admin_users', app.request.query.all|merge({'sort':'prenom','direction': sort == 'prenom' and direction == 'ASC' ? 'DESC' : 'ASC'})) }}">
+                        Prénom {% if sort=='prenom' %}{{ direction == 'ASC' ? '▲' : '▼' }}{% endif %}
+                    </a>
+                </th>
+                <th>Email</th>
+                <th>
+                    <a href="{{ path('admin_users', app.request.query.all|merge({'sort':'username','direction': sort == 'username' and direction == 'ASC' ? 'DESC' : 'ASC'})) }}">
+                        Username {% if sort=='username' %}{{ direction == 'ASC' ? '▲' : '▼' }}{% endif %}
+                    </a>
+                </th>
+                <th>Rôle</th>
+                <th>Statut</th>
+                <th>
+                    <a href="{{ path('admin_users', app.request.query.all|merge({'sort':'createdAt','direction': sort == 'createdAt' and direction == 'ASC' ? 'DESC' : 'ASC'})) }}">
+                        Créé le {% if sort=='createdAt' %}{{ direction == 'ASC' ? '▲' : '▼' }}{% endif %}
+                    </a>
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>#{{ user.id }}</td>
+                <td>{{ user.nom|default('') }}</td>
+                <td>{{ user.prenom|default('') }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.username }}</td>
+                <td>
+                    {% if user.isAdmin() %}
+                        <span class="badge badge-active">Admin</span>
+                    {% else %}
+                        <span class="badge badge-inactive">User</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.isBlocked %}
+                        <span class="badge badge-inactive">Bloqué</span>
+                    {% else %}
+                        <span class="badge badge-active">Actif</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.createdAt|date('Y-m-d') }}</td>
+                <td>
+                    <div class="action-buttons">
+                        <form method="post" action="{{ path('admin_user_toggle_role', {'id': user.id}) }}">
+                            <button class="btn-edit" type="submit">Changer rôle</button>
+                        </form>
+                        <form method="post" action="{{ path('admin_user_block', {'id': user.id}) }}">
+                            <button class="btn-edit" type="submit">{{ user.isBlocked ? 'Débloquer' : 'Bloquer' }}</button>
+                        </form>
+                        <form method="post" action="{{ path('admin_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                            <button class="btn-delete" type="submit">Supprimer</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9" style="text-align:center;">Aucun utilisateur trouvé.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
         </div>
     </div>
 </body>

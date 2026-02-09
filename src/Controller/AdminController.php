@@ -22,33 +22,37 @@ class AdminController extends AbstractController
         $start = $request->query->get('start_date', null);
         $end = $request->query->get('end_date', null);
 
+        $sort = $request->query->get('sort', 'createdAt'); // valeur par défaut
+        $direction = strtoupper($request->query->get('direction', 'DESC')) === 'ASC' ? 'ASC' : 'DESC';
+
+        $allowedSorts = ['username','lastName','firstName','createdAt'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'createdAt';
+        }
+
         $repo = $em->getRepository(User::class);
         $qb = $repo->createQueryBuilder('u');
 
         if ($q) {
             $qb->andWhere('u.username LIKE :q OR u.email LIKE :q')
-                ->setParameter('q', '%' . $q . '%');
+               ->setParameter('q', '%' . $q . '%');
         }
 
-        // date filters (expects YYYY-MM-DD)
         if ($start) {
             try {
                 $startDt = new \DateTimeImmutable($start);
-                $qb->andWhere('u.createdAt >= :start')->setParameter('start', $startDt->setTime(0, 0, 0));
-            } catch (\Exception $e) {
-                // ignore invalid date
-            }
+                $qb->andWhere('u.createdAt >= :start')->setParameter('start', $startDt->setTime(0,0,0));
+            } catch (\Exception $e) {}
         }
+
         if ($end) {
             try {
                 $endDt = new \DateTimeImmutable($end);
-                $qb->andWhere('u.createdAt <= :end')->setParameter('end', $endDt->setTime(23, 59, 59));
-            } catch (\Exception $e) {
-                // ignore invalid date
-            }
+                $qb->andWhere('u.createdAt <= :end')->setParameter('end', $endDt->setTime(23,59,59));
+            } catch (\Exception $e) {}
         }
 
-        $qb->orderBy('u.createdAt', 'DESC');
+        $qb->orderBy('u.' . $sort, $direction);
 
         $users = $qb->getQuery()->getResult();
 
@@ -57,74 +61,8 @@ class AdminController extends AbstractController
             'search' => $q,
             'start_date' => $start,
             'end_date' => $end,
-        ]);
-    }
-
-    #[Route('/artefacts', name: 'admin_artefacts')]
-    public function artefacts(Request $request, EntityManagerInterface $em): Response
-    {
-        $start = $request->query->get('start_date', null);
-        $end = $request->query->get('end_date', null);
-
-        $repo = $em->getRepository(Artefact::class);
-        $qb = $repo->createQueryBuilder('a');
-
-        if ($start) {
-            try {
-                $startDt = new \DateTimeImmutable($start);
-                $qb->andWhere('a.createdAt >= :start')->setParameter('start', $startDt->setTime(0, 0, 0));
-            } catch (\Exception $e) {
-            }
-        }
-        if ($end) {
-            try {
-                $endDt = new \DateTimeImmutable($end);
-                $qb->andWhere('a.createdAt <= :end')->setParameter('end', $endDt->setTime(23, 59, 59));
-            } catch (\Exception $e) {
-            }
-        }
-
-        $qb->orderBy('a.createdAt', 'DESC');
-        $artefacts = $qb->getQuery()->getResult();
-
-        return $this->render('admin/artefacts.html.twig', [
-            'artefacts' => $artefacts,
-            'start_date' => $start,
-            'end_date' => $end,
-        ]);
-    }
-
-    #[Route('/oeuvres', name: 'admin_oeuvres')]
-    public function oeuvres(Request $request, EntityManagerInterface $em): Response
-    {
-        $start = $request->query->get('start_date', null);
-        $end = $request->query->get('end_date', null);
-
-        $repo = $em->getRepository(Oeuvre::class);
-        $qb = $repo->createQueryBuilder('o');
-
-        if ($start) {
-            try {
-                $startDt = new \DateTimeImmutable($start);
-                $qb->andWhere('o.createdAt >= :start')->setParameter('start', $startDt->setTime(0, 0, 0));
-            } catch (\Exception $e) {
-            }
-        }
-        if ($end) {
-            try {
-                $endDt = new \DateTimeImmutable($end);
-                $qb->andWhere('o.createdAt <= :end')->setParameter('end', $endDt->setTime(23, 59, 59));
-            } catch (\Exception $e) {
-            }
-        }
-
-        $qb->orderBy('o.createdAt', 'DESC');
-        $oeuvres = $qb->getQuery()->getResult();
-
-        return $this->render('admin/oeuvres.html.twig', [
-            'oeuvres' => $oeuvres,
-            'start_date' => $start,
-            'end_date' => $end,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 
