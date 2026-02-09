@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Participer - {{ defi.titre }} | Midgar{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{{ path('challenges_index') }}" class="btn btn-secondary mb-4" style="display: inline-flex; align-items: center; gap: 0.5rem;">← Retour aux défis</a>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="card mb-4">
+        <div class="card-body">
+            {% if defi.imageCover %}
+                <div style="margin-bottom: 1rem; border-radius: 6px; overflow: hidden;">
+                    <img src="{{ vich_uploader_asset(defi, 'imageCoverFile') }}" alt="{{ defi.titre }}" style="width: 100%; max-height: 200px; object-fit: cover;">
+                </div>
+            {% endif %}
+            <h2 style="color: #18E3A4;">{{ defi.titre }}</h2>
+            <span class="badge bg-success mb-2">{{ defi.theme }}</span>
+            <p>{{ defi.description }}</p>
+            <p style="font-size: 0.9rem;">📅 Du {{ defi.dateDebut|date('d/m/Y') }} au {{ defi.dateFin|date('d/m/Y') }}</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h3 style="color: #18E3A4; margin-bottom: 1.5rem;">Participer à ce défi</h3>
+            <p class="text-muted" style="margin-bottom: 1rem; font-size: 0.9rem;">Indiquez l'ID d'une œuvre déjà en ligne ou <a href="{{ path('challenges_peindre', {'id': defi.id}) }}">peignez une œuvre</a> dans l'éditeur.</p>
+            {{ form_start(form, { 'attr': { 'class': 'participation-form', 'enctype': 'multipart/form-data' } }) }}
+                <div class="mb-3">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description, { 'attr': { 'class': 'form-control', 'rows': 5 } }) }}
+                    {{ form_errors(form.description) }}
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <p class="text-muted" style="font-size: 0.95rem;">Vous avez deux options :</p>
+                    <ul class="text-muted" style="margin-left: 1rem; margin-bottom: 0.5rem;">
+                        <li>Utiliser une œuvre déjà en ligne en indiquant son ID ci-dessous.</li>
+                        <li>Ou <strong>peindre une nouvelle œuvre</strong> dans l'éditeur en ligne.</li>
+                    </ul>
+                    <a href="{{ path('challenges_peindre', {'id': defi.id}) }}" class="btn btn-secondary" style="margin-right: 1rem;">Peindre une œuvre</a>
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.artworkId) }}
+                    {{ form_widget(form.artworkId, { 'attr': { 'class': 'form-control', 'min': 1, 'placeholder': 'Ex: 1' } }) }}
+                    {{ form_errors(form.artworkId) }}
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Envoyer ma participation</button>
+                    <a href="{{ path('challenges_index') }}" class="btn btn-secondary">Annuler</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

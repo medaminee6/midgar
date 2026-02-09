@@ -1,176 +1,74 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Défis Artistiques - Midgar</title>
-    <link rel="stylesheet" href="/css/midgar.css">
-</head>
-<body>
-    <header>
-        <div class="logo">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
-                <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
-                <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
-                <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
-                <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
-                <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
-            </svg>
-            Midgar
-        </div>
-        <nav>
-            <ul>
-                <li><a href="/">Accueil</a></li>
-                <li><a href="/discover">Découvrir</a></li>
-                <li><a href="/universes">Univers</a></li>
-                <li><a href="/oeuvre">Œuvre</a></li>
-                <li><a href="/shop">Boutique</a></li>
-                <li><a href="/challenges">Défis</a></li>
-            </ul>
-        </nav>
-        <div class="auth-buttons">
-            <a href="/login" class="btn btn-secondary btn-sm">Connexion</a>
-            <a href="/register" class="btn btn-primary btn-sm">S'inscrire</a>
-        </div>
-    </header>
+{% extends 'base.html.twig' %}
 
-    <main>
-        <section class="section">
-            <div class="container">
-                <h1 class="mb-4">Défis Artistiques</h1>
+{% block title %}Défis Artistiques - Midgar{% endblock %}
 
+{% block content %}
                 <!-- ACTIVE CHALLENGES -->
-                <h2 style="color: #18E3A4; margin-bottom: 2rem;">Défis Actifs</h2>
-                <div class="grid grid-2 mb-4">
-                    <div class="card">
-                        <div class="card-image" style="font-size: 4rem;">⚔️</div>
-                        <div class="card-body">
-                            <h3 class="card-title">Héros Légendaire</h3>
-                            <p class="card-text">Créez un héros qui marquera l'histoire. Du design au backstory, tout est permis! Fin: 15 Février 2026</p>
-                            <div class="card-tags mb-2">
-                                <span class="tag">Personnage</span>
-                                <span class="tag">Création</span>
-                                <span class="tag">Actif</span>
+                <h2 style="color: #18E3A4; margin-bottom: 2rem;">🔥 Défis Actifs</h2>
+                {% set active_defis = defis|filter(defi => defi.statut.value == 'OUVERT') %}
+                {% if active_defis|length > 0 %}
+                    <div class="grid grid-2 mb-4">
+                        {% for defi in active_defis %}
+                            <div class="card">
+                                <div class="card-image" style="font-size: 3rem; height: 140px; display: flex; align-items: center; justify-content: center;">
+                                    {% if defi.imageCover %}
+                                        <img src="{{ vich_uploader_asset(defi, 'imageCoverFile') }}" alt="{{ defi.titre }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% else %}
+                                        🎨
+                                    {% endif %}
+                                    </div>
+                                <div class="card-body">
+                                    <h3 class="card-title">{{ defi.titre }}</h3>
+                                    <p class="card-text">{{ defi.description[:150] }}{{ defi.description|length > 150 ? '...' : '' }}</p>
+                                    <div class="card-tags mb-2">
+                                        <span class="tag">{{ defi.theme }}</span>
+                                        <span class="tag">Actif</span>
+                                    </div>
+                                    <div style="margin: 1rem 0; color: #18E3A4; font-weight: 600;">📅 {{ defi.dateDebut|date('d/m/Y') }} → {{ defi.dateFin|date('d/m/Y') }}</div>
+                                    <a href="{{ path('challenges_participate', { id: defi.id }) }}" class="btn btn-primary btn-sm" style="width: 100%;">Participer</a>
+                                </div>
                             </div>
-                            <div style="margin: 1rem 0; color: #18E3A4; font-weight: 600;">📊 42 participations</div>
-                            <a href="#" class="btn btn-primary btn-sm" style="width: 100%;">Participer</a>
-                        </div>
+                        {% endfor %}
                     </div>
-
-                    <div class="card">
-                        <div class="card-image" style="font-size: 4rem;">🌍</div>
-                        <div class="card-body">
-                            <h3 class="card-title">Monde Souterrain</h3>
-                            <p class="card-text">Imaginez un univers sous terre avec ses propres règles, créatures et magie. Fin: 22 Février 2026</p>
-                            <div class="card-tags mb-2">
-                                <span class="tag">Univers</span>
-                                <span class="tag">Worldbuilding</span>
-                                <span class="tag">Actif</span>
-                            </div>
-                            <div style="margin: 1rem 0; color: #18E3A4; font-weight: 600;">📊 28 participations</div>
-                            <a href="#" class="btn btn-primary btn-sm" style="width: 100%;">Participer</a>
-                        </div>
+                {% else %}
+                    <div style="text-align: center; padding: 3rem 2rem; color: #B0B9B6; font-style: italic;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">🌟</div>
+                        <h3>Aucun défi actif pour le moment</h3>
+                        <p>Revenez plus tard pour découvrir de nouveaux défis passionnants!</p>
                     </div>
-
-                    <div class="card">
-                        <div class="card-image" style="font-size: 4rem;">📖</div>
-                        <div class="card-body">
-                            <h3 class="card-title">Contes de Minuit</h3>
-                            <p class="card-text">Écrivez une histoire courte dans le thème nocturne et mystérieux. Fin: 8 Février 2026</p>
-                            <div class="card-tags mb-2">
-                                <span class="tag">Écriture</span>
-                                <span class="tag">Fiction</span>
-                                <span class="tag">Actif</span>
-                            </div>
-                            <div style="margin: 1rem 0; color: #18E3A4; font-weight: 600;">📊 67 participations</div>
-                            <a href="#" class="btn btn-primary btn-sm" style="width: 100%;">Participer</a>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-image" style="font-size: 4rem;">🎨</div>
-                        <div class="card-body">
-                            <h3 class="card-title">Art des Créatures</h3>
-                            <p class="card-text">Créez et illustrez votre créature fantastique unique. Fin: 28 Février 2026</p>
-                            <div class="card-tags mb-2">
-                                <span class="tag">Illustration</span>
-                                <span class="tag">Design</span>
-                                <span class="tag">Actif</span>
-                            </div>
-                            <div style="margin: 1rem 0; color: #18E3A4; font-weight: 600;">📊 35 participations</div>
-                            <a href="#" class="btn btn-primary btn-sm" style="width: 100%;">Participer</a>
-                        </div>
-                    </div>
-                </div>
+                {% endif %}
 
                 <!-- PAST CHALLENGES -->
-                <h2 style="color: #18E3A4; margin-bottom: 2rem; margin-top: 3rem;">Défis Passés</h2>
-                <div class="grid grid-2">
-                    <div class="card" style="opacity: 0.8;">
-                        <div class="card-image" style="font-size: 4rem;">✨</div>
-                        <div class="card-body">
-                            <h3 class="card-title">Cristaux Magiques</h3>
-                            <p class="card-text">Créer des objets magiques avec des propriétés uniques. Terminé le 1 Février</p>
-                            <div class="card-tags mb-2">
-                                <span class="tag">Objet</span>
-                                <span class="tag">Terminé</span>
+                <h2 style="color: #18E3A4; margin-bottom: 2rem; margin-top: 3rem;">✨ Défis Passés</h2>
+                {% set closed_defis = defis|filter(defi => defi.statut.value == 'FERME') %}
+                {% if closed_defis|length > 0 %}
+                    <div class="grid grid-2">
+                        {% for defi in closed_defis %}
+                            <div class="card" style="opacity: 0.8;">
+                                <div class="card-image" style="font-size: 3rem; height: 140px; display: flex; align-items: center; justify-content: center;">
+                                        {% if defi.imageCover %}
+                                            <img src="{{ vich_uploader_asset(defi, 'imageCoverFile') }}" alt="{{ defi.titre }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        {% else %}
+                                            🏆
+                                        {% endif %}
+                                    </div>
+                                <div class="card-body">
+                                    <h3 class="card-title">{{ defi.titre }}</h3>
+                                    <p class="card-text">{{ defi.description[:150] }}{{ defi.description|length > 150 ? '...' : '' }}</p>
+                                    <div class="card-tags mb-2">
+                                        <span class="tag">{{ defi.theme }}</span>
+                                        <span class="tag">Terminé</span>
+                                    </div>
+                                    <div style="margin: 1rem 0; color: #B0B9B6; font-weight: 600;">👁️ Voir les résultats</div>
+                                </div>
                             </div>
-                            <div style="margin: 1rem 0; color: #B0B9B6; font-weight: 600;">👁️ Voir les résultats</div>
-                        </div>
+                        {% endfor %}
                     </div>
-
-                    <div class="card" style="opacity: 0.8;">
-                        <div class="card-image" style="font-size: 4rem;">🏰</div>
-                        <div class="card-body">
-                            <h3 class="card-title">Architecture Fantastique</h3>
-                            <p class="card-text">Concevoir des bâtiments et structures magiques. Terminé le 25 Janvier</p>
-                            <div class="card-tags mb-2">
-                                <span class="tag">Architecture</span>
-                                <span class="tag">Terminé</span>
-                            </div>
-                            <div style="margin: 1rem 0; color: #B0B9B6; font-weight: 600;">👁️ Voir les résultats</div>
-                        </div>
+                {% else %}
+                    <div style="text-align: center; padding: 3rem 2rem; color: #B0B9B6; font-style: italic;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">🎭</div>
+                        <h3>Aucun défi terminé</h3>
+                        <p>Les défis passés apparaîtront ici après leur conclusion.</p>
                     </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-section">
-                    <h4>À propos</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">À propos de Midgar</a></li>
-                        <li><a href="#">Notre mission</a></li>
-                        <li><a href="#">Équipe</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Ressources</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">Aide & Support</a></li>
-                        <li><a href="#">Documentation</a></li>
-                        <li><a href="#">Blog</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Légal</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">Conditions d'utilisation</a></li>
-                        <li><a href="#">Politique de confidentialité</a></li>
-                        <li><a href="#">Cookies</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="/assets/js/main.js"></script>
-</body>
-</html>
+                {% endif %}
+{% endblock %}

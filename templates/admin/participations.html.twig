@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des participations | Midgar Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{{ path('admin_challenges') }}" class="btn btn-secondary mb-4" style="display: inline-flex; align-items: center; gap: 0.5rem;">← Retour aux défis</a>
+    <h1 style="color: #18E3A4; margin-bottom: 1.5rem;">{% if defi %}Participations au défi : {{ defi.titre }}{% else %}Toutes les participations{% endif %}</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Utilisateur</th>
+                    <th>Description</th>
+                    <th>Image</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for participation in participations %}
+                    <tr>
+                        <td>{{ participation.id }}</td>
+                        <td>{{ participation.userId }}</td>
+                        <td>{{ participation.description|slice(0, 50) }}{{ participation.description|length > 50 ? '...' : '' }}</td>
+                        <td>
+                            {% if participation.imageFileName %}
+                                <img src="{{ vich_uploader_asset(participation, 'imageFile') }}" alt="Participation" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td><span class="badge {% if participation.statut.value == 'VALIDE' %}bg-success{% elseif participation.statut.value == 'REFUSE' %}bg-danger{% else %}bg-warning{% endif %}">{{ participation.statut.value }}</span></td>
+                        <td>{{ participation.dateSoumission ? participation.dateSoumission|date('d/m/Y H:i') : '—' }}</td>
+                        <td>
+                            <a href="{{ path('admin_participation_edit_statut', { id: participation.id }) }}" class="btn btn-sm btn-primary">Statut</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Aucune participation trouvée.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

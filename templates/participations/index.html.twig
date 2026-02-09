@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Participations | Midgar{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 style="color: #18E3A4; margin-bottom: 1.5rem;">Participations</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    {% if participations|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Image</th>
+                        <th>Défi</th>
+                        <th>Description</th>
+                        <th>Utilisateur</th>
+                        <th>Artwork</th>
+                        <th>Statut</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in participations %}
+                        <tr>
+                            <td>{{ p.id }}</td>
+                            <td>
+                                {% if p.imageFileName %}
+                                    <img src="{{ vich_uploader_asset(p, 'imageFile') }}" alt="Participation" style="max-width: 60px; max-height: 50px; object-fit: cover; border-radius: 4px;">
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ p.defi ? p.defi.titre : '—' }}</td>
+                            <td style="max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ p.description }}">{{ p.description|slice(0, 50) }}{{ p.description|length > 50 ? '…' : '' }}</td>
+                            <td>{{ p.userId }}</td>
+                            <td>{{ p.artworkId }}</td>
+                            <td>
+                                <span class="badge {% if p.statut.value == 'EN_ATTENTE' %}bg-warning{% else %}bg-success{% endif %}">{{ p.statut.value }}</span>
+                            </td>
+                            <td>{{ p.dateSoumission ? p.dateSoumission|date('d/m/Y') : '—' }}</td>
+                            <td>
+                                <a href="{{ path('participation_edit', { id: p.id }) }}" class="btn btn-sm btn-secondary">Modifier</a>
+                                <form method="post" action="{{ path('participation_delete', { id: p.id }) }}" style="display: inline;" onsubmit="return confirm('Supprimer cette participation ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ p.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-5 text-muted">
+            <p>Aucune participation pour le moment.</p>
+            <p><a href="{{ path('challenges_index') }}" style="color: #18E3A4;">Voir les défis</a> pour participer.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
