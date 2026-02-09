@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ personnage.name }} - Midgar</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        .hero-banner { 
+            width: 100%; 
+            height: 300px; 
+            background: linear-gradient(135deg, #18E3A4, #0DCF92); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 3rem; 
+            margin: 0 0 2rem 0; 
+            overflow: hidden;
+        }
+        .hero-banner img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .personnage-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .personnage-info { flex: 1; }
+        .personnage-info h1 { font-size: 2.5rem; margin: 0 0 0.5rem 0; text-transform: uppercase; }
+        .class-badges { display: flex; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .class-badge { padding: 6px 14px; background-color: #18E3A4; color: #0B0F0E; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .personnage-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+        .action-btn { padding: 10px 20px; border: 2px solid #18E3A4; background-color: transparent; color: #18E3A4; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s; text-decoration: none; }
+        .action-btn:hover, .action-btn.primary:hover { background-color: #0DCF92; border-color: #0DCF92; }
+        .action-btn.primary { background-color: #18E3A4; color: #0B0F0E; }
+        .action-btn.danger { border-color: #ff4d4d; color: #ff4d4d; }
+        .action-btn.danger:hover { background-color: #ff4d4d; color: white; }
+        .content-wrapper { display: grid; grid-template-columns: 1fr 300px; gap: 2rem; }
+        .main-content { background-color: #1A1F1E; border: 1px solid #2A3139; border-radius: 8px; padding: 2rem; }
+        .tabs { display: flex; gap: 0; border-bottom: 2px solid #2A3139; margin-bottom: 2rem; overflow-x: auto; }
+        .tab-btn { padding: 1rem 1.5rem; background: none; border: none; color: #B0B9B6; cursor: pointer; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.3s; white-space: nowrap; }
+        .tab-btn.active { color: #18E3A4; border-bottom-color: #18E3A4; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .content-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
+        .item-card { background-color: #0B0F0E; padding: 1rem; border-radius: 6px; border: 1px solid #2A3139; text-align: center; }
+        .item-emoji { font-size: 2rem; margin-bottom: 0.5rem; }
+        .item-emoji img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+        .item-name { font-weight: 600; color: #E6FFF6; margin-bottom: 0.25rem; }
+        .item-creator { font-size: 0.75rem; color: #B0B9B6; }
+        .creator-card { background-color: #0B0F0E; border: 1px solid #2A3139; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }
+        .creator-avatar { width: 60px; height: 60px; border-radius: 50%; background-color: #18E3A4; display: flex; align-items: center; justify-content: center; color: #0B0F0E; font-weight: 700; font-size: 1.5rem; margin-bottom: 1rem; }
+        .creator-name { font-weight: 600; margin-bottom: 0.25rem; }
+        .creator-username { font-size: 0.9rem; color: #B0B9B6; margin-bottom: 1rem; }
+        .follow-btn { width: 100%; padding: 0.75rem; background-color: #18E3A4; color: #0B0F0E; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .follow-btn:hover { background-color: #0DCF92; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 2rem 0; }
+        .stat { text-align: center; padding: 1rem; background-color: #1A1F1E; border-radius: 6px; border: 1px solid #2A3139; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: #18E3A4; }
+        .stat-label { font-size: 0.85rem; color: #B0B9B6; margin-top: 0.5rem; }
+        .flash-success { background-color: #18E3A4; color: #0B0F0E; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; font-weight: 600; }
+        .flash-error { background-color: #ff4d4d; color: white; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
+        @media (max-width: 768px) { .content-wrapper { grid-template-columns: 1fr; } .content-items { grid-template-columns: repeat(2, 1fr); } .stats { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+    <header style="background-color: #1A1F1E; border-bottom: 2px solid #2A3139; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #18E3A4;">◆ Midgar</div>
+        <nav style="display: flex; gap: 2rem;">
+            <a href="/" style="color: #B0B9B6; text-decoration: none; font-weight: 600; transition: all 0.3s;">Accueil</a>
+            <a href="/universes" style="color: #B0B9B6; text-decoration: none; font-weight: 600; transition: all 0.3s;">Univers</a>
+            <a href="/personnages" style="color: #18E3A4; text-decoration: none; font-weight: 600; transition: all 0.3s;">Personnages</a>
+        </nav>
+        <div>
+            <a href="/login" style="padding: 0.6rem 1.2rem; border: 1px solid #18E3A4; color: #18E3A4; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 0.85rem;">Se connecter</a>
+        </div>
+    </header>
+
+    {% for flash_message in app.flashes('success') %}
+        <div class="flash-success">{{ flash_message }}</div>
+    {% endfor %}
+    {% for flash_message in app.flashes('error') %}
+        <div class="flash-error">{{ flash_message }}</div>
+    {% endfor %}
+
+    <div class="hero-banner">
+        {% if personnage.getPortraitBase64() %}
+            <img src="{{ personnage.getPortraitBase64() }}" alt="{{ personnage.name }}">
+        {% else %}
+            👤
+        {% endif %}
+    </div>
+
+    <div class="container">
+        <div class="personnage-header">
+            <div class="personnage-info">
+                <h1>{{ personnage.name }}</h1>
+                <div class="class-badges">
+                    <span class="class-badge">{{ {'warrior':'Guerrier','mage':'Mage','rogue':'Escroc','cleric':'Clerc','ranger':'Rôdeur','other':'Autre'}[personnage.classRole] ?? personnage.classRole }}</span>
+                </div>
+                <p style="color: #B0B9B6;">Univers: <a href="{{ path('universe_show', {'id': personnage.universe.id}) }}" style="color: #18E3A4; text-decoration: none;">{{ personnage.universe.name }}</a></p>
+            </div>
+            <div class="personnage-actions">
+                <a href="{{ path('personnage_edit', {'id': personnage.id}) }}" class="action-btn">Modifier</a>
+                <form method="post" action="{{ path('personnage_delete', {'id': personnage.id}) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce personnage?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_personnage_' ~ personnage.id) }}">
+                    <button type="submit" class="action-btn danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value">{{ personnage.strength ?? '—' }}</div>
+                <div class="stat-label">Force</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">{{ personnage.agility ?? '—' }}</div>
+                <div class="stat-label">Agilité</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">{{ personnage.magic ?? '—' }}</div>
+                <div class="stat-label">Magie</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">{{ personnage.defense ?? '—' }}</div>
+                <div class="stat-label">Défense</div>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="main-content">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="apropos">À propos</button>
+                    <button class="tab-btn" data-tab="pouvoirs">Pouvoirs</button>
+                </div>
+
+                <div id="apropos" class="tab-content active">
+                    <h3>Histoire & Contexte</h3>
+                    <p>{{ personnage.historyContext }}</p>
+                </div>
+
+                <div id="pouvoirs" class="tab-content">
+                    <h3>Capacités & Pouvoirs</h3>
+                    {% if personnage.abilitiesPowers %}
+                        <p>{{ personnage.abilitiesPowers }}</p>
+                    {% else %}
+                        <p style="color: #B0B9B6;">Aucune capacité enregistrée pour ce personnage.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <div class="creator-card">
+                    <div class="creator-avatar">{{ personnage.name|first|upper }}</div>
+                    <div class="creator-name">Créateur</div>
+                    <div class="creator-username">Anonyme</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background-color: #1A1F1E; border-top: 2px solid #2A3139; padding: 2rem; margin-top: 4rem; text-align: center; color: #B0B9B6;">
+        <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll(".tab-btn").forEach(function(btn) {
+            btn.addEventListener("click", function() {
+                document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); });
+                document.querySelectorAll(".tab-content").forEach(function(c) { c.classList.remove("active"); });
+                this.classList.add("active");
+                const tab = this.dataset.tab;
+                const element = document.getElementById(tab);
+                if(element) element.classList.add("active");
+            });
+        });
+    </script>
+</body>
+</html>

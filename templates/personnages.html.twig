@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tous les Univers - Midgar</title>
+    <title>Tous les Personnages - Midgar</title>
     <link rel="stylesheet" href="/css/midgar.css">
     <style>
         .universes-container {
@@ -97,10 +97,6 @@
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
-            display: block;
-            text-align: center;
-            text-decoration: none;
-            margin-top: 1rem;
         }
 
         .filter-reset:hover {
@@ -169,13 +165,6 @@
             justify-content: center;
             font-size: 3rem;
             overflow: hidden;
-        }
-        
-        .card-banner img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
         }
 
         .card-content {
@@ -259,6 +248,21 @@
 
         .results-count { color: #B0B9B6; font-size: 0.9rem; }
 
+        .load-more { display: flex; justify-content: center; margin-top: 2rem; }
+
+        .load-more-btn {
+            padding: 12px 40px;
+            background-color: #18E3A4;
+            color: #0B0F0E;
+            border: none;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .load-more-btn:hover { background-color: #0DCF92; }
+
         .empty-state {
             text-align: center;
             padding: 3rem;
@@ -266,15 +270,6 @@
         }
 
         .empty-state p { font-size: 1.1rem; margin-bottom: 1rem; }
-
-        .flash-success {
-            background-color: #18E3A4;
-            color: #0B0F0E;
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
 
         @media (max-width: 1024px) {
             .universes-container { grid-template-columns: 1fr; }
@@ -319,90 +314,120 @@
     <main>
         <section class="section">
             <div class="container">
-                {% for flash_message in app.flashes('success') %}
-                    <div class="flash-success">{{ flash_message }}</div>
-                {% endfor %}
-
                 <div class="section-header">
                     <div>
-                        <h1 style="margin-bottom: 0.5rem;">Tous les Univers</h1>
-                        <p style="color: #B0B9B6; margin: 0;">Explorez les mondes créés par notre communauté</p>
+                        <h1 style="margin-bottom: 0.5rem;">Tous les Personnages</h1>
+                        <p style="color: #B0B9B6; margin: 0;">Parcourez les personnages créés dans les univers</p>
                     </div>
                     <div class="create-ctas">
-                        <a href="{{ path('universe_new') }}" class="create-cta">+ Créer un Univers</a>
-                    </div>
+                            <a href="{{ path('personnage_new') }}" class="create-cta">+ Créer un Personnage</a>
+                        </div>
                 </div>
 
                 <div class="universes-container">
                     <div class="filter-sidebar">
-                        <form method="get" action="{{ path('universe_index') }}">
+                        <form method="get" action="{{ path('personnage_index') }}" id="filterForm">
                             <div class="filter-group">
                                 <input type="text" name="search" class="search-box" placeholder="Chercher..." value="{{ app.request.query.get('search') }}">
                             </div>
 
                             <div class="filter-group">
+                                <h4>Classe / Rôle</h4>
+                                <div class="filter-option">
+                                    <input type="checkbox" id="role-guerrier" name="classRole[]" value="guerrier" class="role-filter" {% if selectedClassRoles and 'guerrier' in selectedClassRoles %}checked{% endif %}>
+                                    <label for="role-guerrier">Guerrier</label>
+                                </div>
+                                <div class="filter-option">
+                                    <input type="checkbox" id="role-mage" name="classRole[]" value="mage" class="role-filter" {% if selectedClassRoles and 'mage' in selectedClassRoles %}checked{% endif %}>
+                                    <label for="role-mage">Mage</label>
+                                </div>
+                                <div class="filter-option">
+                                    <input type="checkbox" id="role-escroc" name="classRole[]" value="escroc" class="role-filter" {% if selectedClassRoles and 'escroc' in selectedClassRoles %}checked{% endif %}>
+                                    <label for="role-escroc">Escroc</label>
+                                </div>
+                                <div class="filter-option">
+                                    <input type="checkbox" id="role-clerc" name="classRole[]" value="clerc" class="role-filter" {% if selectedClassRoles and 'clerc' in selectedClassRoles %}checked{% endif %}>
+                                    <label for="role-clerc">Clerc</label>
+                                </div>
+                                <div class="filter-option">
+                                    <input type="checkbox" id="role-rodeur" name="classRole[]" value="rodeur" class="role-filter" {% if selectedClassRoles and 'rodeur' in selectedClassRoles %}checked{% endif %}>
+                                    <label for="role-rodeur">Rôdeur</label>
+                                </div>
+                                <div class="filter-option">
+                                    <input type="checkbox" id="role-other" name="classRole[]" value="other" class="role-filter" {% if selectedClassRoles and 'other' in selectedClassRoles %}checked{% endif %}>
+                                    <label for="role-other">Autre</label>
+                                </div>
+                            </div>
+
+                            <div class="filter-group">
+                                <h4>Univers</h4>
+                                {% if universes is defined and universes|length > 0 %}
+                                    {% for u in universes %}
+                                        {% set u_id = u.id ~ '' %}
+                                        <div class="filter-option">
+                                            <input type="checkbox" id="universe-{{ u.id }}" name="universe[]" value="{{ u.id }}" class="universe-filter" {% if selectedUniverses and u_id in selectedUniverses %}checked{% endif %}>
+                                            <label for="universe-{{ u.id }}">{{ u.name }}</label>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="filter-option">
+                                        <input type="checkbox" id="universe-all" name="universe[]" value="all" class="universe-filter" checked>
+                                        <label for="universe-all">Tous</label>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="filter-group">
                                 <h4>Tri</h4>
                                 <div class="filter-option">
-                                    <input type="radio" id="sort-newest" name="sort" value="newest" {% if app.request.query.get('sort') == 'newest' or not app.request.query.get('sort') %}checked{% endif %}>
+                                    <input type="radio" id="sort-newest" name="sort" value="newest" class="sort-filter" {% if app.request.query.get('sort') == 'newest' or not app.request.query.get('sort') %}checked{% endif %}>
                                     <label for="sort-newest">Plus récent</label>
                                 </div>
                                 <div class="filter-option">
-                                    <input type="radio" id="sort-oldest" name="sort" value="oldest" {% if app.request.query.get('sort') == 'oldest' %}checked{% endif %}>
+                                    <input type="radio" id="sort-oldest" name="sort" value="oldest" class="sort-filter" {% if app.request.query.get('sort') == 'oldest' %}checked{% endif %}>
                                     <label for="sort-oldest">Plus ancien</label>
                                 </div>
                                 <div class="filter-option">
-                                    <input type="radio" id="sort-name" name="sort" value="name" {% if app.request.query.get('sort') == 'name' %}checked{% endif %}>
+                                    <input type="radio" id="sort-name" name="sort" value="name" class="sort-filter" {% if app.request.query.get('sort') == 'name' %}checked{% endif %}>
                                     <label for="sort-name">Nom (A-Z)</label>
                                 </div>
                             </div>
 
-                            <button type="submit" class="filter-reset">Filtrer</button>
-                            <a href="{{ path('universe_index') }}" class="filter-reset">Réinitialiser</a>
+                            <button type="submit" class="filter-reset" style="width: 100%; margin-top: 1rem;">Filtrer</button>
+                            <a href="{{ path('personnage_index') }}" class="filter-reset" style="width: 100%; margin-top: 0.5rem; display: block; text-align: center;">Réinitialiser</a>
                         </form>
                     </div>
 
                     <div class="universes-section">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #2A3139;">
                             <div>
-                                <h2 style="margin: 0; color: #E6FFF6;">Univers</h2>
-                                <p style="color: #B0B9B6; margin: 0; font-size: 0.9rem;">Affichage: <a href="/universes" style="color:#18E3A4;">Univers</a> • <a href="/personnages" style="color:#B0B9B6;">Personnages</a></p>
+                                <h2 style="margin: 0; color: #E6FFF6;">Personnages</h2>
+                                <p style="color: #B0B9B6; margin: 0; font-size: 0.9rem;">Affichage: <a href="/personnages" style="color:#18E3A4;">Personnages</a> • <a href="/universes" style="color:#B0B9B6;">Univers</a></p>
                             </div>
                             <div class="results-count">
-                                <span>{{ universes|length }}</span> univers{{ universes|length != 1 ? 's' : '' }}
+                                <span>{{ personnages|length }}</span>
                             </div>
                         </div>
 
                         <div class="universes-grid" id="universesGrid">
-                            {% for u in universes %}
-                                <div class="universe-card" onclick="location.href='{{ path('universe_show', {'id': u.id}) }}'">
-                                    <div class="card-banner">
-                                        {% if u.getBannerBase64() %}
-                                            <img src="{{ u.getBannerBase64() }}" alt="banner">
-                                        {% else %}
-                                            🌌
-                                        {% endif %}
-                                    </div>
+                            {% for p in personnages %}
+                                <div class="universe-card" onclick="location.href='{{ path('personnage_show', {'id': p.id}) }}'">
+                                    <div class="card-banner">{% if p.getPortraitBase64() %}<img src="{{ p.getPortraitBase64() }}" alt="portrait" style="width:100%;height:160px;object-fit:cover;">{% else %}🧍{% endif %}</div>
                                     <div class="card-content">
-                                        <h3 class="card-title">{{ u.name }}</h3>
+                                        <h3 class="card-title">{{ p.name }}</h3>
                                         <div class="card-genre-tags">
-                                            <span class="genre-tag">{{ {'high-fantasy':'Haute Fantaisie','dark-fantasy':'Sombre','scifi-fantasy':'Sci-Fi','urban-fantasy':'Urban'}[u.genre] ?? u.genre }}</span>
+                                            <span class="genre-tag">{{ {'warrior':'Guerrier','mage':'Mage','rogue':'Escroc','cleric':'Clerc','ranger':'Rôdeur','other':'Autre'}[p.classRole] ?? p.classRole }}</span>
                                         </div>
-                                        <p class="card-description">{{ u.shortDescription }}</p>
+                                        <p class="card-description">{{ p.historyContext|slice(0,200) ~ '...' }}</p>
                                         <div class="card-footer">
-                                            <div class="card-stats">
-                                                <div class="stat">Personnages {{ u.personnages|length }}</div>
-                                            </div>
-                                            <div class="creator-info">
-                                                <div class="creator-avatar">{{ u.name|first|upper }}</div>
-                                                <span>—</span>
-                                            </div>
+                                            <div class="card-stats"><div class="stat">Univers: {{ p.universe.name }}</div></div>
+                                            <div class="creator-info"><div class="creator-avatar">{{ p.name|first|upper }}</div><span>—</span></div>
                                         </div>
                                     </div>
                                 </div>
                             {% else %}
                                 <div class="empty-state">
-                                    <p>😔 Aucun univers trouvé.</p>
-                                    <a href="{{ path('universe_new') }}" class="create-cta">Créer le premier univers</a>
+                                    <p>😔 Aucun personnage trouvé.</p>
                                 </div>
                             {% endfor %}
                         </div>
@@ -446,5 +471,9 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Note: Script removed as it's for mock data, real data handled by controller
+    </script>
 </body>
 </html>
