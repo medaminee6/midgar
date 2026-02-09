@@ -45,13 +45,13 @@ class PageController extends AbstractController
 
     /**
      * Catch-all static pages
-     * EXCLUDES admin, quiz, shop routes
+     * EXCLUDES admin, quiz, shop, universes, preferences, personnages routes
      */
     #[Route(
         '/{page}',
         name: 'page',
         requirements: [
-            'page' => '(?!admin|quiz|shop).*'
+            'page' => '(?!admin|quiz|shop|universes|preferences|personnages).*'
         ]
     )]
     public function show(string $page): Response

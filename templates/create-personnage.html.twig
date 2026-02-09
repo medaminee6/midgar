@@ -36,6 +36,10 @@
         .btn-primary:hover { background-color: var(--accent-hover); }
         .btn-secondary { background-color: var(--border-color); color: var(--text-primary); border: 1px solid var(--accent-primary); }
         .btn-secondary:hover { background-color: rgba(24, 227, 164, 0.1); }
+        /* Form error styling */
+        .form-error { color: #ff6b6b; font-size: 0.85rem; margin-top: 0.5rem; }
+        .form-row-error input, .form-row-error textarea, .form-row-error select { border-color: #ff6b6b !important; }
+        .form-error-list { background-color: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; border-radius: 4px; padding: 1rem; margin-bottom: 1.5rem; color: #ff6b6b; }
         @media (max-width: 1024px) { .creation-container { grid-template-columns: 1fr; } .sidebar { position: static; height: auto; border-right: none; border-bottom: 2px solid var(--border-color); } .sidebar-nav { flex-direction: row; gap: 1rem; overflow-x: auto; } .form-row { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -46,6 +50,7 @@
             <a href="/" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Accueil</a>
             <a href="/discover" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Découvrir</a>
             <a href="/universes" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Univers</a>
+            <a href="/personnages" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Personnages</a>
             <a href="/oeuvre" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Œuvre</a>
             <a href="/shop" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Boutique</a>
             <a href="/challenges" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: all 0.3s;">Défis</a>
@@ -59,30 +64,19 @@
         <aside class="sidebar">
             <div class="sidebar-title">◇ Créer du Contenu</div>
             <nav class="sidebar-nav">
-                <a href="/create-universe" class="sidebar-link">
+                <a href="{{ path('universe_new') }}" class="sidebar-link">
                     <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="2" r="1.5"/>
                     </svg>
                     Univers
                 </a>
-                <a href="/create-oeuvre" class="sidebar-link">
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4h16v12H4z"/>
-                    </svg>
-                    Œuvre
-                </a>
-                <a href="/create-personnage" class="sidebar-link active">
+                <a href="{{ path('personnage_new') }}" class="sidebar-link active">
                     <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
                     </svg>
                     Personnage
                 </a>
-                <a href="/create-artifact" class="sidebar-link">
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2l3.5 10h10.5l-8.5 6 3 9.5L12 21l-8.5 6 3-9.5-8.5-6h10.5z"/>
-                    </svg>
-                    Artefact
-                </a>
+                
             </nav>
         </aside>
 
@@ -91,65 +85,46 @@
                 <h1 class="form-title">Créer un Personnage</h1>
                 <p class="form-subtitle">Définissez un héros ou une créature de votre univers</p>
                 
-                <form id="personnageForm">
-                    <div class="form-group">
-                        <label class="form-label">Nom du Personnage *</label>
-                        <input type="text" class="form-input" placeholder="Ex: Aerith Gainsborough" required>
-                    </div>
-
+                {% for flash_error in app.flashes('error') %}
+                    <div style="background: #ff4d4d; color: white; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">{{ flash_error }}</div>
+                {% endfor %}
+                
+                {{- form_start(form, {'attr': {'id':'personnageForm', 'enctype':'multipart/form-data'}}) -}}
+                    {{ form_errors(form, {'attr': {'class': 'form-error-list'}}) }}
+                    <div class="form-group">{{ form_row(form.name, {'attr': {'class':'form-input'}}) }}</div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Univers *</label>
-                            <select class="form-select" required>
-                                <option value="">Sélectionner</option>
-                                <option value="universe-1">Royaumes de Cristal</option>
-                                <option value="universe-2">Les Terres Oubliées</option>
-                                <option value="universe-3">Chroniques du Noir</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Classe/Rôle *</label>
-                            <select class="form-select" required>
-                                <option value="">Sélectionner</option>
-                                <option value="warrior">Guerrier</option>
-                                <option value="mage">Mage</option>
-                                <option value="rogue">Escroc</option>
-                                <option value="cleric">Clerc</option>
-                                <option value="ranger">Rôdeur</option>
-                                <option value="other">Autre</option>
-                            </select>
-                        </div>
+                        <div class="form-group">{{ form_row(form.universe, {'attr': {'class':'form-select'}}) }}</div>
+                        <div class="form-group">{{ form_row(form.classRole, {'attr': {'class':'form-select'}}) }}</div>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Historique & Contexte *</label>
-                        <textarea class="form-textarea" placeholder="Racontez l'histoire de votre personnage, son passé, ses motivations..." required></textarea>
+                    
+                    <h3 style="margin: 2rem 0 1rem 0; color: var(--accent-primary); font-size: 1.1rem;">Statistiques</h3>
+                    <div class="form-row" style="grid-template-columns: repeat(4, 1fr);">
+                        <div class="form-group">{{ form_row(form.strength, {'attr': {'class':'form-input', 'min':'0', 'max':'100', 'placeholder':'0-100'}}) }}</div>
+                        <div class="form-group">{{ form_row(form.agility, {'attr': {'class':'form-input', 'min':'0', 'max':'100', 'placeholder':'0-100'}}) }}</div>
+                        <div class="form-group">{{ form_row(form.magic, {'attr': {'class':'form-input', 'min':'0', 'max':'100', 'placeholder':'0-100'}}) }}</div>
+                        <div class="form-group">{{ form_row(form.defense, {'attr': {'class':'form-input', 'min':'0', 'max':'100', 'placeholder':'0-100'}}) }}</div>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Capacités & Pouvoirs</label>
-                        <textarea class="form-textarea" placeholder="Listez les capacités spéciales, magie, talents..."></textarea>
-                    </div>
-
+                    
+                    <div class="form-group">{{ form_row(form.historyContext, {'attr': {'class':'form-textarea'}}) }}</div>
+                    <div class="form-group">{{ form_row(form.abilitiesPowers, {'attr': {'class':'form-textarea'}}) }}</div>
                     <div class="form-group file-upload">
-                        <label class="form-label">Portrait ou Avatar *</label>
-                        <label class="file-label" for="fileInput">
+                        <label for="fileInput" class="file-label">
                             <div class="file-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 28px; height: 28px;">
-                                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14.828 14.828a4 4 0 0 1-5.656 0M9 10h1.586a1 1 0 0 1 .707.293l.707.707A1 1 0 0 0 13.414 11H15m-3-3h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
                                 </svg>
                             </div>
-                            <div class="file-text">Déposer une image ou cliquer</div>
+                            <div class="file-text">Choisir un portrait</div>
                             <div class="file-hint">PNG, JPG jusqu'à 5MB</div>
                         </label>
-                        <input type="file" id="fileInput" accept="image/*" required>
+                        {{ form_widget(form.portraitFile, {'attr': {'id': 'fileInput'}}) }}
+                        {{ form_errors(form.portraitFile) }}
                     </div>
-
                     <div class="form-actions">
                         <a href="/discover" class="btn btn-secondary">Annuler</a>
                         <button type="submit" class="btn btn-primary">Créer le Personnage</button>
                     </div>
-                </form>
+                {{ form_end(form) }}
             </div>
         </main>
     </div>
@@ -164,10 +139,6 @@
         });
         document.querySelector('.file-label').addEventListener('click', (e) => {
             if(e.target.closest('.file-label')) document.getElementById('fileInput').click();
-        });
-        document.getElementById('personnageForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Personnage créé! (Fonctionnalité de démonstration)');
         });
     </script>
 </body>
