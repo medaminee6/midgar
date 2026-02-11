@@ -36,16 +36,27 @@
             <div class="card-body">
                 <h2 class="card-title" style="text-align: center; margin-bottom: 2rem;">Connexion à Midgar</h2>
 
-                <form>
+                {% if error %}
+                    <div class="alert alert-danger" style="color:#FF6B6B; text-align:center; margin-bottom:1rem;">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{{ path('app_login') }}">
+                    <input type="hidden" name="_csrf_token"
+                           value="{{ csrf_token('authenticate') }}">
+
                     <div class="form-group">
                         <label for="email" style="color: #E6FFF6; font-weight: 600;">Email ou Nom d'utilisateur</label>
                         <input 
                             type="email" 
                             id="email" 
                             name="email"
+                            value="{{ last_username }}"
                             placeholder="votre.email@exemple.com"
                             style="width: 100%; padding: 10px; background-color: #1A1F1E; border: 1px solid #2A3139; border-radius: 4px; color: #E6FFF6; font-size: 0.95rem; margin-bottom: 1rem;"
-                            required>
+                            required
+                            autofocus>
                     </div>
 
                     <div class="form-group">
@@ -61,7 +72,7 @@
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <label style="color: #B0B9B6; font-size: 0.9rem;">
-                            <input type="checkbox" name="remember" style="margin-right: 6px;">
+                            <input type="checkbox" name="_remember_me" style="margin-right: 6px;">
                             Se souvenir de moi
                         </label>
                         <a href="#" style="color: #18E3A4; text-decoration: none; font-size: 0.9rem;">Mot de passe oublié?</a>
@@ -73,7 +84,7 @@
                 <hr style="border: none; border-top: 1px solid #2A3139; margin: 2rem 0;">
 
                 <p style="text-align: center; color: #B0B9B6; margin-bottom: 1rem;">Pas encore de compte?</p>
-                <a href="/register" class="btn btn-secondary" style="width: 100%; text-align: center; display: block;">Créer un Compte</a>
+                <a href="{{ path('app_register') }}" class="btn btn-secondary" style="width: 100%; text-align: center; display: block;">Créer un Compte</a>
             </div>
         </div>
     </div>
@@ -86,6 +97,6 @@
         </div>
     </footer>
 
-    <script src="/assets/js/main.js"></script>
+    <script src="/js/main.js"></script>
 </body>
 </html>
