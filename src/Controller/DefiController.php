@@ -81,9 +81,11 @@ class DefiController extends AbstractController
     public function peindre(Defi $defi): Response
     {
         return $this->render('challenges/peindre.html.twig', [
+        
             'defi' => $defi,
         ]);
     }
+
 
     #[Route('/challenges/{id}/peindre-save', name: 'challenges_peindre_save', methods: ['POST'])]
     public function peindreSave(Request $request, Defi $defi, EntityManagerInterface $entityManager): Response
@@ -139,7 +141,7 @@ class DefiController extends AbstractController
         $entityManager->persist($participation);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Votre peinture a été enregistrée et envoyée. Merci !');
+        $this->addFlash('success', 'Votre peinture a été enregistrée et envoyée. Merci !'); 
         return $this->redirectToRoute('challenges_index');
     }
 

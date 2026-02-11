@@ -1,14 +1,146 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin · Modifier le statut</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== Même style que participations.html.twig ===== */
+        :root {
+            --bg-main: #0B0F0E;
+            --bg-panel: #141A19;
+            --bg-soft: #1A1F1E;
+            --border: #2A3139;
 
-{% block title %}Modifier le statut | Midgar Admin{% endblock %}
+            --accent: #18E3A4;
+            --accent-dark: #13c891;
+            --danger: #EF5350;
+            --warning: #FFA726;
 
-{% block content %}
-<div class="container">
-    <a href="{{ path('admin_participations', { id: participation.defi.id }) }}" class="btn btn-secondary mb-4" style="display: inline-flex; align-items: center; gap: 0.5rem;">← Retour aux participations</a>
+            --text-main: #E6FFF6;
+            --text-muted: #9BA6A2;
 
-    <div class="card">
-        <div class="card-body">
-            <h2 style="color: #18E3A4; margin-bottom: 1.5rem;">Modifier le statut de la participation #{{ participation.id }}</h2>
+            --sidebar-width: 260px;
+            --radius: 10px;
+        }
+
+        * { box-sizing: border-box; margin:0; padding:0; }
+        body { font-family: "Segoe UI", Arial, sans-serif; background: var(--bg-main); color: var(--text-main); }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .sidebar-logo { 
+            padding: 0 1.5rem 1.5rem; 
+            margin-bottom: 2.5rem; 
+            border-bottom: 1px solid var(--border); 
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 10px rgba(24,227,164,0.25));
+        }
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+        .admin-sidebar ul { list-style: none; }
+        .admin-sidebar a { 
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem; 
+            color: var(--text-muted); 
+            text-decoration: none; 
+            border-left: 3px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            position: relative;
+            margin: 0.25rem 0;
+            font-weight: 500;
+        }
+        .admin-sidebar a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .admin-sidebar a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, rgba(24,227,164,0.12), transparent);
+            transition: width 0.4s ease;
+            z-index: -1;
+        }
+        .admin-sidebar a:hover::before,
+        .admin-sidebar a.active::before { 
+            width: 100%;
+        }
+        .admin-sidebar a:hover, .admin-sidebar a.active { 
+            color: var(--accent); 
+            border-left-color: var(--accent); 
+            font-weight: 600;
+        }
+        .admin-sidebar a:hover i,
+        .admin-sidebar a.active i {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px rgba(24,227,164,0.25));
+        }
+
+        .admin-content { margin-left: var(--sidebar-width); padding: 2rem; width: calc(100% - var(--sidebar-width)); }
+
+        h1,h2 { color: var(--accent); margin-bottom: 1.5rem; }
+
+        .btn { padding: 8px 14px; border-radius: var(--radius); border:none; cursor:pointer; font-weight:600; text-decoration:none; display:inline-block; transition:all .2s ease; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color:#000; }
+        .btn-secondary { background: var(--bg-soft); color: var(--text-main); border:1px solid var(--border); }
+        .btn:hover { opacity:0.85; transform: translateY(-1px); }
+
+        .card { background: var(--bg-panel); border-radius: var(--radius); padding: 1.5rem; margin-bottom:2rem; box-shadow:0 10px 25px rgba(0,0,0,.3); }
+        .form-control, .form-select { padding: 8px 12px; border-radius: var(--radius); border:1px solid var(--border); background: var(--bg-soft); color: var(--text-main); width:100%; }
+    </style>
+</head>
+<body>
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Midgar Admin</div>
+        </div>
+        <ul>
+            <li><a href="/admin/dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
+            <li><a href="/admin/users"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+            <li><a href="/admin/quiz-questions"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+            <li><a href="/admin/produits"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+            <li><a href="/admin/challenges"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+        </ul>
+    </aside>
+
+    <main class="admin-content">
+        <a href="{{ path('admin_participations', { id: participation.defi.id }) }}" class="btn btn-secondary mb-4">← Retour aux participations</a>
+
+        <div class="card">
+            <h2>Modifier le statut de la participation #{{ participation.id }}</h2>
 
             <div class="mb-4">
                 <p class="text-muted">Défi</p>
@@ -18,10 +150,8 @@
             <div class="mb-4">
                 <p class="text-muted">Image</p>
                 {% if participation.imageFileName %}
-                    <img src="{{ vich_uploader_asset(participation, 'imageFile') }}" alt="Participation" style="max-width: 300px; max-height: 200px; object-fit: contain; border-radius: 8px;">
-                {% else %}
-                    <p>Aucune image</p>
-                {% endif %}
+                    <img src="{{ vich_uploader_asset(participation, 'imageFile') }}" alt="Participation" style="max-width:300px; max-height:200px; object-fit:contain; border-radius:8px;">
+                {% else %}<p>Aucune image</p>{% endif %}
             </div>
 
             <div class="mb-4">
@@ -32,14 +162,14 @@
             {{ form_start(form) }}
                 <div class="mb-3">
                     {{ form_label(form.statut) }}
-                    {{ form_widget(form.statut, { 'attr': { 'class': 'form-select' } }) }}
+                    {{ form_widget(form.statut, { 'attr': { 'class':'form-select' } }) }}
                     {{ form_errors(form.statut) }}
                 </div>
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
-                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
             {{ form_end(form) }}
         </div>
-    </div>
+    </main>
 </div>
-{% endblock %}
+
+</body>
+</html>

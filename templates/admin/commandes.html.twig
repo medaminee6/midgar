@@ -4,97 +4,786 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Commandes - Admin</title>
-    <link rel="stylesheet" href="/css/midgar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        .admin-layout { display: grid; grid-template-columns: 250px 1fr; gap: 0; min-height: 100vh; }
-        .admin-sidebar { background-color: #1A1F1E; border-right: 1px solid #2A3139; padding: 2rem 0; position: fixed; left: 0; top: 0; width: 250px; height: 100vh; overflow-y: auto; }
-        .admin-sidebar .logo { padding: 1rem 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid #2A3139; }
-        .admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; }
-        .admin-sidebar nav li { margin: 0; }
-        .admin-sidebar nav a { display: block; padding: 12px 1.5rem; color: #B0B9B6; text-decoration: none; border-left: 3px solid transparent; transition: all 0.3s; }
-        .admin-sidebar nav a:hover { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; }
-        .admin-sidebar nav a.active { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; font-weight: 600; }
-        .admin-content { margin-left: 250px; padding: 2rem; }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #2A3139; }
-        .admin-header h1 { margin: 0; color: #18E3A4; }
-        .table-wrapper { background-color: #1A1F1E; border-radius: 6px; overflow: hidden; }
-        .table-wrapper table { width: 100%; border-collapse: collapse; }
-        .table-wrapper th { background-color: #0B0F0E; padding: 1rem 1.5rem; text-align: left; color: #18E3A4; font-weight: 600; border-bottom: 1px solid #2A3139; }
-        .table-wrapper td { padding: 1rem 1.5rem; border-bottom: 1px solid #2A3139; color: #E6FFF6; }
-        .table-wrapper tr:hover { background-color: #252A29; }
-        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-        .badge-completed { background-color: rgba(24, 227, 164, 0.2); color: #18E3A4; }
-        .badge-pending { background-color: rgba(176, 185, 182, 0.2); color: #B0B9B6; }
-        .action-buttons { display: flex; gap: 0.5rem; }
-        .action-buttons a { padding: 4px 12px; font-size: 0.85rem; text-decoration: none; border-radius: 3px; }
-        .btn-edit { background-color: #18E3A4; color: #0B0F0E; }
-        .btn-delete { background-color: #BD3B44; color: #E6FFF6; }
+        :root {
+            --bg-main: #0B0F0E;
+            --bg-panel: #141A19;
+            --bg-soft: #1A1F1E;
+            --bg-card: #1E2423;
+            --border: #2A3139;
+            --border-light: #3A424A;
+            --border-hover: #4A5259;
+
+            --accent: #18E3A4;
+            --accent-dark: #13c891;
+            --accent-light: rgba(24,227,164,0.12);
+            --accent-glow: rgba(24,227,164,0.25);
+            --danger: #EF5350;
+            --danger-light: rgba(239,83,80,0.12);
+            --warning: #FFA726;
+            --warning-light: rgba(255,167,38,0.12);
+            --info: #42A5F5;
+            --info-light: rgba(66,165,245,0.12);
+            --success: #66BB6A;
+            --purple: #AB47BC;
+
+            --text-main: #E6FFF6;
+            --text-light: #CBD5D1;
+            --text-muted: #9BA6A2;
+            --text-placeholder: #7A8580;
+
+            --sidebar-width: 280px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --shadow: 0 10px 25px rgba(0,0,0,0.3);
+            --shadow-lg: 0 15px 35px rgba(0,0,0,0.4);
+            --shadow-xl: 0 20px 50px rgba(0,0,0,0.5);
+            --shadow-accent: 0 0 25px rgba(24,227,164,0.3);
+            --shadow-hover: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body {
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Inter", Arial, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== LAYOUT ===== */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+
+        .admin-sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            margin: 0.25rem 0;
+            font-weight: 500;
+        }
+
+        .admin-sidebar a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .admin-sidebar a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent-light), transparent);
+            transition: width 0.4s ease;
+            z-index: -1;
+        }
+
+        .admin-sidebar a:hover::before,
+        .admin-sidebar a.active::before {
+            width: 100%;
+        }
+
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .admin-sidebar a:hover i,
+        .admin-sidebar a.active i {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px var(--accent-glow));
+        }
+
+        /* ===== CONTENT ===== */
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem 3rem;
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-main) 0%, #0F1413 100%);
+            position: relative;
+        }
+
+        .admin-content::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            z-index: 1;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .page-title {
+            font-size: 2.2rem;
+            color: var(--accent);
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .page-title i {
+            font-size: 2rem;
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* ===== STATS DASHBOARD ===== */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--accent);
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-icon {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* ===== ALERT ===== */
+        .alert {
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            border-left: 4px solid;
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .alert i {
+            font-size: 1.4rem;
+        }
+
+        .alert-success {
+            background: rgba(24,227,164,0.08);
+            border-left-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .alert-danger {
+            background: rgba(239,83,80,0.08);
+            border-left-color: var(--danger);
+            color: var(--danger);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== TABLE ===== */
+        .table-container {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-light);
+            animation: tableAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes tableAppear {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, rgba(26,31,30,0.9), rgba(32,38,37,0.9));
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        th {
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+
+        th::after {
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        th:hover::after {
+            width: 100%;
+        }
+
+        td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-light);
+            transition: all 0.2s ease;
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            animation: fadeRow 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+            position: relative;
+        }
+
+        tbody tr:hover {
+            background: rgba(24,227,164,0.05);
+        }
+
+        tbody tr:hover td {
+            color: var(--text-main);
+            transform: translateX(5px);
+        }
+
+        @keyframes fadeRow {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border: 1px solid transparent;
+        }
+
+        .badge i {
+            font-size: 0.7rem;
+            margin-right: 0.3rem;
+        }
+
+        .badge-completed {
+            background: rgba(24,227,164,0.15);
+            color: var(--accent);
+            border-color: rgba(24,227,164,0.3);
+        }
+
+        .badge-pending {
+            background: rgba(255,167,38,0.15);
+            color: var(--warning);
+            border-color: rgba(255,167,38,0.3);
+        }
+
+        .badge-processing {
+            background: rgba(66,165,245,0.15);
+            color: var(--info);
+            border-color: rgba(66,165,245,0.3);
+        }
+
+        .badge-cancelled {
+            background: rgba(239,83,80,0.15);
+            color: var(--danger);
+            border-color: rgba(239,83,80,0.3);
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-view {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: linear-gradient(135deg, var(--info), #2196F3);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(66,165,245,0.3);
+        }
+
+        .btn-edit {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: linear-gradient(135deg, var(--warning), #FF9800);
+            color: #000;
+            text-decoration: none;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(255,167,38,0.3);
+        }
+
+        .btn-delete {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: linear-gradient(135deg, var(--danger), #D32F2F);
+            color: #FFFFFF;
+            text-decoration: none;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(239,83,80,0.3);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+            display: block;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-light);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                width: 80px;
+                padding: 1.5rem 0;
+            }
+            
+            .admin-sidebar .logo-text,
+            .admin-sidebar a span {
+                display: none;
+            }
+            
+            .admin-sidebar a {
+                justify-content: center;
+                padding: 1rem;
+            }
+            
+            .admin-content {
+                margin-left: 80px;
+                padding: 2rem;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-view, .btn-edit, .btn-delete {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* ===== ANIMATION DELAYS FOR ROWS ===== */
+        tbody tr:nth-child(1) { animation-delay: 0.1s; }
+        tbody tr:nth-child(2) { animation-delay: 0.2s; }
+        tbody tr:nth-child(3) { animation-delay: 0.3s; }
+        tbody tr:nth-child(4) { animation-delay: 0.4s; }
+        tbody tr:nth-child(5) { animation-delay: 0.5s; }
+        tbody tr:nth-child(6) { animation-delay: 0.6s; }
+        tbody tr:nth-child(7) { animation-delay: 0.7s; }
+        tbody tr:nth-child(8) { animation-delay: 0.8s; }
+        tbody tr:nth-child(9) { animation-delay: 0.9s; }
+        tbody tr:nth-child(10) { animation-delay: 1s; }
     </style>
 </head>
-<body style="margin: 0;">
-    <div class="admin-layout">
-        <aside class="admin-sidebar">
-            <div class="logo" style="color: #18E3A4; font-weight: 700; font-size: 1.2rem;">⚙️ Admin</div>
-            <nav>
-                <ul>
-                    <li><a href="/admin/dashboard">📊 Tableau de Bord</a></li>
-                    <li><a href="/admin/users">👥 Utilisateurs</a></li>
-                    <li><a href="/admin/oeuvres">📖 Œuvres</a></li>
-                    <li><a href="/admin/artefacts">⚔️ Artefacts</a></li>
-                    <li><a href="/admin/univers">🌍 Univers</a></li>
-                    <li><a href="/admin/personnages">👹 Personnages</a></li>
-                    <li><a href="/admin/produits">🛍️ Produits</a></li>
-                    <li><a href="/admin/commandes" class="active">📦 Commandes</a></li>
-                    <li><a href="/admin/challenges">🎯 Défis</a></li>
-                    <li><a href="/admin/submissions">📤 Soumissions</a></li>
-                    <li><a href="/admin/quiz-questions">❓ Questions Quiz</a></li>
-                    <li><a href="/admin/quiz-reponses">✅ Réponses Quiz</a></li>
-                    <li><a href="/admin/preferences">⚙️ Préférences</a></li>
-                </ul>
-            </nav>
-        </aside>
+<body>
 
-        <div class="admin-content">
-            <div class="admin-header">
-                <h1>Gestion des Commandes</h1>
+<div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Midgar Admin</div>
+        </div>
+        <ul>
+            <li><a href="{{ path('admin_users') }}"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+            <li><a href="{{ path('admin_quiz_questions') }}"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+            <li><a href="{{ path('admin_produits') }}"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+            <li><a href="{{ path('admin_challenges') }}" class="active"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="admin-content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <h1 class="page-title"><i class="fas fa-truck"></i> Gestion des Commandes</h1>
+        </div>
+
+        <!-- STATS DASHBOARD -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="stat-title">Commandes Total</div>
+                <div class="stat-value">{{ commandes|length }}</div>
             </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-title">Commandes Livrées</div>
+                <div class="stat-value">{{ commandes|filter(c => c.etat.value == 'LIVREE')|length }}</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-spinner"></i></div>
+                <div class="stat-title">En cours</div>
+                <div class="stat-value">{{ commandes|filter(c => c.etat.value == 'EN_COURS')|length }}</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
+                <div class="stat-title">Chiffre d'affaires</div>
+                <div class="stat-value">
+                    {{ (commandes|reduce((total, c) => total + c.prixTotal, 0))|round }}€
+                </div>
+            </div>
+        </div>
 
+        <!-- ALERTS -->
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+        
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+
+        <!-- TABLE DES COMMANDES -->
+        <div class="table-container">
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Client</th>
-                            <th>Produit</th>
-                            <th>Montant</th>
-                            <th>Date</th>
-                            <th>Statut</th>
-                            <th>Actions</th>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-user"></i> Client</th>
+                            <th><i class="fas fa-box"></i> Produit</th>
+                            <th><i class="fas fa-euro-sign"></i> Montant</th>
+                            <th><i class="fas fa-calendar"></i> Date</th>
+                            <th><i class="fas fa-chart-line"></i> Statut</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>#ORD001</td>
-                            <td>Léa Mage</td>
-                            <td>Grimoire Ancestral</td>
-                            <td>29,99€</td>
-                            <td>2026-02-01</td>
-                            <td><span class="badge badge-completed">Livrée</span></td>
-                            <td><div class="action-buttons"><a href="#" class="btn-edit">Voir</a></div></td>
-                        </tr>
-                        <tr>
-                            <td>#ORD002</td>
-                            <td>Alexis Shadowborn</td>
-                            <td>Pack Artiste Complet</td>
-                            <td>199,99€</td>
-                            <td>2026-01-30</td>
-                            <td><span class="badge badge-pending">En cours</span></td>
-                            <td><div class="action-buttons"><a href="#" class="btn-edit">Voir</a></div></td>
-                        </tr>
+                        {% if commandes|length > 0 %}
+                            {% for commande in commandes %}
+                                <tr>
+                                    <td><strong>#{{ commande.id }}</strong></td>
+                                    <td style="font-weight: 600; color: var(--text-main);">{{ commande.acheteur }}</td>
+                                    <td>
+                                        <div style="font-weight: 600;">{{ commande.produit.nomProduit }}</div>
+                                        <div style="color: var(--text-muted); font-size: 0.8rem;">Qty: {{ commande.quantite }}</div>
+                                    </td>
+                                    <td style="font-weight: 600; color: var(--accent);">{{ commande.prixTotal }}€</td>
+                                    <td>{{ commande.dateCommande|date('d/m/Y H:i') }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if commande.etat.value == 'LIVREE' %}badge-completed
+                                            {% elseif commande.etat.value == 'EN_COURS' %}badge-processing
+                                            {% elseif commande.etat.value == 'EN_ATTENTE' %}badge-pending
+                                            {% elseif commande.etat.value == 'ANNULEE' %}badge-cancelled
+                                            {% else %}badge-pending{% endif %}">
+                                            <i class="fas fa-circle"></i> 
+                                            {{ commande.etat.getLabel() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="{{ path('admin_commande_detail', {id: commande.id}) }}" class="btn-view">
+                                                <i class="fas fa-eye"></i> Voir
+                                            </a>
+                                            <a href="{{ path('admin_commande_edit', {id: commande.id}) }}" class="btn-edit">
+                                                <i class="fas fa-edit"></i> Modifier
+                                            </a>
+                                            <form method="POST" action="{{ path('admin_commande_delete', {id: commande.id}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ? Cette action est irréversible.');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_commande_' ~ commande.id) }}">
+                                                <button type="submit" class="btn-delete">
+                                                    <i class="fas fa-trash"></i> Supprimer
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <i class="fas fa-truck"></i>
+                                        <h3>Aucune commande trouvée</h3>
+                                        <p>Les commandes apparaîtront ici une fois que des clients auront effectué des achats.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
+    </main>
+</div>
+
+<script>
+    // Animation des cartes de statistiques
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Animation progressive des lignes du tableau
+    document.querySelectorAll('tbody tr').forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.05}s`;
+    });
+
+    // Confirmation pour les suppressions
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (this.form && this.form.onsubmit) return;
+        });
+    });
+</script>
+
 </body>
 </html>

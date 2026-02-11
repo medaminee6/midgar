@@ -1,58 +1,208 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin · Participations</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #0B0F0E;
+            --bg-panel: #141A19;
+            --bg-soft: #1A1F1E;
+            --border: #2A3139;
 
-{% block title %}Gestion des participations | Midgar Admin{% endblock %}
+            --accent: #18E3A4;
+            --accent-dark: #13c891;
+            --danger: #EF5350;
+            --warning: #FFA726;
+            --info: #42A5F5;
 
-{% block content %}
-<div class="container">
-    <a href="{{ path('admin_challenges') }}" class="btn btn-secondary mb-4" style="display: inline-flex; align-items: center; gap: 0.5rem;">← Retour aux défis</a>
-    <h1 style="color: #18E3A4; margin-bottom: 1.5rem;">{% if defi %}Participations au défi : {{ defi.titre }}{% else %}Toutes les participations{% endif %}</h1>
+            --text-main: #E6FFF6;
+            --text-muted: #9BA6A2;
 
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            --sidebar-width: 260px;
+            --radius: 10px;
+        }
+
+        * { box-sizing: border-box; margin:0; padding:0; }
+        body { font-family: "Segoe UI", Arial, sans-serif; background: var(--bg-main); color: var(--text-main); }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .sidebar-logo { 
+            padding: 0 1.5rem 1.5rem; 
+            margin-bottom: 2.5rem; 
+            border-bottom: 1px solid var(--border); 
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 10px rgba(24,227,164,0.25));
+        }
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+        .admin-sidebar ul { list-style: none; }
+        .admin-sidebar a { 
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem; 
+            color: var(--text-muted); 
+            text-decoration: none; 
+            border-left: 3px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            position: relative;
+            margin: 0.25rem 0;
+            font-weight: 500;
+        }
+        .admin-sidebar a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .admin-sidebar a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, rgba(24,227,164,0.12), transparent);
+            transition: width 0.4s ease;
+            z-index: -1;
+        }
+        .admin-sidebar a:hover::before,
+        .admin-sidebar a.active::before { 
+            width: 100%;
+        }
+        .admin-sidebar a:hover, .admin-sidebar a.active { 
+            color: var(--accent); 
+            border-left-color: var(--accent); 
+            font-weight: 600;
+        }
+        .admin-sidebar a:hover i,
+        .admin-sidebar a.active i {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px rgba(24,227,164,0.25));
+        }
+
+        .admin-content { margin-left: var(--sidebar-width); padding: 2rem; width: calc(100% - var(--sidebar-width)); }
+
+        h1 { color: var(--accent); margin-bottom: 1.5rem; }
+
+        .btn { padding: 8px 14px; border-radius: var(--radius); border:none; cursor:pointer; font-weight:600; text-decoration:none; display:inline-block; transition: all .2s ease; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color:#000; }
+        .btn-secondary { background: var(--bg-soft); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-info { background: var(--info); color:#fff; }
+        .btn-warning { background: var(--warning); color:#000; }
+        .btn-danger { background: var(--danger); color:#fff; }
+        .btn:hover { opacity:0.85; transform: translateY(-1px); }
+
+        .card { background: var(--bg-panel); border-radius: var(--radius); padding: 1.5rem; margin-bottom:2rem; box-shadow:0 10px 25px rgba(0,0,0,.3); }
+        .alert-success { background: rgba(24,227,164,.2); color: var(--accent); padding: .75rem 1rem; border-radius: var(--radius); margin-bottom: 1rem; }
+
+        .table-wrapper { background: var(--bg-panel); border-radius: var(--radius); overflow-x:auto; box-shadow:0 10px 25px rgba(0,0,0,.3); }
+        table { width:100%; border-collapse: collapse; }
+        th, td { padding:1rem; text-align:left; border-bottom:1px solid var(--border); white-space: nowrap; }
+        th { background: var(--bg-soft); color: var(--accent); }
+        tbody tr { animation: fadeRow .4s ease both; }
+        @keyframes fadeRow { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+        .badge { padding:5px 14px; border-radius:20px; font-size:.8rem; font-weight:700; }
+        .bg-success { background: rgba(24,227,164,.15); color: var(--accent); }
+        .bg-warning { background: rgba(255,167,38,.2); color: var(--warning); }
+        .bg-danger { background: rgba(239,83,80,.15); color: var(--danger); }
+    </style>
+</head>
+<body>
+
+<div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Midgar Admin</div>
         </div>
-    {% endfor %}
+        <ul>
+            <li><a href="/admin/dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
+            <li><a href="/admin/users"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+            <li><a href="/admin/quiz-questions"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+            <li><a href="/admin/produits"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+            <li><a href="/admin/challenges"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+        </ul>
+    </aside>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Utilisateur</th>
-                    <th>Description</th>
-                    <th>Image</th>
-                    <th>Statut</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for participation in participations %}
+    <!-- CONTENT -->
+    <main class="admin-content">
+        <a href="{{ path('admin_challenges') }}" class="btn btn-secondary mb-4">← Retour aux défis</a>
+        <h1>{% if defi %}Participations au défi : {{ defi.titre }}{% else %}Toutes les participations{% endif %}</h1>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert-success">{{ message }}</div>
+        {% endfor %}
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ participation.id }}</td>
-                        <td>{{ participation.userId }}</td>
-                        <td>{{ participation.description|slice(0, 50) }}{{ participation.description|length > 50 ? '...' : '' }}</td>
-                        <td>
-                            {% if participation.imageFileName %}
-                                <img src="{{ vich_uploader_asset(participation, 'imageFile') }}" alt="Participation" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-                        <td><span class="badge {% if participation.statut.value == 'VALIDE' %}bg-success{% elseif participation.statut.value == 'REFUSE' %}bg-danger{% else %}bg-warning{% endif %}">{{ participation.statut.value }}</span></td>
-                        <td>{{ participation.dateSoumission ? participation.dateSoumission|date('d/m/Y H:i') : '—' }}</td>
-                        <td>
-                            <a href="{{ path('admin_participation_edit_statut', { id: participation.id }) }}" class="btn btn-sm btn-primary">Statut</a>
-                        </td>
+                        <th>ID</th>
+                        <th>Utilisateur</th>
+                        <th>Description</th>
+                        <th>Image</th>
+                        <th>Statut</th>
+                        <th>Date</th>
+                        <th>Actions</th>
                     </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="7" class="text-center">Aucune participation trouvée.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    {% for participation in participations %}
+                        <tr>
+                            <td>{{ participation.id }}</td>
+                            <td>{{ participation.userId }}</td>
+                            <td>{{ participation.description|slice(0,50) }}{{ participation.description|length > 50 ? '...' : '' }}</td>
+                            <td>
+                                {% if participation.imageFileName %}
+                                    <img src="{{ vich_uploader_asset(participation, 'imageFile') }}" alt="Participation" style="width:50px;height:50px;object-fit:cover;border-radius:4px;">
+                                {% else %}—{% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {% if participation.statut.value == 'VALIDE' %}bg-success{% elseif participation.statut.value == 'REFUSE' %}bg-danger{% else %}bg-warning{% endif %}">{{ participation.statut.value }}</span>
+                            </td>
+                            <td>{{ participation.dateSoumission ? participation.dateSoumission|date('d/m/Y H:i') : '—' }}</td>
+                            <td>
+                                <a href="{{ path('admin_participation_edit_statut', { id: participation.id }) }}" class="btn btn-primary btn-sm">Statut</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Aucune participation trouvée.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </main>
 </div>
-{% endblock %}
+</body>
+</html>

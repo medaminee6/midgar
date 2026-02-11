@@ -51,6 +51,9 @@ class Universe
     #[ORM\OneToMany(mappedBy: 'universe', targetEntity: Personnage::class, cascade: ['remove'], orphanRemoval: true)]
     private $personnages;
 
+    #[ORM\OneToMany(mappedBy: 'universe', targetEntity: Oeuvre::class, cascade: ['remove'], orphanRemoval: true)]
+    private $oeuvres;
+
     public function __construct()
     {
         $this->themes = [];
@@ -194,5 +197,11 @@ class Universe
         }
         
         return 'data:image/jpeg;base64,' . base64_encode($data);
+    }
+
+    /** @return \Doctrine\Common\Collections\Collection|Oeuvre[] */
+    public function getOeuvres()
+    {
+        return $this->oeuvres;
     }
 }

@@ -5,16 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Œuvres - Admin</title>
     <link rel="stylesheet" href="/css/midgar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .admin-layout { display: grid; grid-template-columns: 250px 1fr; gap: 0; min-height: 100vh; }
-        .admin-sidebar { background-color: #1A1F1E; border-right: 1px solid #2A3139; padding: 2rem 0; position: fixed; left: 0; top: 0; width: 250px; height: 100vh; overflow-y: auto; }
-        .admin-sidebar .logo { padding: 1rem 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid #2A3139; }
-        .admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; }
-        .admin-sidebar nav li { margin: 0; }
-        .admin-sidebar nav a { display: block; padding: 12px 1.5rem; color: #B0B9B6; text-decoration: none; border-left: 3px solid transparent; transition: all 0.3s; }
-        .admin-sidebar nav a:hover { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; }
-        .admin-sidebar nav a.active { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; font-weight: 600; }
-        .admin-content { margin-left: 250px; padding: 2rem; }
+        :root {
+            --sidebar-width: 280px;
+            --border: #2A3139;
+            --border-light: #3A424A;
+            --accent: #18E3A4;
+            --accent-light: rgba(24,227,164,0.12);
+            --accent-glow: rgba(24,227,164,0.25);
+            --text-muted: #9BA6A2;
+        }
+        .admin-layout { display: flex; min-height: 100vh; }
+        /* ===== SIDEBAR ===== */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+        .admin-sidebar ul { list-style: none; }
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            margin: 0.25rem 0;
+            font-weight: 500;
+        }
+        .admin-sidebar a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .admin-sidebar a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent-light), transparent);
+            transition: width 0.4s ease;
+            z-index: -1;
+        }
+        .admin-sidebar a:hover::before,
+        .admin-sidebar a.active::before {
+            width: 100%;
+        }
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+        .admin-sidebar a:hover i,
+        .admin-sidebar a.active i {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px var(--accent-glow));
+        }
+        .admin-content { margin-left: var(--sidebar-width); padding: 2rem; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #2A3139; }
         .admin-header h1 { margin: 0; color: #18E3A4; }
         .table-wrapper { background-color: #1A1F1E; border-radius: 6px; overflow: hidden; }
@@ -34,24 +114,16 @@
 <body style="margin: 0;">
     <div class="admin-layout">
         <aside class="admin-sidebar">
-            <div class="logo" style="color: #18E3A4; font-weight: 700; font-size: 1.2rem;">⚙️ Admin</div>
-            <nav>
-                <ul>
-                    <li><a href="/admin/dashboard">📊 Tableau de Bord</a></li>
-                    <li><a href="/admin/users">👥 Utilisateurs</a></li>
-                    <li><a href="/admin/oeuvres" class="active">📖 Œuvres</a></li>
-                    <li><a href="/admin/artefacts">⚔️ Artefacts</a></li>
-                    <li><a href="/admin/univers">🌍 Univers</a></li>
-                    <li><a href="/admin/personnages">👹 Personnages</a></li>
-                    <li><a href="/admin/produits">🛍️ Produits</a></li>
-                    <li><a href="/admin/commandes">📦 Commandes</a></li>
-                    <li><a href="/admin/challenges">🎯 Défis</a></li>
-                    <li><a href="/admin/submissions">📤 Soumissions</a></li>
-                    <li><a href="/admin/quiz-questions">❓ Questions Quiz</a></li>
-                    <li><a href="/admin/quiz-reponses">✅ Réponses Quiz</a></li>
-                    <li><a href="/admin/preferences">⚙️ Préférences</a></li>
-                </ul>
-            </nav>
+            <div class="sidebar-logo">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">Midgar Admin</div>
+            </div>
+            <ul>
+                <li><a href="{{ path('admin_users') }}"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+                <li><a href="{{ path('admin_quiz_questions') }}"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+                <li><a href="{{ path('admin_produits') }}"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+                <li><a href="{{ path('admin_challenges') }}"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+            </ul>
         </aside>
 
         <div class="admin-content">
@@ -83,7 +155,16 @@
                             <td>1,240</td>
                             <td><span class="badge badge-published">Publié</span></td>
                             <td>2026-01-30</td>
-                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn-edit">
+                                        <i class="fas fa-edit"></i> Éditer
+                                    </a>
+                                    <a href="#" class="btn-delete">
+                                        <i class="fas fa-trash"></i> Supprimer
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td>#2</td>
@@ -93,7 +174,16 @@
                             <td>892</td>
                             <td><span class="badge badge-published">Publié</span></td>
                             <td>2026-01-25</td>
-                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn-edit">
+                                        <i class="fas fa-edit"></i> Éditer
+                                    </a>
+                                    <a href="#" class="btn-delete">
+                                        <i class="fas fa-trash"></i> Supprimer
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td>#3</td>
@@ -103,7 +193,16 @@
                             <td>456</td>
                             <td><span class="badge badge-draft">Brouillon</span></td>
                             <td>2026-01-20</td>
-                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn-edit">
+                                        <i class="fas fa-edit"></i> Éditer
+                                    </a>
+                                    <a href="#" class="btn-delete">
+                                        <i class="fas fa-trash"></i> Supprimer
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
