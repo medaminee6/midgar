@@ -414,16 +414,13 @@
             transform: scale(1.1);
         }
         
-        /* ===== PROFILE SPECIFIC - GARDÉ COMME AVANT ===== */
+        /* ===== PROFILE SPECIFIC ===== */
         .profile-layout {
             display: grid;
             grid-template-columns: 250px 1fr;
             gap: 2rem;
             margin-bottom: 3rem;
         }
-        
-        /* Section des boutons et statistiques gardée comme avant */
-        
         
         .avatar-container {
             width: 100px;
@@ -467,7 +464,7 @@
             gap: 1.5rem;
         }
         
-        /* ===== ANCIEN STYLE DE MODAL POUR ÉDITER PROFIL ===== */
+        /* ===== MODAL STYLES ===== */
         .modal {
             display: none; 
             position: fixed;
@@ -541,7 +538,7 @@
             padding-right: 2rem;
         }
         
-        /* ===== NOUVELLES MODALES POUR ŒUVRES/ARTEFACTS/UNIVERS ===== */
+        /* ===== MODALES DÉTAILLÉES ===== */
         .modal-detail {
             max-width: 800px;
             width: 95%;
@@ -727,7 +724,7 @@
 
     <!-- SITE CONTENT -->
     <div class="site-content">
-        <!-- HEADER MIS À JOUR -->
+        <!-- HEADER -->
         <header>
             <div class="logo">
                 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -785,45 +782,43 @@
                     <h1 class="section-title">Mon Profil</h1>
                     
                     <div class="profile-layout">
-                                   <!-- SIDEBAR -->
-            <div>
-                <div class="card">
-                    <div class="card-body" style="text-align: center;">
-                            <div style="
-                                width: 100px;
-                                height: 100px;
-                                margin: 0 auto 1rem;
-                                border-radius: 50%;
-                                background: linear-gradient(135deg, #18E3A4, #0DCF92);
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                overflow: hidden;
-                            ">
-                                {% if app.user.avatar %}
-                                    <img
-                                        src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}"
-                                        alt="Avatar de {{ app.user.username }}"
-                                        style="
-                                            width: 100%;
-                                            height: 100%;
-                                            object-fit: cover;
-                                        "
-                                    >
-                                {% else %}
-                                    <span style="font-size: 3rem;">🧙</span>
-                                {% endif %}
+                        <!-- SIDEBAR -->
+                        <div>
+                            <div class="card">
+                                <div class="card-body" style="text-align: center;">
+                                    <div style="
+                                        width: 100px;
+                                        height: 100px;
+                                        margin: 0 auto 1rem;
+                                        border-radius: 50%;
+                                        background: linear-gradient(135deg, #18E3A4, #0DCF92);
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        overflow: hidden;
+                                    ">
+                                        {% if app.user.avatar %}
+                                            <img
+                                                src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}"
+                                                alt="Avatar de {{ app.user.username }}"
+                                                style="
+                                                    width: 100%;
+                                                    height: 100%;
+                                                    object-fit: cover;
+                                                "
+                                            >
+                                        {% else %}
+                                            <span style="font-size: 3rem;">🧙</span>
+                                        {% endif %}
+                                    </div>
+                                    <h3 style="margin-bottom: 0.5rem;">{{ app.user.username }}</h3>
+                                    <p style="color: #B0B9B6; margin-bottom: 1rem;">{{ '@' ~ app.user.username|lower }}</p>
+                                    <p style="color: #B0B9B6; margin-bottom: 1rem;">{{ app.user.email }}</p>
+                                    <button class="btn btn-secondary btn-sm" style="width: 100%; margin-bottom: 1rem;" onclick="openModal('editProfileModal')">Éditer le Profil</button>
+                                    <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="openModal('settingsModal')">Paramètres</button>
+                                </div>
                             </div>
-                                                    <h3 style="margin-bottom: 0.5rem;">{{ app.user.username }}</h3>
-                                                    <p style="color: #B0B9B6; margin-bottom: 1rem;">{{ '@' ~ app.user.username|lower }}</p>
-                                                    <p style="color: #B0B9B6; margin-bottom: 1rem;">{{ app.user.email }}</p>
-                                                    <button class="btn btn-secondary btn-sm" style="width: 100%; margin-bottom: 1rem;" onclick="openModal('editProfileModal')">Éditer le Profil</button>
-                                                    <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="openModal('settingsModal')">Paramètres</button>
-                                                </div>
-                                            </div>
-
-                                           
-                                        </div>
+                        </div>
 
                         <!-- MAIN CONTENT AVEC NOUVELLES MODALES -->
                         <div class="content-grid">
@@ -866,54 +861,86 @@
                             <div class="content-section">
                                 <h2>Mes Œuvres Récentes</h2>
                                 <div class="items-grid">
-                                    {% for o in oeuvres %}
-                                        <div class="card" onclick="openOeuvreModal({{ loop.index0 }})">
-                                            <div class="card-image">
-                                                {% if o.imageUrl %}
-                                                    <img src="{{ asset(o.imageUrl) }}" alt="{{ o.title }}">
-                                                {% else %}
-                                                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
-                                                        🎨
-                                                    </div>
-                                                {% endif %}
+                                    {% if oeuvres is defined and oeuvres|length > 0 %}
+                                        {% for o in oeuvres %}
+                                            <div class="card" onclick="openOeuvreModal({{ o.id|default(loop.index0) }})">
+                                                <div class="card-image">
+                                                    {% if o.imageUrl is defined and o.imageUrl %}
+                                                        <img src="{{ asset(o.imageUrl) }}" alt="{{ o.title|default('Œuvre') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            🎨
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3 class="card-title">{{ o.title|default('Sans titre') }}</h3>
+                                                    <p class="card-text">{{ o.description|default('Aucune description')|slice(0, 100) ~ (o.description|default('')|length > 100 ? '...' : '') }}</p>
+                                                    <small style="color: var(--text-secondary);">
+                                                        {% if o.createdAt is defined and o.createdAt %}
+                                                            {{ o.createdAt|date('d/m/Y') }}
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="card" onclick="openOeuvreModal('empty')">
+                                            <div class="card-image" style="display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                                                📝
                                             </div>
                                             <div class="card-body">
-                                                <h3 class="card-title">{{ o.title }}</h3>
-                                                <p class="card-text">{{ o.description[:100] ~ (o.description|length > 100 ? '...' : '') }}</p>
-                                                <small style="color: var(--text-secondary);">{{ o.createdAt ? o.createdAt.diff(date()).days ~ ' jours' : '' }}</small>
+                                                <h3 class="card-title">Aucune œuvre</h3>
+                                                <p class="card-text">Vous n'avez pas encore créé d'œuvre</p>
+                                                <button class="btn btn-primary btn-sm magic-btn" style="width: 100%; margin-top: 1rem;">Créer une œuvre</button>
                                             </div>
                                         </div>
-                                    {% else %}
-                                        <p style="color: var(--text-secondary); text-align: center; grid-column: 1 / -1;">Aucune œuvre trouvée.</p>
-                                    {% endfor %}
+                                    {% endif %}
                                 </div>
-                                <a href="/oeuvre" class="btn btn-secondary magic-btn" style="margin-top: 1rem;">Voir toutes mes œuvres ({{ oeuvresCount|default(0) }})</a>
+                                <a href="/oeuvre" class="btn btn-secondary magic-btn" style="margin-top: 1rem;">
+                                    Voir toutes mes œuvres ({{ oeuvresCount|default(oeuvres|length)|default(0) }})
+                                </a>
                             </div>
 
                             <!-- MES ARTEFACTS -->
                             <div class="content-section">
                                 <h2>Mes Artefacts</h2>
                                 <div class="items-grid">
-                                    {% for a in artefacts %}
-                                        <div class="card" onclick="openArtefactModal({{ loop.index0 }})">
-                                            <div class="card-image">
-                                                {% if a.imageUrl %}
-                                                    <img src="{{ asset(a.imageUrl) }}" alt="{{ a.name }}">
-                                                {% else %}
-                                                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
-                                                        ⚔️
-                                                    </div>
-                                                {% endif %}
+                                    {% if artefacts is defined and artefacts|length > 0 %}
+                                        {% for a in artefacts %}
+                                            <div class="card" onclick="openArtefactModal({{ a.id|default(loop.index0) }})">
+                                                <div class="card-image">
+                                                    {% if a.imageUrl is defined and a.imageUrl %}
+                                                        <img src="{{ asset(a.imageUrl) }}" alt="{{ a.name|default('Artefact') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            ⚔️
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3 class="card-title">{{ a.name|default('Sans nom') }}</h3>
+                                                    <p class="card-text">{{ a.origins|default('Aucune description')|slice(0, 100) ~ (a.origins|default('')|length > 100 ? '...' : '') }}</p>
+                                                    <small style="color: var(--text-secondary);">
+                                                        {% if a.createdAt is defined and a.createdAt %}
+                                                            {{ a.createdAt|date('d/m/Y') }}
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="card" onclick="openArtefactModal('empty')">
+                                            <div class="card-image" style="display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                                                🏺
                                             </div>
                                             <div class="card-body">
-                                                <h3 class="card-title">{{ a.name }}</h3>
-                                                <p class="card-text">{{ (a.origins|default(''))[:100] ~ ((a.origins|default('')|length) > 100 ? '...' : '') }}</p>
-                                                <small style="color: var(--text-secondary);">{{ a.createdAt ? a.createdAt.diff(date()).days ~ ' jours' : '' }}</small>
+                                                <h3 class="card-title">Aucun artefact</h3>
+                                                <p class="card-text">Vous n'avez pas encore créé d'artefact</p>
+                                                <button class="btn btn-primary btn-sm magic-btn" style="width: 100%; margin-top: 1rem;">Créer un artefact</button>
                                             </div>
                                         </div>
-                                    {% else %}
-                                        <p style="color: var(--text-secondary); text-align: center; grid-column: 1 / -1;">Aucun artefact trouvé.</p>
-                                    {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -937,7 +964,6 @@
             {% endif %}
         </main>
 
-        <!-- ANCIEN STYLE DE MODALS POUR ÉDITER PROFIL -->
         <!-- MODAL ÉDITER PROFIL -->
         <div id="editProfileModal" class="modal">
             <div class="modal-content">
@@ -967,7 +993,6 @@
                 <span class="close" onclick="closeModal('settingsModal')">&times;</span>
                 <h2>Paramètres</h2>
 
-                <!-- Bouton changement mot de passe -->
                 <button class="btn btn-primary" onclick="document.getElementById('passwordForm').style.display='block'" style="width: 100%; margin-bottom: 1.5rem;">
                     Changer le mot de passe
                 </button>
@@ -991,7 +1016,6 @@
                     {{ form_end(passwordForm) }}
                 </div>
 
-                <!-- Supprimer compte -->
                 <button class="btn btn-danger" onclick="document.getElementById('deleteForm').style.display='block'" style="width: 100%;">
                     Supprimer mon compte
                 </button>
@@ -1010,7 +1034,7 @@
             </div>
         </div>
 
-        <!-- NOUVELLES MODALES POUR ŒUVRES -->
+        <!-- MODALE POUR ŒUVRES -->
         <div id="oeuvreModal" class="modal">
             <div class="modal-content modal-detail">
                 <span class="close" onclick="closeModal('oeuvreModal')">&times;</span>
@@ -1054,7 +1078,7 @@
             </div>
         </div>
 
-        <!-- NOUVELLES MODALES POUR ARTEFACTS -->
+        <!-- MODALE POUR ARTEFACTS -->
         <div id="artefactModal" class="modal">
             <div class="modal-content modal-detail">
                 <span class="close" onclick="closeModal('artefactModal')">&times;</span>
@@ -1096,7 +1120,7 @@
             </div>
         </div>
 
-        <!-- NOUVELLES MODALES POUR UNIVERS -->
+        <!-- MODALE POUR UNIVERS -->
         <div id="universeModal" class="modal">
             <div class="modal-content modal-detail">
                 <span class="close" onclick="closeModal('universeModal')">&times;</span>
@@ -1150,10 +1174,9 @@
     </div>
 
     <script>
-        // Magic Button Particle Effect (sans clignotement)
+        // Magic Button Particle Effect
         document.querySelectorAll('.magic-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
-                // Effet de particules seulement
                 for(let i = 0; i < 8; i++) {
                     const particle = document.createElement('span');
                     particle.classList.add('particle');
@@ -1178,8 +1201,9 @@
         // Highlight active nav link
         const currentPath = window.location.pathname;
         document.querySelectorAll('nav .magic-btn').forEach(link => {
+            const homePath = '{{ path('home') }}';
             if (link.getAttribute('href') === currentPath || 
-                (link.getAttribute('href') === '{{ path('home') }}' && currentPath === '/')) {
+                (link.getAttribute('href') === homePath && currentPath === '/')) {
                 link.classList.add('active');
             }
         });
@@ -1189,7 +1213,6 @@
             const bgVideo = document.getElementById('bg-video');
             const gradientBg = document.getElementById('gradient-bg');
             
-            // Handle video load error
             if (bgVideo) {
                 bgVideo.addEventListener('error', function() {
                     console.log('Background video failed to load, using gradient fallback');
@@ -1198,7 +1221,6 @@
                     }
                 });
                 
-                // Try to play video
                 bgVideo.play().catch(function(error) {
                     console.log('Video autoplay prevented:', error);
                     if (gradientBg) {
@@ -1207,7 +1229,6 @@
                 });
             }
             
-            // Pause/play video on visibility change
             document.addEventListener('visibilitychange', function() {
                 if (bgVideo) {
                     if (document.hidden) {
@@ -1219,7 +1240,7 @@
             });
         });
 
-        // Anciennes fonctions de modal pour éditer profil
+        // Fonctions modales
         function openModal(id) {
             document.getElementById(id).style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -1230,13 +1251,9 @@
             document.body.style.overflow = 'auto';
         }
 
-        function confirmSuppression() {
-            return confirm('Êtes-vous ABSOLUMENT certain de vouloir supprimer votre compte ? Cette action est IRREVERSIBLE et supprimera toutes vos données.');
-        }
-
         // Fermer si clic en dehors de la modal
         window.onclick = function(event) {
-            const modals = ['editProfileModal','settingsModal','oeuvreModal','artefactModal','universeModal'];
+            const modals = ['editProfileModal', 'settingsModal', 'oeuvreModal', 'artefactModal', 'universeModal'];
             modals.forEach(id => {
                 const modal = document.getElementById(id);
                 if (event.target == modal) {
@@ -1256,20 +1273,32 @@
             }
         });
 
-        // Nouvelles fonctions pour ouvrir les modales détaillées
-        function openOeuvreModal(index) {
-            // Récupérer les données de l'œuvre
-            // Pour l'exemple, on utilise des données simulées
-            const oeuvreData = {
-                title: "{{ oeuvres[0].title|default('Titre de l\'œuvre') }}",
-                author: "{{ app.user.username }}",
-                image: "{{ oeuvres[0].imageUrl|default('') }}",
-                type: "Roman",
-                date: "{{ oeuvres[0].createdAt ? oeuvres[0].createdAt|date('d/m/Y') : '01/01/2024' }}",
-                status: "Publié",
-                tags: ["Fantasy", "Aventure"],
-                description: "{{ oeuvres[0].description|default('Description de l\'œuvre...') }}"
-            };
+        // Fonction pour ouvrir la modale d'œuvre
+        function openOeuvreModal(id) {
+            {% if oeuvres is defined and oeuvres|length > 0 %}
+                {% set oeuvre = oeuvres[0] %}
+                const oeuvreData = {
+                    title: "{{ oeuvre.title|default('Titre de l\'œuvre')|e('js') }}",
+                    author: "{{ app.user.username|e('js') }}",
+                    image: "{{ oeuvre.imageUrl|default('')|e('js') }}",
+                    type: "{{ oeuvre.type|default('Roman')|e('js') }}",
+                    date: "{{ oeuvre.createdAt ? oeuvre.createdAt|date('d/m/Y') : '01/01/2024' }}",
+                    status: "{{ oeuvre.status|default('Publié')|e('js') }}",
+                    tags: {{ oeuvre.tags|default(['Fantasy', 'Aventure'])|json_encode|raw }},
+                    description: "{{ oeuvre.description|default('Description de l\'œuvre...')|e('js') }}"
+                };
+            {% else %}
+                const oeuvreData = {
+                    title: "Aucune œuvre",
+                    author: "{{ app.user.username|e('js') }}",
+                    image: "",
+                    type: "-",
+                    date: "-",
+                    status: "-",
+                    tags: [],
+                    description: "Vous n'avez pas encore créé d'œuvre. Commencez dès maintenant !"
+                };
+            {% endif %}
             
             document.getElementById('oeuvreTitle').textContent = oeuvreData.title;
             document.getElementById('oeuvreAuthor').textContent = "Par " + oeuvreData.author;
@@ -1279,31 +1308,51 @@
             document.getElementById('oeuvreStatus').textContent = oeuvreData.status;
             document.getElementById('oeuvreDescription').textContent = oeuvreData.description;
             
-            // Mettre à jour les tags
             const tagsContainer = document.getElementById('oeuvreTags');
             tagsContainer.innerHTML = '';
-            oeuvreData.tags.forEach(tag => {
+            if (oeuvreData.tags && oeuvreData.tags.length > 0) {
+                oeuvreData.tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = tag;
+                    tagsContainer.appendChild(tagElement);
+                });
+            } else {
                 const tagElement = document.createElement('span');
                 tagElement.className = 'tag';
-                tagElement.textContent = tag;
+                tagElement.textContent = 'Non catégorisé';
                 tagsContainer.appendChild(tagElement);
-            });
+            }
             
             openModal('oeuvreModal');
         }
 
-        function openArtefactModal(index) {
-            // Récupérer les données de l'artefact
-            const artefactData = {
-                name: "{{ artefacts[0].name|default('Nom de l\'artefact') }}",
-                type: "Arme légendaire",
-                image: "{{ artefacts[0].imageUrl|default('') }}",
-                rarity: "Légendaire",
-                powers: "Contrôle des éléments",
-                date: "{{ artefacts[0].createdAt ? artefacts[0].createdAt|date('d/m/Y') : '01/01/2024' }}",
-                origin: "Ancienne civilisation perdue",
-                description: "{{ artefacts[0].origins|default('Description de l\'artefact...') }}"
-            };
+        // Fonction pour ouvrir la modale d'artefact
+        function openArtefactModal(id) {
+            {% if artefacts is defined and artefacts|length > 0 %}
+                {% set artefact = artefacts[0] %}
+                const artefactData = {
+                    name: "{{ artefact.name|default('Nom de l\'artefact')|e('js') }}",
+                    type: "{{ artefact.type|default('Artefact mystérieux')|e('js') }}",
+                    image: "{{ artefact.imageUrl|default('')|e('js') }}",
+                    rarity: "{{ artefact.rarity|default('Légendaire')|e('js') }}",
+                    powers: "{{ artefact.powers|default('Pouvoirs inconnus')|e('js') }}",
+                    date: "{{ artefact.createdAt ? artefact.createdAt|date('d/m/Y') : '01/01/2024' }}",
+                    origin: "{{ artefact.origins|default('Origine inconnue')|e('js') }}",
+                    description: "{{ artefact.description|default(artefact.origins)|default('Description de l\'artefact...')|e('js') }}"
+                };
+            {% else %}
+                const artefactData = {
+                    name: "Aucun artefact",
+                    type: "-",
+                    image: "",
+                    rarity: "-",
+                    powers: "-",
+                    date: "-",
+                    origin: "-",
+                    description: "Vous n'avez pas encore créé d'artefact. Commencez dès maintenant !"
+                };
+            {% endif %}
             
             document.getElementById('artefactName').textContent = artefactData.name;
             document.getElementById('artefactType').textContent = artefactData.type;
@@ -1317,20 +1366,44 @@
             openModal('artefactModal');
         }
 
+        // Fonction pour ouvrir la modale d'univers
         function openUniverseModal(universeId) {
-            // Récupérer les données de l'univers
-            const universeData = {
-                name: universeId === 'universe-1' ? 'Nuit Éternelle' : 'Châteaux Flottants',
-                creator: "{{ app.user.username }}",
-                image: "",
-                themes: universeId === 'universe-1' ? ['Sombre', 'Mystère'] : ['Épic', 'Magie'],
-                favorites: universeId === 'universe-1' ? '1,240' : '892',
-                date: '01/01/2024',
-                status: 'Public',
-                description: universeId === 'universe-1' 
-                    ? 'Un monde plongé dans une nuit perpétuelle, où la lune ne se couche jamais et les créatures nocturnes règnent en maître.' 
-                    : 'Des forteresses majestueuses flottant dans les nuages, où la magie est omniprésente et les chevaliers combattent à dos de griffons.'
-            };
+            let universeData;
+            
+            if (universeId === 'universe-1') {
+                universeData = {
+                    name: 'Nuit Éternelle',
+                    creator: "{{ app.user.username|e('js') }}",
+                    image: "",
+                    themes: ['Sombre', 'Mystère'],
+                    favorites: '1,240',
+                    date: '01/01/2024',
+                    status: 'Public',
+                    description: 'Un monde plongé dans une nuit perpétuelle, où la lune ne se couche jamais et les créatures nocturnes règnent en maître.'
+                };
+            } else if (universeId === 'universe-2') {
+                universeData = {
+                    name: 'Châteaux Flottants',
+                    creator: "{{ app.user.username|e('js') }}",
+                    image: "",
+                    themes: ['Épic', 'Magie'],
+                    favorites: '892',
+                    date: '01/01/2024',
+                    status: 'Public',
+                    description: 'Des forteresses majestueuses flottant dans les nuages, où la magie est omniprésente et les chevaliers combattent à dos de griffons.'
+                };
+            } else {
+                universeData = {
+                    name: 'Univers inconnu',
+                    creator: "{{ app.user.username|e('js') }}",
+                    image: "",
+                    themes: [],
+                    favorites: '0',
+                    date: '01/01/2024',
+                    status: 'Privé',
+                    description: 'Description non disponible.'
+                };
+            }
             
             document.getElementById('universeName').textContent = universeData.name;
             document.getElementById('universeCreator').textContent = "Créé par " + universeData.creator;
@@ -1340,44 +1413,42 @@
             document.getElementById('universeStatus').textContent = universeData.status;
             document.getElementById('universeDescription').textContent = universeData.description;
             
-            // Mettre à jour les thèmes
             const themesContainer = document.getElementById('universeThemes');
             themesContainer.innerHTML = '';
-            universeData.themes.forEach(theme => {
+            if (universeData.themes && universeData.themes.length > 0) {
+                universeData.themes.forEach(theme => {
+                    const themeElement = document.createElement('span');
+                    themeElement.className = 'tag';
+                    themeElement.textContent = theme;
+                    themesContainer.appendChild(themeElement);
+                });
+            } else {
                 const themeElement = document.createElement('span');
                 themeElement.className = 'tag';
-                themeElement.textContent = theme;
+                themeElement.textContent = 'Non catégorisé';
                 themesContainer.appendChild(themeElement);
-            });
+            }
             
             openModal('universeModal');
         }
 
         // Form submission feedback
         document.querySelectorAll('.profile-form, .password-form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Enregistrement...';
-                submitBtn.disabled = true;
-                
-                // Simulate loading
-                setTimeout(() => {
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-                }, 1500);
-            });
-        });
-
-        // Add hover effects to cards (seulement dans la section content)
-        document.querySelectorAll('.content-section .card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-10px) scale(1.02)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-            });
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        const originalText = submitBtn.textContent;
+                        submitBtn.textContent = 'Enregistrement...';
+                        submitBtn.disabled = true;
+                        
+                        setTimeout(() => {
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        }, 1500);
+                    }
+                });
+            }
         });
     </script>
 </body>
