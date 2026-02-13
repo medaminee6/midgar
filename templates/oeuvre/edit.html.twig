@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Modifier une Œuvre - Midgar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ===== VARIABLES ===== */
+:root {
+    --primary: #18E3A4;
+    --primary-dark: #13c891;
+    --text: #E6FFF6;
+    --text-muted: #B0B9B6;
+    --bg-main: #1A1F1E;
+    --bg-dark: #0D0F0F;
+    --glass: rgba(26,31,30,.55);
+    --card: rgba(26,31,30,.75);
+    --radius: 12px;
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* ===== BACKGROUND ===== */
+.video-bg, .overlay, .gradient {
+    position: fixed;
+    inset: 0;
+}
+
+.video-bg {
+    object-fit: cover;
+    z-index: -3;
+}
+
+.overlay {
+    background: rgba(0,0,0,.9);
+    z-index: -2;
+}
+
+.gradient {
+    background: linear-gradient(135deg,var(--bg-main),var(--bg-dark));
+    display: none;
+    z-index: -4;
+}
+
+/* ===== LAYOUT ===== */
+main {
+    padding: 4rem 1rem;
+}
+
+.section {
+    max-width: 1000px;
+    margin: auto;
+    background: var(--glass);
+    border-radius: 16px;
+    padding: 3rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(24,227,164,.15);
+}
+
+.card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    max-width: 720px;
+    margin: auto;
+}
+
+h1 {
+    color: var(--primary);
+    margin-bottom: .3rem;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+/* ===== FORM ===== */
+label {
+    display: block;
+    margin-bottom: .5rem;
+    font-size: .8rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: .85rem;
+    border-radius: 8px;
+    background: rgba(0,0,0,.35);
+    border: 1px solid rgba(24,227,164,.25);
+    color: var(--text);
+    font-size: .95rem;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 12px rgba(24,227,164,.35);
+}
+
+textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.form-group {
+    margin-bottom: 1.6rem;
+}
+
+/* ===== IMAGE PREVIEW ===== */
+.preview img {
+    max-width: 220px;
+    border-radius: 6px;
+    border: 1px solid rgba(24,227,164,.3);
+}
+
+/* ===== BUTTONS ===== */
+.actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: .85rem 2rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: .25s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #000;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 0 15px var(--primary);
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-secondary:hover {
+    background: var(--primary);
+    color: #000;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width:768px){
+    main { padding: 2rem 1rem; }
+    .section { padding: 2rem 1rem; }
+    .card { padding: 1.5rem; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="gradient" id="gradient"></div>
+<div class="overlay"></div>
+<video class="video-bg" autoplay muted loop playsinline id="bgVideo">
+    <source src="{{ asset('uploads/dragon.mp4') }}" type="video/mp4">
+</video>
+
+
+<main>
+<section class="section">
+
+<h1>Modifier une Œuvre</h1>
+<p class="subtitle">{{ oeuvre.title }}</p>
+
+<div class="card">
+<form method="POST" enctype="multipart/form-data">
+
+    <div class="form-group">
+        <label>Titre *</label>
+        <input type="text" name="title" value="{{ oeuvre.title }}" required>
+    </div>
+
+    <div class="form-group">
+        <label>Type *</label>
+        <select name="type" required>
+            <option value="">Choisir</option>
+            {% for t in ['roman','nouvelle','poesie','artwork','musique','autre'] %}
+                <option value="{{ t }}" {% if oeuvre.type == t %}selected{% endif %}>
+                    {{ t|capitalize }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Description *</label>
+        <textarea name="description" required>{{ oeuvre.description }}</textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Date de publication</label>
+        <input type="date" name="datePublication"
+               value="{{ oeuvre.datePublication ? oeuvre.datePublication|date('Y-m-d') : '' }}">
+    </div>
+
+    <div class="form-group">
+        <label>Image</label>
+        {% if oeuvre.imageUrl %}
+            <div class="preview">
+                <img src="{{ asset(oeuvre.imageUrl) }}" alt="">
+                <p class="subtitle">Laisser vide pour conserver l’image</p>
+            </div>
+        {% endif %}
+        <input type="file" name="image" accept="image/*">
+    </div>
+
+    <div class="form-group">
+        <label>Auteur</label>
+        <input type="text" name="author" value="{{ oeuvre.author }}">
+    </div>
+
+    <div class="actions">
+        <a href="{{ path('oeuvre_show', {id: oeuvre.id}) }}" class="btn btn-secondary">Annuler</a>
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
+    </div>
+
+</form>
+</div>
+
+</section>
+</main>
+
+<script>
+const video = document.getElementById('bgVideo');
+const gradient = document.getElementById('gradient');
+
+video.addEventListener('error', () => gradient.style.display = 'block');
+video.play().catch(() => gradient.style.display = 'block');
+</script>
+
+</body>
+</html>

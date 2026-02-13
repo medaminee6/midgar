@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Personnaliser ton feed - Midgar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/midgar.css">
+
+    <style>
+        .preference-form {
+            background-color: #1A1F1E;
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid #2A3139;
+        }
+
+        .form-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .form-section h3 {
+            color: #18E3A4;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-section p {
+            color: #B0B9B6;
+            font-size: 0.95rem;
+            margin-bottom: 1.2rem;
+        }
+
+        /* === GENRE RADIO CARDS === */
+        .radio-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .radio-grid input {
+            display: none;
+        }
+
+        .radio-card {
+            background-color: #0B0F0E;
+            border: 2px solid #2A3139;
+            border-radius: 10px;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .radio-card:hover {
+            transform: translateY(-3px);
+            border-color: #18E3A4;
+            box-shadow: 0 10px 25px rgba(24,227,164,0.15);
+        }
+
+        .radio-grid input:checked + .radio-card {
+            border-color: #18E3A4;
+            background: linear-gradient(135deg, rgba(24,227,164,0.15), rgba(24,227,164,0.05));
+            box-shadow: 0 0 0 1px rgba(24,227,164,0.6);
+        }
+
+        /* === THEMES CHECKBOX === */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            background-color: #0B0F0E;
+            border: 1px solid #2A3139;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: #18E3A4;
+            box-shadow: 0 0 10px rgba(24,227,164,0.15);
+        }
+
+        .checkbox-item input {
+            margin-right: 0.5rem;
+            accent-color: #18E3A4;
+        }
+
+        /* === NUMBER INPUT === */
+        .affinity-input {
+            width: 100%;
+            background-color: #0B0F0E;
+            border: 1px solid #2A3139;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            color: #E6FFF6;
+        }
+
+        .affinity-input:focus {
+            outline: none;
+            border-color: #18E3A4;
+            box-shadow: 0 0 10px rgba(24,227,164,0.2);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        @media (max-width: 640px) {
+            .radio-grid,
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+            <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+            <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+            <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+            <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+            <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+        </svg>
+        Midgar
+    </div>
+    <nav>
+        <ul>
+            <li><a href="/">Accueil</a></li>
+            <li><a href="/discover">Découvrir</a></li>
+            <li><a href="/universes">Univers</a></li>
+            <li><a href="/personnages">Personnages</a></li>
+            <li><a href="/oeuvre">Œuvre</a></li>
+            <li><a href="/artefact">Artefacts</a></li>
+            <li><a href="/shop">Boutique</a></li>
+            <li><a href="/challenges">Défis</a></li>
+        </ul>
+    </nav>
+    <div class="auth-buttons">
+        {% if app.user %}
+            <!-- Profil -->
+            <a href="{{ path('profile') }}" class="profile-link" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+                <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; border:2px solid #18E3A4;">
+                    {% if app.user.avatar %}
+                        <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}" style="width:100%; height:100%; object-fit:cover;">
+                    {% else %}
+                        <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}" style="width:100%; height:100%; object-fit:cover;">
+                    {% endif %}
+                </div>
+                <span style="color:#E6FFF6; font-weight:500;">{{ app.user.username }}</span>
+            </a>
+            <!-- Déconnexion -->
+            <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm">Déconnexion</a>
+        {% else %}
+            <!-- Connexion / Inscription -->
+            <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm">Connexion</a>
+            <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm">S'inscrire</a>
+        {% endif %}
+    </div>
+</header>
+
+<main class="section">
+    <div class="container">
+        <div style="max-width: 800px; margin: 0 auto;">
+
+            <h1 class="text-center mb-4">Personnaliser ton feed</h1>
+            <p class="text-center mb-5" style="color:#B0B9B6;">
+                Dis-nous ce que tu aimes, on s’occupe du reste ✨
+            </p>
+
+            <form class="preference-form" method="POST" action="{{ path('advanced_preferences') }}" novalidate>
+                
+                {% if errors is defined and errors | length > 0 %}
+                    <div style="background-color:#BD3B44;color:#E6FFF6;padding:1rem;border-radius:4px;margin-bottom:2rem;">
+                        <h4>Erreurs de validation:</h4>
+                        <ul>
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <!-- FREE DESCRIPTION -->
+                <div class="form-section">
+                    <h3>Description libre</h3>
+                    <p>Décris les univers, styles ou ambiances que tu préfères</p>
+                    <textarea class="form-control" name="free_description"
+                        placeholder="Ex : mondes sombres, magie ancienne, royaumes oubliés...">{{ preference.freeDescription | default('') }}</textarea>
+                </div>
+
+                <!-- FAVORITE GENRE -->
+                <div class="form-section">
+                    <h3>Genre favori</h3>
+                    <p>Choisis celui qui te représente le plus</p>
+
+                    <div class="radio-grid">
+                        <input type="radio" id="genre-epic" name="favorite_genre" value="Epic Fantasy" {% if preference.favoriteGenre == 'Epic Fantasy' %}checked{% endif %}>
+                        <label for="genre-epic" class="radio-card">Epic Fantasy</label>
+
+                        <input type="radio" id="genre-dark" name="favorite_genre" value="Dark Fantasy" {% if preference.favoriteGenre == 'Dark Fantasy' %}checked{% endif %}>
+                        <label for="genre-dark" class="radio-card">Dark Fantasy</label>
+
+                        <input type="radio" id="genre-heroic" name="favorite_genre" value="Heroic Fantasy" {% if preference.favoriteGenre == 'Heroic Fantasy' %}checked{% endif %}>
+                        <label for="genre-heroic" class="radio-card">Heroic Fantasy</label>
+
+                        <input type="radio" id="genre-medieval" name="favorite_genre" value="Medieval Fantasy" {% if preference.favoriteGenre == 'Medieval Fantasy' %}checked{% endif %}>
+                        <label for="genre-medieval" class="radio-card">Medieval Fantasy</label>
+
+                        <input type="radio" id="genre-scifi" name="favorite_genre" value="Sci-Fi Fantasy" {% if preference.favoriteGenre == 'Sci-Fi Fantasy' %}checked{% endif %}>
+                        <label for="genre-scifi" class="radio-card">Sci-Fi Fantasy</label>
+                    </div>
+                </div>
+
+                <!-- GENRE AFFINITY -->
+                <div class="form-section">
+                    <h3>Affinité avec ce genre</h3>
+                    <p>Sur une échelle de 1 à 10</p>
+
+                    <input type="number"
+                           name="genre_affinity"
+                           min="1"
+                           max="10"
+                           class="affinity-input"
+                           value="{{ preference.affinityLevel | default('') }}"
+                           placeholder="Ex : 8">
+                </div>
+
+                <!-- FAVORITE THEMES -->
+                <div class="form-section">
+                    <h3>Thèmes favoris</h3>
+
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="favorite_themes[]" value="Magie" {% if 'Magie' in preference.favoriteThemes %}checked{% endif %}> Magie
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="favorite_themes[]" value="Guerre" {% if 'Guerre' in preference.favoriteThemes %}checked{% endif %}> Guerre
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="favorite_themes[]" value="Politique" {% if 'Politique' in preference.favoriteThemes %}checked{% endif %}> Politique
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="favorite_themes[]" value="Nature" {% if 'Nature' in preference.favoriteThemes %}checked{% endif %}> Nature
+                        </label>
+                    </div>
+                </div>
+
+                <!-- CUSTOM TAGS -->
+                <div class="form-section">
+                    <h3>Tags personnalisés</h3>
+                    <p>Mots-clés séparés par des virgules</p>
+
+                    <input type="text"
+                           name="custom_tags"
+                           class="affinity-input"
+                           value="{{ preference.customTags | default('') }}"
+                           placeholder="Ex : dragons, magie noire, civilisations anciennes">
+                </div>
+
+                <!-- SUBMIT -->
+                <div style="text-align:center; margin-top:3rem;">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        {% if isCreating %}
+                            Enregistrer mes préférences
+                        {% else %}
+                            Mettre à jour mes préférences
+                        {% endif %}
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        <p style="text-align:center;color:#B0B9B6;">
+            &copy; 2026 Midgar Fantasy Platform
+        </p>
+    </div>
+</footer>
+
+</body>
+</html>
