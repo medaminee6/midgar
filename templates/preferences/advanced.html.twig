@@ -120,6 +120,9 @@
 <body>
 
 <header>
+<<<<<<< HEAD
+    <div class="logo">Midgar</div>
+=======
     <div class="logo">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
@@ -164,6 +167,7 @@
             <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm">S'inscrire</a>
         {% endif %}
     </div>
+>>>>>>> validation-final-2
 </header>
 
 <main class="section">
@@ -175,6 +179,9 @@
                 Dis-nous ce que tu aimes, on s’occupe du reste ✨
             </p>
 
+<<<<<<< HEAD
+            <form class="preference-form" novalidate>
+=======
             <form class="preference-form" method="POST" action="{{ path('advanced_preferences') }}" novalidate>
                 
                 {% if errors is defined and errors | length > 0 %}
@@ -187,13 +194,18 @@
                         </ul>
                     </div>
                 {% endif %}
+>>>>>>> validation-final-2
 
                 <!-- FREE DESCRIPTION -->
                 <div class="form-section">
                     <h3>Description libre</h3>
                     <p>Décris les univers, styles ou ambiances que tu préfères</p>
                     <textarea class="form-control" name="free_description"
+<<<<<<< HEAD
+                        placeholder="Ex : mondes sombres, magie ancienne, royaumes oubliés..."></textarea>
+=======
                         placeholder="Ex : mondes sombres, magie ancienne, royaumes oubliés...">{{ preference.freeDescription | default('') }}</textarea>
+>>>>>>> validation-final-2
                 </div>
 
                 <!-- FAVORITE GENRE -->
@@ -202,6 +214,19 @@
                     <p>Choisis celui qui te représente le plus</p>
 
                     <div class="radio-grid">
+<<<<<<< HEAD
+                        <input type="radio" id="genre-epic" name="favorite_genre" value="Epic Fantasy">
+                        <label for="genre-epic" class="radio-card">Epic Fantasy</label>
+
+                        <input type="radio" id="genre-dark" name="favorite_genre" value="Dark Fantasy">
+                        <label for="genre-dark" class="radio-card">Dark Fantasy</label>
+
+                        <input type="radio" id="genre-heroic" name="favorite_genre" value="Heroic Fantasy">
+                        <label for="genre-heroic" class="radio-card">Heroic Fantasy</label>
+
+                        <input type="radio" id="genre-medieval" name="favorite_genre" value="Medieval Fantasy">
+                        <label for="genre-medieval" class="radio-card">Medieval Fantasy</label>
+=======
                         <input type="radio" id="genre-epic" name="favorite_genre" value="Epic Fantasy" {% if preference.favoriteGenre == 'Epic Fantasy' %}checked{% endif %}>
                         <label for="genre-epic" class="radio-card">Epic Fantasy</label>
 
@@ -216,6 +241,7 @@
 
                         <input type="radio" id="genre-scifi" name="favorite_genre" value="Sci-Fi Fantasy" {% if preference.favoriteGenre == 'Sci-Fi Fantasy' %}checked{% endif %}>
                         <label for="genre-scifi" class="radio-card">Sci-Fi Fantasy</label>
+>>>>>>> validation-final-2
                     </div>
                 </div>
 
@@ -229,7 +255,10 @@
                            min="1"
                            max="10"
                            class="affinity-input"
+<<<<<<< HEAD
+=======
                            value="{{ preference.affinityLevel | default('') }}"
+>>>>>>> validation-final-2
                            placeholder="Ex : 8">
                 </div>
 
@@ -239,6 +268,18 @@
 
                     <div class="checkbox-grid">
                         <label class="checkbox-item">
+<<<<<<< HEAD
+                            <input type="checkbox" name="favorite_themes[]" value="Magie"> Magie
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="favorite_themes[]" value="Guerre"> Guerre
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="favorite_themes[]" value="Politique"> Politique
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="favorite_themes[]" value="Nature"> Nature
+=======
                             <input type="checkbox" name="favorite_themes[]" value="Magie" {% if 'Magie' in preference.favoriteThemes %}checked{% endif %}> Magie
                         </label>
                         <label class="checkbox-item">
@@ -249,6 +290,7 @@
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="favorite_themes[]" value="Nature" {% if 'Nature' in preference.favoriteThemes %}checked{% endif %}> Nature
+>>>>>>> validation-final-2
                         </label>
                     </div>
                 </div>
@@ -261,18 +303,26 @@
                     <input type="text"
                            name="custom_tags"
                            class="affinity-input"
+<<<<<<< HEAD
+=======
                            value="{{ preference.customTags | default('') }}"
+>>>>>>> validation-final-2
                            placeholder="Ex : dragons, magie noire, civilisations anciennes">
                 </div>
 
                 <!-- SUBMIT -->
                 <div style="text-align:center; margin-top:3rem;">
+<<<<<<< HEAD
+                    <button class="btn btn-primary btn-lg">
+                        Enregistrer mes préférences
+=======
                     <button type="submit" class="btn btn-primary btn-lg">
                         {% if isCreating %}
                             Enregistrer mes préférences
                         {% else %}
                             Mettre à jour mes préférences
                         {% endif %}
+>>>>>>> validation-final-2
                     </button>
                 </div>
 

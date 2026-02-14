@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Artefact;
 use App\Entity\Oeuvre;
+use App\Entity\Favoris;
 use App\Form\ProfileType;
 use App\Form\ChangePasswordType;
 use App\Repository\ArtefactRepository;
@@ -105,6 +106,32 @@ class ProfileController extends AbstractController
                 ->getResult();
         }
 
+        // Load user's favorites (oeuvres and artefacts)
+        $favoriOeuvres = [];
+        $favoriArtefacts = [];
+        if ($currentUser instanceof User) {
+            /** @var \App\Repository\FavorisRepository $favorisRepo */
+            $favorisRepo = $em->getRepository(Favoris::class);
+            $favorisOeuvres = $favorisRepo->findFavoriOeuvresByUser($currentUser->getId());
+            $favorisArtefacts = $favorisRepo->findFavoriArtefactsByUser($currentUser->getId());
+
+            // Fetch actual Oeuvre entities from IDs
+            foreach ($favorisOeuvres as $favori) {
+                $oeuvre = $oeuvreRepo->find($favori->getOeuvreId());
+                if ($oeuvre) {
+                    $favoriOeuvres[] = $oeuvre;
+                }
+            }
+
+            // Fetch actual Artefact entities from IDs
+            foreach ($favorisArtefacts as $favori) {
+                $artefact = $artefactRepo->find($favori->getArtefactId());
+                if ($artefact) {
+                    $favoriArtefacts[] = $artefact;
+                }
+            }
+        }
+
         return $this->render('profile/profile.html.twig', [
             'user' => $user,
             'profileForm' => $profileForm->createView(),
@@ -112,9 +139,9 @@ class ProfileController extends AbstractController
             'artefacts' => $artefacts,
             'oeuvres' => $oeuvres,
             'isOwner' => true,
-            ]);
-
-        
+            'favoriOeuvres' => $favoriOeuvres,
+            'favoriArtefacts' => $favoriArtefacts,
+        ]);
     }
 
     #[Route('/profile/delete', name: 'profile_delete', methods: ['POST'])]
@@ -143,41 +170,41 @@ class ProfileController extends AbstractController
         return $this->redirectToRoute('home');
     }
     #[Route('/profile/{id}', name: 'profile_public', requirements: ['id' => '\d+'])]
-public function publicProfile(
-    User $user,
-    EntityManagerInterface $em
-): Response {
-    // sécurité minimale
-    if (!$user->isVerified()) {
-        throw $this->createNotFoundException();
+    public function publicProfile(
+        User $user,
+        EntityManagerInterface $em
+    ): Response {
+        // sécurité minimale
+        if (!$user->isVerified()) {
+            throw $this->createNotFoundException();
+        }
+
+        // charger ses artefacts
+        $artefacts = $em->getRepository(Artefact::class)
+            ->createQueryBuilder('a')
+            ->where('a.createdBy = :user')
+            ->setParameter('user', $user)
+            ->orderBy('a.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        // charger ses œuvres
+        $oeuvres = $em->getRepository(Oeuvre::class)
+            ->createQueryBuilder('o')
+            ->where('o.createdBy = :user')
+            ->setParameter('user', $user)
+            ->orderBy('o.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('profile/profile.html.twig', [
+            'user' => $user,
+            'artefacts' => $artefacts,
+            'oeuvres' => $oeuvres,
+            'profileForm' => null,
+            'passwordForm' => null,
+            'isOwner' => false,
+        ]);
     }
-
-    // charger ses artefacts
-    $artefacts = $em->getRepository(Artefact::class)
-        ->createQueryBuilder('a')
-        ->where('a.createdBy = :user')
-        ->setParameter('user', $user)
-        ->orderBy('a.createdAt', 'DESC')
-        ->getQuery()
-        ->getResult();
-
-    // charger ses œuvres
-    $oeuvres = $em->getRepository(Oeuvre::class)
-        ->createQueryBuilder('o')
-        ->where('o.createdBy = :user')
-        ->setParameter('user', $user)
-        ->orderBy('o.createdAt', 'DESC')
-        ->getQuery()
-        ->getResult();
-
-    return $this->render('profile/profile.html.twig', [
-        'user' => $user,
-        'artefacts' => $artefacts,
-        'oeuvres' => $oeuvres,
-        'profileForm' => null,
-        'passwordForm' => null,
-        'isOwner' => false,
-    ]);
-}
 
 }

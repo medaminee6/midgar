@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Univers - Admin</title>
     <link rel="stylesheet" href="/css/midgar.css">
+<<<<<<< HEAD
+    <style>
+        .admin-layout { display: grid; grid-template-columns: 250px 1fr; gap: 0; min-height: 100vh; }
+        .admin-sidebar { background-color: #1A1F1E; border-right: 1px solid #2A3139; padding: 2rem 0; position: fixed; left: 0; top: 0; width: 250px; height: 100vh; overflow-y: auto; }
+        .admin-sidebar .logo { padding: 1rem 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid #2A3139; }
+        .admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+        .admin-sidebar nav li { margin: 0; }
+        .admin-sidebar nav a { display: block; padding: 12px 1.5rem; color: #B0B9B6; text-decoration: none; border-left: 3px solid transparent; transition: all 0.3s; }
+        .admin-sidebar nav a:hover { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; }
+        .admin-sidebar nav a.active { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; font-weight: 600; }
+        .admin-content { margin-left: 250px; padding: 2rem; }
+=======
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -121,6 +133,7 @@
         }
         
         .admin-content { margin-left: var(--sidebar-width); padding: 2rem; }
+>>>>>>> validation-final-2
         .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #2A3139; }
         .admin-header h1 { margin: 0; color: #18E3A4; }
         .table-wrapper { background-color: #1A1F1E; border-radius: 6px; overflow: hidden; }
@@ -139,6 +152,26 @@
 <body style="margin: 0;">
     <div class="admin-layout">
         <aside class="admin-sidebar">
+<<<<<<< HEAD
+            <div class="logo" style="color: #18E3A4; font-weight: 700; font-size: 1.2rem;">⚙️ Admin</div>
+            <nav>
+                <ul>
+                    <li><a href="/admin/dashboard">📊 Tableau de Bord</a></li>
+                    <li><a href="/admin/users">👥 Utilisateurs</a></li>
+                    <li><a href="/admin/oeuvres">📖 Œuvres</a></li>
+                    <li><a href="/admin/artefacts">⚔️ Artefacts</a></li>
+                    <li><a href="/admin/univers" class="active">🌍 Univers</a></li>
+                    <li><a href="/admin/personnages">👹 Personnages</a></li>
+                    <li><a href="/admin/produits">🛍️ Produits</a></li>
+                    <li><a href="/admin/commandes">📦 Commandes</a></li>
+                    <li><a href="/admin/challenges">🎯 Défis</a></li>
+                    <li><a href="/admin/submissions">📤 Soumissions</a></li>
+                    <li><a href="/admin/quiz-questions">❓ Questions Quiz</a></li>
+                    <li><a href="/admin/quiz-reponses">✅ Réponses Quiz</a></li>
+                    <li><a href="/admin/preferences">⚙️ Préférences</a></li>
+                </ul>
+            </nav>
+=======
             <div class="sidebar-logo">
                 <div class="logo-icon">⚡</div>
                 <div class="logo-text">Midgar Admin</div>
@@ -150,6 +183,7 @@
                 <li><a href="/admin/produits"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
                 <li><a href="/admin/challenges"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
             </ul>
+>>>>>>> validation-final-2
         </aside>
 
         <div class="admin-content">

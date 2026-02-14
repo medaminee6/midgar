@@ -1,3 +1,131 @@
+<<<<<<< HEAD
+{% extends 'base.html.twig' %}
+
+{% block title %}Tous les Artefacts - Midgar{% endblock %}
+
+{% block body %}
+<main>
+    <section class="section">
+        <div class="container">
+            {% for message in app.flashes('success') %}
+                <div style="background-color: #2d5c2d; border: 1px solid #4a8f4a; color: #90ee90; padding: 1rem; border-radius: 4px; margin-bottom: 2rem; text-align: center;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div style="background-color: #5c2d2d; border: 1px solid #8f4a4a; color: #ee9090; padding: 1rem; border-radius: 4px; margin-bottom: 2rem; text-align: center;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h1 style="margin-bottom: 0.5rem;">{{ myItems ? 'Mes Artefacts' : 'Tous les Artefacts' }}</h1>
+                    <p style="color: #B0B9B6; margin: 0;">{{ artefacts|length }} artefact(s) trouvé(s)</p>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    {% if currentUser %}
+                        {% if myItems %}
+                            <a href="{{ path('artefact_index') }}" style="padding: 12px 24px; background-color: #555; color: #fff; border: none; border-radius: 4px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.3s;">← Tous les Artefacts</a>
+                        {% else %}
+                            <a href="{{ path('artefact_index', {my_items: 1}) }}" style="padding: 12px 24px; background-color: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: 4px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.3s;">Mes Artefacts</a>
+                        {% endif %}
+                    {% endif %}
+                    <a href="{{ path('artefact_create') }}" style="padding: 12px 24px; background-color: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: 4px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.3s;">+ Créer un Artefact</a>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <form method="GET" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <input type="text" name="search" value="{{ search }}" placeholder="Rechercher par nom..." style="flex: 1; min-width: 200px; padding: 12px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-size: 0.95rem;">
+                    <button type="submit" style="padding: 12px 24px; background-color: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: 4px; font-weight: 700; cursor: pointer; transition: all 0.3s;">Rechercher</button>
+                    {% if search or type %}
+                        <a href="{{ path('artefact_index') }}" style="padding: 12px 24px; background-color: var(--border-color); color: var(--text-primary); border: none; border-radius: 4px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.3s;">Réinitialiser</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 250px 1fr; gap: 2rem;">
+                <!-- Sidebar avec filtres -->
+                <aside style="padding: 1.5rem; background-color: var(--bg-secondary); border-radius: 4px; border: 1px solid var(--border-color); height: fit-content;">
+                    <h4 style="margin: 0 0 1.5rem 0; color: var(--accent-primary); text-transform: uppercase; font-size: 0.85rem;">Filtrer par type</h4>
+                    <form method="GET">
+                        {% if types|length > 0 %}
+                            {% for filterType in types %}
+                                <label style="display: block; margin-bottom: 0.75rem; cursor: pointer; color: var(--text-primary);">
+                                    <input type="radio" name="type" value="{{ filterType }}" {% if type == filterType %}checked{% endif %} style="margin-right: 0.5rem; cursor: pointer; accent-color: var(--accent-primary);">
+                                    <span>{{ filterType }}</span>
+                                </label>
+                            {% endfor %}
+                            <label style="display: block; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); cursor: pointer; color: var(--text-primary);">
+                                <input type="radio" name="type" value="" {% if not type %}checked{% endif %} style="margin-right: 0.5rem; cursor: pointer; accent-color: var(--accent-primary);">
+                                <span style="font-weight: 600;">Tous les types</span>
+                            </label>
+                        {% else %}
+                            <p style="color: #B0B9B6; font-size: 0.9rem;">Aucun type disponible</p>
+                        {% endif %}
+                        {% if search %}
+                            <input type="hidden" name="search" value="{{ search }}">
+                        {% endif %}
+                        <button type="submit" style="width: 100%; margin-top: 1rem; padding: 8px 16px; background-color: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Appliquer</button>
+                    </form>
+                </aside>
+
+                <!-- Contenu principal -->
+                <div>
+            {% if artefacts %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+                    {% for artefact in artefacts %}
+                        <div style="background-color: #1A1F1E; border-radius: 8px; overflow: hidden; border: 1px solid #2A3139; transition: all 0.3s; display: flex; flex-direction: column;">
+                            {% if artefact.imageUrl %}
+                                <img src="{{ artefact.imageUrl }}" alt="{{ artefact.name }}" style="width: 100%; height: 160px; object-fit: cover;">
+                            {% else %}
+                                <div style="width: 100%; height: 160px; background: linear-gradient(135deg, #FF6B6B, #FF8E7F); display: flex; align-items: center; justify-content: center; font-size: 3rem;">✨</div>
+                            {% endif %}
+                            
+                            <div style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column;">
+                                <h3 style="font-size: 1.2rem; font-weight: 700; color: #E6FFF6; margin: 0 0 0.5rem 0; line-height: 1.3;">{{ artefact.name }}</h3>
+                                
+                                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                    <span style="display: inline-block; padding: 4px 10px; background-color: #0B0F0E; border: 1px solid #FF6B6B; color: #FF6B6B; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">{{ artefact.type }}</span>
+                                </div>
+                                
+                                <p style="font-size: 0.85rem; color: #B0B9B6; margin-bottom: 1rem; flex: 1; line-height: 1.5;">{{ artefact.origins|slice(0, 100) }}{% if artefact.origins|length > 100 %}...{% endif %}</p>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #B0B9B6; padding-top: 1rem; border-top: 1px solid #2A3139;">
+                                    <div>
+                                        <strong>{{ artefact.universe }}</strong>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <a href="{{ path('artefact_show', {id: artefact.id}) }}" style="padding: 6px 12px; background-color: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: 3px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 0.8rem;">Voir</a>
+                                        {% if currentUser and artefact.createdBy == currentUser %}
+                                            <a href="{{ path('artefact_edit', {id: artefact.id}) }}" style="padding: 6px 12px; background-color: #3a6f3a; color: white; border: none; border-radius: 3px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 0.8rem;">Éditer</a>
+                                            <form method="POST" action="{{ path('artefact_delete', {id: artefact.id}) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr?');">
+                                                <button type="submit" style="padding: 6px 12px; background-color: #d32f2f; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">Supprimer</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 3rem; color: #B0B9B6;">
+                    <p style="font-size: 1.1rem; margin-bottom: 1rem;">😔 Aucun artefact trouvé</p>
+                    <a href="{{ path('artefact_create') }}" style="padding: 12px 24px; background-color: var(--accent-primary); color: var(--bg-primary); border: none; border-radius: 4px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">Créer le premier</a>
+                </div>
+            {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+
+=======
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -490,6 +618,46 @@
         .universe-card:hover .card-banner img {
             transform: scale(1.1);
         }
+        
+        /* Favorite button on card */
+        .favorite-btn-card {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .favorite-btn-card:hover {
+            background: rgba(220, 53, 69, 0.8);
+            border-color: #dc3545;
+            transform: scale(1.1);
+        }
+        
+        .favorite-btn-card.favorited {
+            background: rgba(220, 53, 69, 0.8);
+            border-color: #dc3545;
+        }
+        
+        .favorite-btn-card.favorited .heart-icon {
+            animation: heartPop 0.3s ease;
+        }
+        
+        @keyframes heartPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
 
         .card-content {
             padding: 1.5rem;
@@ -942,6 +1110,13 @@
                                             {% else %}
                                                 ✨
                                             {% endif %}
+                                            {% if app.user %}
+                                                <button class="favorite-btn-card" 
+                                                        onclick="event.stopPropagation(); toggleFavoriteCard('artefact', {{ artefact.id }}, this)"
+                                                        data-artefact-id="{{ artefact.id }}">
+                                                    <span class="heart-icon">🤍</span>
+                                                </button>
+                                            {% endif %}
                                         </div>
                                         <div class="card-content">
                                             <h3 class="card-title">{{ artefact.name }}</h3>
@@ -1133,6 +1308,59 @@
                 link.classList.add('active');
             }
         });
+
+        // ===== FAVORITE BUTTON FUNCTIONALITY =====
+        // Toggle favorite on card click
+        async function toggleFavoriteCard(type, id, button) {
+            try {
+                const response = await fetch(`/favoris/${type}/${id}/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                const heartIcon = button.querySelector('.heart-icon');
+                
+                if (data.success) {
+                    if (data.favorited) {
+                        button.classList.add('favorited');
+                        heartIcon.textContent = '❤️';
+                    } else {
+                        button.classList.remove('favorited');
+                        heartIcon.textContent = '🤍';
+                    }
+                } else {
+                    alert('Erreur: ' + (data.message || 'Impossible de modifier les favoris'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue');
+            }
+        }
+
+        // Check favorites status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check all artefact favorites
+            {% if app.user %}
+            fetch('/favoris/check/artefacts')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.favoritedIds) {
+                        data.favoritedIds.forEach(id => {
+                            const btn = document.querySelector(`.favorite-btn-card[data-artefact-id="${id}"]`);
+                            if (btn) {
+                                btn.classList.add('favorited');
+                                btn.querySelector('.heart-icon').textContent = '❤️';
+                            }
+                        });
+                    }
+                })
+                .catch(err => console.log('Error checking favorites:', err));
+            {% endif %}
+        });
     </script>
 </body>
 </html>
+>>>>>>> validation-final-2

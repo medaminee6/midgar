@@ -33,7 +33,7 @@ security:
                 lifetime: 604800
                 path: /
 
-   
+
 # Config pour les tests
 when@test:
     security:

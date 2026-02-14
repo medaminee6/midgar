@@ -3,6 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
+    <title>{% block title %}Midgar{% endblock %}</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        :root {
+            --bg-primary: #0B0F0E;
+            --bg-secondary: #1A1F1E;
+            --text-primary: #E6FFF6;
+            --text-secondary: #B0B9B6;
+            --accent-primary: #18E3A4;
+            --accent-hover: #0DCF92;
+            --border-color: #2A3139;
+            --shadow-color: rgba(24, 227, 164, 0.15);
+        }
+
+=======
     <title>{% block title %}Midgar - Plateforme de Création Fantasy{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -144,10 +160,183 @@
             --border-radius: 12px;
         }
         
+>>>>>>> validation-final-2
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+<<<<<<< HEAD
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-primary);
+        }
+
+        header .logo svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        header nav {
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        header nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        header nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        header nav a:hover {
+            color: var(--accent-primary);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            background-color: transparent;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(24, 227, 164, 0.1);
+        }
+
+        .btn-sm {
+            padding: 0.55rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        main {
+            min-height: calc(100vh - 200px);
+        }
+
+        .section {
+            padding: 3rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        footer {
+            background-color: var(--bg-secondary);
+            border-top: 2px solid var(--border-color);
+            padding: 3rem 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            header nav {
+                margin: 0;
+            }
+
+            header nav ul {
+                justify-content: center;
+                gap: 1rem;
+            }
+=======
             font-family: 'Arial', sans-serif;
         }
         
@@ -775,10 +964,73 @@
         
         .pulse {
             animation: pulse 2s infinite;
+>>>>>>> validation-final-2
         }
     </style>
 </head>
 <body>
+<<<<<<< HEAD
+    <header>
+        <div class="logo">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="50" y1="20" x2="50" y2="50" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="35" cy="40" r="3" fill="currentColor"/>
+                <circle cx="65" cy="40" r="3" fill="currentColor"/>
+                <circle cx="50" cy="60" r="4" fill="currentColor"/>
+                <circle cx="50" cy="70" r="3" fill="currentColor"/>
+            </svg>
+            Midgar
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/">Accueil</a></li>
+                <li><a href="/discover">Découvrir</a></li>
+                <li><a href="/universes">Univers</a></li>
+                <li><a href="/oeuvre">Œuvre</a></li>
+                <li><a href="/artefact">Artefacts</a></li>
+                <li><a href="/shop">Boutique</a></li>
+                <li><a href="/challenges">Défis</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    {% block body %}{% endblock %}
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>À propos</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">À propos de Midgar</a></li>
+                        <li><a href="#">Notre mission</a></li>
+                        <li><a href="#">Équipe</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Ressources</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Aide & Support</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Légal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Conditions d'utilisation</a></li>
+                        <li><a href="#">Politique de confidentialité</a></li>
+                        <li><a href="#">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
+            </div>
+        </div>
+    </footer>
+=======
     <!-- VIDEO BACKGROUND -->
     <video id="bg-video" class="video-background" autoplay muted loop playsinline>
         <source src="/uploads/dragon.mp4" type="video/mp4">
@@ -896,5 +1148,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
+>>>>>>> validation-final-2
 </body>
 </html>

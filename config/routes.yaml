@@ -3,6 +3,8 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+<<<<<<< HEAD
+=======
 
 # Sécurité (si tu n'utilises PAS les attributes pour ces routes)
 app_login:
@@ -22,3 +24,4 @@ connect_google_start:
 
 connect_google_check:
     path: /connect/google/check
+>>>>>>> validation-final-2

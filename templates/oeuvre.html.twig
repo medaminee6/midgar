@@ -299,7 +299,10 @@
                 <li><a href="/">Accueil</a></li>
                 <li><a href="/discover">Découvrir</a></li>
                 <li><a href="/universes">Univers</a></li>
+<<<<<<< HEAD
+=======
                 <li><a href="/personnages">Personnages</a></li>
+>>>>>>> validation-final-2
                 <li><a href="/oeuvre">Œuvre</a></li>
                 <li><a href="/artefact">Artefacts</a></li>
                 <li><a href="/shop">Boutique</a></li>
@@ -307,6 +310,10 @@
             </ul>
         </nav>
         <div class="auth-buttons">
+<<<<<<< HEAD
+            <a href="/login" class="btn btn-secondary btn-sm">Connexion</a>
+            <a href="/register" class="btn btn-primary btn-sm">S'inscrire</a>
+=======
             {% if app.user %}
                 <!-- Profil -->
                 <a href="{{ path('profile') }}" class="profile-link" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
@@ -326,6 +333,7 @@
                 <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm">Connexion</a>
                 <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm">S'inscrire</a>
             {% endif %}
+>>>>>>> validation-final-2
         </div>
     </header>
 
@@ -339,7 +347,11 @@
                     </div>
                     <div class="create-ctas">
                         <a href="/create-oeuvre" class="create-cta">+ Créer une Œuvre</a>
+<<<<<<< HEAD
+                        
+=======
                         <a href="/create-artifact" class="create-cta" style="background-color: transparent; border: 1px solid #18E3A4; color: #18E3A4;">+ Créer un Artefact</a>
+>>>>>>> validation-final-2
                     </div>
                 </div>
 
@@ -349,6 +361,53 @@
                             <input type="text" class="search-box" id="searchInput" placeholder="Chercher...">
                         </div>
 
+<<<<<<< HEAD
+                        
+
+                        <div class="filter-group">
+    <h4>Type</h4>
+
+    <div class="filter-option">
+        <input type="checkbox" id="type-roman" value="Roman" class="type-filter">
+        <label for="type-roman">Roman</label>
+    </div>
+
+    <div class="filter-option">
+        <input type="checkbox" id="type-nouvelle" value="Nouvelle" class="type-filter">
+        <label for="type-nouvelle">Nouvelle</label>
+    </div>
+
+    <div class="filter-option">
+        <input type="checkbox" id="type-poesie" value="Poésie" class="type-filter">
+        <label for="type-poesie">Poésie</label>
+    </div>
+
+    <div class="filter-option">
+        <input type="checkbox" id="type-illustration" value="Illustration" class="type-filter">
+        <label for="type-illustration">Illustration</label>
+    </div>
+
+    <div class="filter-option">
+        <input type="checkbox" id="type-musique" value="Musique" class="type-filter">
+        <label for="type-musique">Musique</label>
+    </div>
+
+</div>
+
+
+                        <div class="filter-group">
+    <h4>Tri</h4>
+    <div class="filter-option">
+        <input type="radio" id="sort-newest" name="sort" value="newest" class="sort-filter" checked>
+        <label for="sort-newest">Récent</label>
+    </div>
+    <div class="filter-option">
+        <input type="radio" id="sort-oldest" name="sort" value="oldest" class="sort-filter">
+        <label for="sort-oldest">Plus ancien</label>
+    </div>
+</div>
+
+=======
                         <div class="filter-group">
                             <h4>Genre</h4>
                             <div class="filter-option">
@@ -412,6 +471,7 @@
                                 <label for="sort-trending">Tendance</label>
                             </div>
                         </div>
+>>>>>>> validation-final-2
 
                         <button class="filter-reset" id="resetFilters">Réinitialiser</button>
                     </div>
@@ -475,6 +535,16 @@
     </footer>
 
     <script>
+<<<<<<< HEAD
+        const mockOeuvres = [];
+
+        let filtered = [...mockOeuvres];
+        let displayedItems = 12;
+        let currentSort = 'newest';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderOeuvres();
+=======
         const mockUniverses = [
             {id:1,name:"Nuit Éternelle",genre:["dark-fantasy"],themes:["mystere","magie"],desc:"Monde plongé dans une nuit perpétuelle",banner:"🌙",creator:"Léa M.",avatar:"L",personnages:12,oeuvres:28,artefacts:7,likes:1240,date:new Date(2026,0,20)},
             {id:2,name:"Châteaux Flottants",genre:["high-fantasy"],themes:["aventure","magie"],desc:"Forteresses majestueuses flottent dans les nuages",banner:"☁️",creator:"Léa M.",avatar:"L",personnages:18,oeuvres:45,artefacts:12,likes:892,date:new Date(2026,0,18)},
@@ -495,18 +565,42 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderUniverses();
+>>>>>>> validation-final-2
             attachListeners();
         });
 
         function attachListeners(){
+<<<<<<< HEAD
+            document.querySelectorAll('.type-filter').forEach(cb => cb.addEventListener('change', filterAndSortOeuvres));
+            document.querySelectorAll('.sort-filter').forEach(r => r.addEventListener('change', filterAndSortOeuvres));
+            document.getElementById('searchInput').addEventListener('input', filterAndSortOeuvres);
+=======
             document.querySelectorAll('.genre-filter').forEach(cb => cb.addEventListener('change', filterUniverses));
             document.querySelectorAll('.theme-filter').forEach(cb => cb.addEventListener('change', filterUniverses));
             document.querySelectorAll('.sort-filter').forEach(r => r.addEventListener('change', filterUniverses));
             document.getElementById('searchInput').addEventListener('input', filterUniverses);
+>>>>>>> validation-final-2
             document.getElementById('resetFilters').addEventListener('click', () => {
                 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
                 document.getElementById('sort-newest').checked = true;
                 document.getElementById('searchInput').value = '';
+<<<<<<< HEAD
+                currentSort = 'newest';
+                filtered = [...mockOeuvres];
+                displayedItems = 12;
+                renderOeuvres();
+            });
+            document.getElementById('loadMoreBtn')?.addEventListener('click', () => { displayedItems += 12; renderOeuvres(); });
+        }
+
+        function filterAndSortOeuvres(){
+            const types = Array.from(document.querySelectorAll('.type-filter:checked')).map(cb => cb.value);
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            currentSort = document.querySelector('.sort-filter:checked').value;
+
+            filtered = mockOeuvres.filter(item => {
+                if(types.length > 0 && !types.includes(item.type)) return false;
+=======
                 filtered = [...mockUniverses];
                 displayedItems = 12;
                 renderUniverses();
@@ -523,10 +617,25 @@
             filtered = mockUniverses.filter(item => {
                 if(genres.length > 0 && !genres.some(g => item.genre.includes(g))) return false;
                 if(themes.length > 0 && !themes.some(t => item.themes.includes(t))) return false;
+>>>>>>> validation-final-2
                 if(search && !item.name.toLowerCase().includes(search)) return false;
                 return true;
             });
 
+<<<<<<< HEAD
+            // Appliquer le tri
+            if(currentSort === 'newest') {
+                filtered.sort((a,b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
+            } else {
+                filtered.sort((a,b) => new Date(a.createdAt || a.date) - new Date(b.createdAt || b.date));
+            }
+
+            displayedItems = 12;
+            renderOeuvres();
+        }
+
+        function renderOeuvres(){
+=======
             if(sort === 'newest') filtered.sort((a,b) => b.date - a.date);
             else if(sort === 'popular') filtered.sort((a,b) => (b.likes || b.personnages) - (a.likes || a.personnages));
             else filtered.sort((a,b) => (b.likes || 0) - (a.likes || 0));
@@ -536,6 +645,7 @@
         }
 
         function renderUniverses(){
+>>>>>>> validation-final-2
             const grid = document.getElementById('universesGrid');
             const empty = document.getElementById('emptyState');
             const more = document.getElementById('loadMoreContainer');
@@ -547,21 +657,35 @@
                 filtered.slice(0, displayedItems).forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'universe-card';
+<<<<<<< HEAD
+=======
                     const genreMap = {'high-fantasy':'Haute Fantaisie','dark-fantasy':'Sombre','scifi-fantasy':'Sci-Fi','urban-fantasy':'Urban'};
                     const genreTags = item.genre.map(g => `<span class="genre-tag">${genreMap[g] || g}</span>`).join('');
+>>>>>>> validation-final-2
                     card.innerHTML = `
                         <div class="card-banner">${item.banner}</div>
                         <div class="card-content">
                             <h3 class="card-title">${item.name}</h3>
+<<<<<<< HEAD
+                            <div class="card-genre-tags"><span class="genre-tag">${item.type}</span></div>
+                            <p class="card-description">${item.desc}</p>
+                            <div class="card-footer">
+                                <div class="card-stats"><div class="stat">Likes ${item.likes || 0}</div><div class="stat">By ${item.author || 'Anonyme'}</div></div>
+=======
                             <div class="card-genre-tags">${genreTags}</div>
                             <p class="card-description">${item.desc}</p>
                             <div class="card-footer">
                                 <div class="card-stats"><div class="stat">Characters ${item.personnages}</div><div class="stat">Works ${item.oeuvres}</div><div class="stat">Artifacts ${item.artefacts}</div></div>
+>>>>>>> validation-final-2
                                 <div class="creator-info"><div class="creator-avatar">${item.avatar}</div><span>${item.creator}</span></div>
                             </div>
                         </div>
                     `;
+<<<<<<< HEAD
+                    card.addEventListener('click', () => window.location.href = `/oeuvre-detail?id=${item.id}`);
+=======
                     card.addEventListener('click', () => window.location.href = `/universe-detail?id=${item.id}`);
+>>>>>>> validation-final-2
                     grid.appendChild(card);
                 });
                 more.style.display = filtered.length > displayedItems ? 'flex' : 'none';

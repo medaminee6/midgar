@@ -4,6 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Produits - Admin</title>
+<<<<<<< HEAD
+    <link rel="stylesheet" href="/css/midgar.css">
+
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-bg: #1A1F1E;
+            --accent: #18E3A4;
+            --muted: #B0B9B6;
+            --panel-bg: #0B0F0E;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid #2A3139;
+            padding: 2rem 0;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .admin-sidebar .logo {
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #2A3139;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+
+        .admin-sidebar nav a {
+            display: block;
+            padding: 12px 1.5rem;
+            color: var(--muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .admin-sidebar nav a:hover,
+        .admin-sidebar nav a.active {
+            background-color: #0B0F0E;
+=======
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -151,11 +204,36 @@
 
         .admin-sidebar a:hover,
         .admin-sidebar a.active {
+>>>>>>> validation-final-2
             color: var(--accent);
             border-left-color: var(--accent);
             font-weight: 600;
         }
 
+<<<<<<< HEAD
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #2A3139;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            color: var(--accent);
+        }
+
+        .table-wrapper {
+            background-color: #1A1F1E;
+            border-radius: 6px;
+            overflow: auto;
+=======
         .admin-sidebar a:hover i,
         .admin-sidebar a.active i {
             transform: scale(1.1);
@@ -373,11 +451,71 @@
 
         .table-wrapper {
             overflow-x: auto;
+>>>>>>> validation-final-2
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+<<<<<<< HEAD
+        }
+
+        th {
+            background-color: var(--panel-bg);
+            padding: 1rem 1.5rem;
+            text-align: left;
+            color: var(--accent);
+            font-weight: 600;
+            border-bottom: 1px solid #2A3139;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #2A3139;
+            color: #E6FFF6;
+        }
+
+        tr:hover { background-color: #252A29; }
+
+        .action-buttons { display: flex; gap: 0.5rem; }
+
+        .btn-edit {
+            background-color: var(--accent);
+            color: #0B0F0E;
+            padding: 4px 12px;
+            border-radius: 3px;
+            text-decoration: none;
+        }
+
+        .btn-delete {
+            background-color: #BD3B44;
+            color: #E6FFF6;
+            padding: 4px 12px;
+            border-radius: 3px;
+            text-decoration: none;
+        }
+
+        .mt-4 { margin-top: 3rem; }
+        .mb-2 { margin-bottom: 1rem; }
+    </style>
+</head>
+
+<body>
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="logo">Admin</div>
+        <nav>
+            <ul>
+                <li><a href="/admin/dashboard">Tableau de bord</a></li>
+                <li><a href="/admin/users">Utilisateurs</a></li>
+                <li><a href="/admin/quiz-questions">Quiz</a></li>
+                <li><a href="/admin/produits" class="active">Shop</a></li>
+                <li><a href="/admin/challenges">Défis</a></li>
+            </ul>
+        </nav>
+=======
             min-width: 1000px;
         }
 
@@ -747,14 +885,101 @@
         </div>
         <ul>
             <li><a href="{{ path('admin_users') }}"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+            <li><a href="{{ path('admin_oeuvres') }}"><i class="fas fa-book"></i><span>Œuvres</span></a></li>
+            <li><a href="{{ path('admin_artefacts') }}"><i class="fas fa-gem"></i><span>Artefacts</span></a></li>
             <li><a href="{{ path('admin_quiz_questions') }}"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
             <li><a href="{{ path('admin_produits') }}" class="active"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
             <li><a href="{{ path('admin_challenges') }}"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
         </ul>
+>>>>>>> validation-final-2
     </aside>
 
     <!-- CONTENT -->
     <main class="admin-content">
+<<<<<<< HEAD
+
+        <div class="admin-header">
+            <h1>Gestion des Produits</h1>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>Nom produit</th>
+                    <th>Description</th>
+                    <th>Prix</th>
+                    <th>Type</th>
+                    <th>Quantité</th>
+                    <th>Date ajout</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Grimoire Ancestral</td>
+                    <td>Recueil de sorts rares</td>
+                    <td>29,99€</td>
+                    <td>Livre</td>
+                    <td>124</td>
+                    <td>2025-05-12</td>
+                    <td class="action-buttons">
+                        <a href="#" class="btn-edit">Éditer</a>
+                        <a href="#" class="btn-delete">Supprimer</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Kit Personnage Pro</td>
+                    <td>Assets complets de création</td>
+                    <td>39,99€</td>
+                    <td>Pack</td>
+                    <td>8</td>
+                    <td>2025-08-01</td>
+                    <td class="action-buttons">
+                        <a href="#" class="btn-edit">Éditer</a>
+                        <a href="#" class="btn-delete">Supprimer</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FORM -->
+        <section class="mt-4">
+            <h2>Ajouter un produit</h2>
+
+            <div class="mb-2">
+                <label>Nom produit</label>
+                <input class="form-control" type="text">
+            </div>
+
+            <div class="mb-2">
+                <label>Description</label>
+                <textarea class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="mb-2">
+                <label>Prix</label>
+                <input class="form-control" type="text">
+            </div>
+
+            <div class="mb-2">
+                <label>Type</label>
+                <input class="form-control" type="text">
+            </div>
+
+            <div class="mb-2">
+                <label>Quantité</label>
+                <input class="form-control" type="number">
+            </div>
+        </section>
+
+    </main>
+</div>
+</body>
+</html>
+=======
         <!-- PAGE HEADER -->
         <div class="page-header">
             <h1 class="page-title"><i class="fas fa-shopping-cart"></i> Gestion des Produits</h1>
@@ -975,3 +1200,4 @@
 
 </body>
 </html>
+>>>>>>> validation-final-2

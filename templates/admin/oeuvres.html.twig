@@ -5,96 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Œuvres - Admin</title>
     <link rel="stylesheet" href="/css/midgar.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<<<<<<< HEAD
     <style>
-        :root {
-            --sidebar-width: 280px;
-            --border: #2A3139;
-            --border-light: #3A424A;
-            --accent: #18E3A4;
-            --accent-light: rgba(24,227,164,0.12);
-            --accent-glow: rgba(24,227,164,0.25);
-            --text-muted: #9BA6A2;
-        }
-        .admin-layout { display: flex; min-height: 100vh; }
-        /* ===== SIDEBAR ===== */
-        .admin-sidebar {
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
-            border-right: 1px solid var(--border);
-            padding: 2.5rem 0;
-            position: fixed;
-            height: 100vh;
-            z-index: 100;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        .sidebar-logo {
-            padding: 0 1.5rem 1.5rem;
-            margin-bottom: 2.5rem;
-            border-bottom: 1px solid var(--border-light);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .logo-icon {
-            font-size: 1.8rem;
-            color: var(--accent);
-            filter: drop-shadow(0 0 10px var(--accent-glow));
-        }
-        .logo-text {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--accent);
-            letter-spacing: -0.5px;
-        }
-        .admin-sidebar ul { list-style: none; }
-        .admin-sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 1.5rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            border-left: 3px solid transparent;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            margin: 0.25rem 0;
-            font-weight: 500;
-        }
-        .admin-sidebar a i {
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-        .admin-sidebar a::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, var(--accent-light), transparent);
-            transition: width 0.4s ease;
-            z-index: -1;
-        }
-        .admin-sidebar a:hover::before,
-        .admin-sidebar a.active::before {
-            width: 100%;
-        }
-        .admin-sidebar a:hover,
-        .admin-sidebar a.active {
-            color: var(--accent);
-            border-left-color: var(--accent);
-            font-weight: 600;
-        }
-        .admin-sidebar a:hover i,
-        .admin-sidebar a.active i {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 5px var(--accent-glow));
-        }
-        .admin-content { margin-left: var(--sidebar-width); padding: 2rem; }
+        .admin-layout { display: grid; grid-template-columns: 250px 1fr; gap: 0; min-height: 100vh; }
+        .admin-sidebar { background-color: #1A1F1E; border-right: 1px solid #2A3139; padding: 2rem 0; position: fixed; left: 0; top: 0; width: 250px; height: 100vh; overflow-y: auto; }
+        .admin-sidebar .logo { padding: 1rem 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid #2A3139; }
+        .admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+        .admin-sidebar nav li { margin: 0; }
+        .admin-sidebar nav a { display: block; padding: 12px 1.5rem; color: #B0B9B6; text-decoration: none; border-left: 3px solid transparent; transition: all 0.3s; }
+        .admin-sidebar nav a:hover { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; }
+        .admin-sidebar nav a.active { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; font-weight: 600; }
+        .admin-content { margin-left: 250px; padding: 2rem; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #2A3139; }
         .admin-header h1 { margin: 0; color: #18E3A4; }
         .table-wrapper { background-color: #1A1F1E; border-radius: 6px; overflow: hidden; }
@@ -114,16 +35,24 @@
 <body style="margin: 0;">
     <div class="admin-layout">
         <aside class="admin-sidebar">
-            <div class="sidebar-logo">
-                <div class="logo-icon">⚡</div>
-                <div class="logo-text">Midgar Admin</div>
-            </div>
-            <ul>
-                <li><a href="{{ path('admin_users') }}"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
-                <li><a href="{{ path('admin_quiz_questions') }}"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
-                <li><a href="{{ path('admin_produits') }}"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
-                <li><a href="{{ path('admin_challenges') }}"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
-            </ul>
+            <div class="logo" style="color: #18E3A4; font-weight: 700; font-size: 1.2rem;">⚙️ Admin</div>
+            <nav>
+                <ul>
+                    <li><a href="/admin/dashboard">📊 Tableau de Bord</a></li>
+                    <li><a href="/admin/users">👥 Utilisateurs</a></li>
+                    <li><a href="/admin/oeuvres" class="active">📖 Œuvres</a></li>
+                    <li><a href="/admin/artefacts">⚔️ Artefacts</a></li>
+                    <li><a href="/admin/univers">🌍 Univers</a></li>
+                    <li><a href="/admin/personnages">👹 Personnages</a></li>
+                    <li><a href="/admin/produits">🛍️ Produits</a></li>
+                    <li><a href="/admin/commandes">📦 Commandes</a></li>
+                    <li><a href="/admin/challenges">🎯 Défis</a></li>
+                    <li><a href="/admin/submissions">📤 Soumissions</a></li>
+                    <li><a href="/admin/quiz-questions">❓ Questions Quiz</a></li>
+                    <li><a href="/admin/quiz-reponses">✅ Réponses Quiz</a></li>
+                    <li><a href="/admin/preferences">⚙️ Préférences</a></li>
+                </ul>
+            </nav>
         </aside>
 
         <div class="admin-content">
@@ -132,10 +61,305 @@
                 <button class="btn btn-primary btn-sm">+ Ajouter Œuvre</button>
             </div>
 
+=======
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --bg-main: #0B0F0E;
+            --border: #2A3139;
+            --border-light: #3A424A;
+            --accent: #18E3A4;
+            --accent-light: rgba(24,227,164,0.12);
+            --accent-glow: rgba(24,227,164,0.25);
+            --text-muted: #9BA6A2;
+            --radius: 8px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg-main); color: #E6FFF6; }
+        
+        /* ===== LAYOUT ===== */
+        .admin-layout { display: flex; min-height: 100vh; position: relative; }
+        
+        /* ===== SIDEBAR ===== */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+        .sidebar-logo { padding: 0 1.5rem 1.5rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { font-size: 1.8rem; color: var(--accent); }
+        .logo-text { font-size: 1.4rem; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+        .admin-sidebar ul { list-style: none; }
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .admin-sidebar a i { width: 20px; text-align: center; font-size: 1.1rem; }
+        .admin-sidebar a::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 0; height: 100%; width: 0;
+            background: linear-gradient(90deg, var(--accent-light), transparent);
+            transition: width 0.4s ease;
+            z-index: -1;
+        }
+        .admin-sidebar a:hover::before, .admin-sidebar a.active::before { width: 100%; }
+        .admin-sidebar a:hover, .admin-sidebar a.active { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+        
+        /* ===== CONTENT ===== */
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem 3rem;
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-main) 0%, #0F1413 100%);
+        }
+        .admin-content::before {
+            content: "";
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+        
+        /* ===== HEADER ===== */
+        .page-header { margin-bottom: 2.5rem; }
+        .page-title {
+            font-size: 2.5rem; color: var(--accent); margin-bottom: 0.5rem;
+            font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 1rem;
+        }
+        .page-title i { font-size: 2.2rem; filter: drop-shadow(0 0 8px var(--accent-glow)); }
+        .page-subtitle { color: var(--text-muted); font-size: 1.1rem; margin-left: 3.5rem; }
+        
+        /* ===== SEARCH ===== */
+        .search-form {
+            display: flex;
+            gap: 0.75rem;
+            flex: 1;
+            max-width: 450px;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-form input {
+            padding: 12px 18px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: #1A1F1E;
+            color: #E6FFF6;
+            flex: 1;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-form input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .search-form input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-form button {
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent), #12c896);
+            color: #000;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .search-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .search-form button::before {
+            content: "🔍";
+        }
+
+        .btn-link {
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            background: #2A3139;
+            color: #E6FFF6;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-link:hover {
+            background: #3A424A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        /* ===== STATS ===== */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat-card {
+            background: #1A1F1E;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-4px); }
+        .stat-icon {
+            width: 48px; height: 48px;
+            background: var(--accent-light);
+            border-radius: var(--radius);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .stat-icon i { font-size: 1.5rem; color: var(--accent); }
+        .stat-title { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.25rem; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); }
+        
+        /* ===== ALERT ===== */
+        .alert {
+            padding: 1.25rem 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;
+            border-left: 4px solid; animation: slideIn 0.5s;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .alert i { font-size: 1.4rem; }
+        .alert-success { background: rgba(24,227,164,0.08); border-left-color: var(--accent); color: var(--accent); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* ===== TABLE ===== */
+        .table-container { background: #1A1F1E; border-radius: var(--radius); overflow: hidden; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #0B0F0E; padding: 1rem 1.5rem; text-align: left; color: var(--accent); font-weight: 600; border-bottom: 1px solid var(--border); }
+        td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); color: #E6FFF6; vertical-align: middle; }
+        tr:hover { background: #252A29; }
+        
+        .description-truncate { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+        }
+        .badge-published { background: rgba(24,227,164,0.2); color: #18E3A4; }
+        .badge-draft { background: rgba(176,185,182,0.2); color: #B0B9B6; }
+        
+        /* ===== ACTIONS ===== */
+        .action-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
+            border-radius: 4px; text-decoration: none; font-size: 0.85rem; border: none; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-danger { background: #BD3B44; color: #fff; }
+        .btn-danger:hover { background: #c9444c; }
+        
+        /* ===== EMPTY STATE ===== */
+        .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Midgar Admin</div>
+        </div>
+        <ul>
+            <li><a href="{{ path('admin_users') }}"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+            <li><a href="{{ path('admin_oeuvres') }}" class="active"><i class="fas fa-book"></i><span>Œuvres</span></a></li>
+            <li><a href="{{ path('admin_artefacts') }}"><i class="fas fa-gem"></i><span>Artefacts</span></a></li>
+            <li><a href="{{ path('admin_quiz_questions') }}"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+            <li><a href="{{ path('admin_produits') }}"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+            <li><a href="{{ path('admin_challenges') }}"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="admin-content">
+        <a href="{{ path('home') }}" class="btn-link" style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+            <i class="fas fa-arrow-left"></i> Retour au site
+        </a>
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <h1 class="page-title"><i class="fas fa-book"></i> Gestion des œuvres</h1>
+            <p class="page-subtitle">Gérez les œuvres créées par les utilisateurs</p>
+        </div>
+
+        <!-- SEARCH -->
+        <form method="get" action="{{ path('admin_oeuvres') }}" class="search-form">
+            <input type="text" name="q" value="{{ search|default('') }}" 
+                   placeholder="Rechercher par titre ou auteur...">
+            <button type="submit">Rechercher</button>
+            {% if search %}
+                <a href="{{ path('admin_oeuvres') }}" class="btn-clear" style="padding: 12px 18px; border-radius: var(--radius); background: var(--bg-soft); color: var(--text-main); text-decoration: none;">
+                    <i class="fas fa-times"></i>
+                </a>
+            {% endif %}
+        </form>
+
+        <!-- STATS -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-book"></i></div>
+                <div class="stat-title">Total Œuvres</div>
+                <div class="stat-value">{{ totalOeuvres|default(oeuvrse|length) }}</div>
+            </div>
+            {% if oeuvrseParType is defined %}
+                {% for type, count in oeuvrseParType %}
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-tag"></i></div>
+                        <div class="stat-title">{{ type }}</div>
+                        <div class="stat-value">{{ count }}</div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- ALERTS -->
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+
+        <!-- TABLE -->
+        <div class="table-container">
+>>>>>>> validation-final-2
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
+<<<<<<< HEAD
                             <th>ID</th>
                             <th>Titre</th>
                             <th>Auteur</th>
@@ -155,16 +379,7 @@
                             <td>1,240</td>
                             <td><span class="badge badge-published">Publié</span></td>
                             <td>2026-01-30</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="#" class="btn-edit">
-                                        <i class="fas fa-edit"></i> Éditer
-                                    </a>
-                                    <a href="#" class="btn-delete">
-                                        <i class="fas fa-trash"></i> Supprimer
-                                    </a>
-                                </div>
-                            </td>
+                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
                         </tr>
                         <tr>
                             <td>#2</td>
@@ -174,16 +389,7 @@
                             <td>892</td>
                             <td><span class="badge badge-published">Publié</span></td>
                             <td>2026-01-25</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="#" class="btn-edit">
-                                        <i class="fas fa-edit"></i> Éditer
-                                    </a>
-                                    <a href="#" class="btn-delete">
-                                        <i class="fas fa-trash"></i> Supprimer
-                                    </a>
-                                </div>
-                            </td>
+                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
                         </tr>
                         <tr>
                             <td>#3</td>
@@ -193,21 +399,178 @@
                             <td>456</td>
                             <td><span class="badge badge-draft">Brouillon</span></td>
                             <td>2026-01-20</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="#" class="btn-edit">
-                                        <i class="fas fa-edit"></i> Éditer
-                                    </a>
-                                    <a href="#" class="btn-delete">
-                                        <i class="fas fa-trash"></i> Supprimer
-                                    </a>
-                                </div>
-                            </td>
+                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
                         </tr>
+=======
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-heading"></i> Titre</th>
+                            <th><i class="fas fa-user"></i> Auteur</th>
+                            <th><i class="fas fa-tag"></i> Type</th>
+                            <th><i class="fas fa-align-left"></i> Description</th>
+                            <th><i class="fas fa-comments"></i> Commentaires</th>
+                            <th><i class="fas fa-calendar"></i> Date</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for oeuvre in oeuvrse %}
+                            <tr>
+                                <td><strong>#{{ oeuvre.id }}</strong></td>
+                                <td>
+                                    <strong>{{ oeuvre.title }}</strong>
+                                    {% if oeuvre.imageUrl %}
+                                        <div style="margin-top: 0.5rem;">
+                                            <img src="{{ asset(oeuvre.imageUrl) }}" alt="" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ oeuvre.author ?: '-' }}</td>
+                                <td><span class="badge badge-published">{{ oeuvre.type }}</span></td>
+                                <td>
+                                    <div class="description-truncate" title="{{ oeuvre.description }}">
+                                        {{ oeuvre.description|default('Aucune')|slice(0,60) }}{{ oeuvre.description|default('')|length > 60 ? '...' : '' }}
+                                    </div>
+                                </td>
+                                <td style="text-align: center;">
+                                    {% set commentCount = oeuvreCommentCounts[oeuvre.id] ?? 0 %}
+                                    {% if commentCount > 0 %}
+                                        <a href="javascript:void(0);" class="comment-count-link" 
+                                           onclick="openCommentsModal('oeuvre', {{ oeuvre.id }}, '{{ oeuvre.title|escape('js') }}')"
+                                           style="display: inline-block; padding: 5px 12px; background: #18E3A4; color: #0B0F0E; border-radius: 20px; text-decoration: none; font-weight: 600; cursor: pointer;">
+                                            <i class="fas fa-comments"></i> {{ commentCount }}
+                                        </a>
+                                    {% else %}
+                                        <span style="color: #9BA6A2;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ oeuvre.createdAt ? oeuvre.createdAt|date('d/m/Y') : '-' }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <form method="POST" action="{{ path('admin_oeuvre_delete', {id: oeuvre.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette œuvre ? Cette action est irréversible.');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_oeuvre_' ~ oeuvre.id) }}">
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="fas fa-trash"></i> Supprimer
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class="fas fa-book"></i>
+                                        <h3>Aucune œuvre trouvée</h3>
+                                        <p>Les œuvres créées par les utilisateurs apparaîtront ici</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+>>>>>>> validation-final-2
                     </tbody>
                 </table>
             </div>
         </div>
+<<<<<<< HEAD
     </div>
+=======
+    </main>
+</div>
+
+<!-- Comments Modal -->
+<div id="commentsModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+    <div style="background: #141A19; margin: 5% auto; padding: 0; width: 90%; max-width: 700px; border-radius: 12px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 1px solid #2A3139;">
+        <div style="background: linear-gradient(135deg, #18E3A4 0%, #13c891 100%); color: #0B0F0E; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 600;"><i class="fas fa-comments"></i> <span id="modalTitle">Commentaires</span></h3>
+            <button onclick="closeCommentsModal()" style="background: none; border: none; color: #0B0F0E; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        <div id="commentsModalBody" style="padding: 20px; max-height: 60vh; overflow-y: auto; color: #E6FFF6;">
+            <p style="text-align: center; color: #9BA6A2;"><i class="fas fa-spinner fa-spin"></i> Chargement...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+
+<script>
+function openCommentsModal(type, id, title) {
+    document.getElementById('modalTitle').textContent = title + ' - Commentaires';
+    document.getElementById('commentsModalBody').innerHTML = '<p style="text-align: center; color: #9BA6A2;"><i class="fas fa-spinner fa-spin"></i> Chargement...</p>';
+    document.getElementById('commentsModal').style.display = 'block';
+    
+    const url = type === 'oeuvre' ? '/admin/comments/oeuvre/' + id + '/list' : '/admin/comments/artefact/' + id + '/list';
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let html = '';
+            if (data.comments && data.comments.length > 0) {
+                data.comments.forEach(function(comment) {
+                    html += `
+                        <div style="background: #1A1F1E; border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 3px solid #18E3A4;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <strong style="color: #18E3A4;">${comment.userName}</strong>
+                                <small style="color: #9BA6A2;">${comment.createdAt}</small>
+                            </div>
+                            <div style="color: #CBD5D1; margin-bottom: 10px; line-height: 1.5;">${comment.contenu}</div>
+                            <div style="text-align: right;">
+                                <button onclick="deleteComment(${comment.id}, this)" style="background: #EF5350; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html = '<p style="text-align: center; color: #9BA6A2;">Aucun commentaire</p>';
+            }
+            document.getElementById('commentsModalBody').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('commentsModalBody').innerHTML = '<p style="color: #EF5350; text-align: center;">Erreur lors du chargement</p>';
+        });
+}
+
+function closeCommentsModal() {
+    document.getElementById('commentsModal').style.display = 'none';
+}
+
+function deleteComment(commentId, btn) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
+        return;
+    }
+    
+    fetch('/admin/comments/' + commentId + '/delete-ajax', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Commentaire supprimé avec succès');
+            // Remove the comment card
+            btn.closest('div[style*="border-left"]').remove();
+            // Reload to update counts
+            location.reload();
+        } else {
+            alert('Erreur: ' + (data.message || 'Impossible de supprimer'));
+        }
+    })
+    .catch(error => {
+        alert('Erreur lors de la suppression');
+    });
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('commentsModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+
+>>>>>>> validation-final-2
 </body>
 </html>

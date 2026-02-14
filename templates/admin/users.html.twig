@@ -2,6 +2,169 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+<<<<<<< HEAD
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Utilisateurs - Admin</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        /* Layout variables */
+        :root { --sidebar-width: 250px; --sidebar-bg: #1A1F1E; --accent: #18E3A4; --muted: #B0B9B6; --panel-bg: #0B0F0E; }
+
+        /* Basic reset for predictable sizing and to avoid horizontal page scroll */
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
+
+        /* Use a simple flex layout for the page; sidebar is fixed and content is fluid */
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        /* Sidebar: fixed width, fixed position so it remains visible; allow internal vertical scrolling */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid #2A3139;
+            padding: 2rem 0;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            z-index: 1000;
+        }
+
+        .admin-sidebar .logo { padding: 1rem 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid #2A3139; }
+        .admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+        .admin-sidebar nav li { margin: 0; }
+        .admin-sidebar nav a { display: block; padding: 12px 1.5rem; color: var(--muted); text-decoration: none; border-left: 3px solid transparent; transition: all 0.18s ease-in-out; }
+        .admin-sidebar nav a:hover { background-color: #0B0F0E; color: var(--accent); border-left-color: var(--accent); }
+        .admin-sidebar nav a.active { background-color: #0B0F0E; color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+
+        /* Main content sits to the right of the fixed sidebar. It fills remaining width and scrolls vertically. */
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden; /* prevent page-level horizontal scrolling */
+        }
+
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #2A3139; }
+        .admin-header h1 { margin: 0; color: var(--accent); }
+
+        /* Make table wrapper scroll horizontally if table is wide, but don't create page-level scroll */
+        .table-wrapper { background-color: #1A1F1E; border-radius: 6px; overflow: auto; }
+        .table-wrapper table { width: 100%; border-collapse: collapse; table-layout: auto; }
+        .table-wrapper th { background-color: var(--panel-bg); padding: 1rem 1.5rem; text-align: left; color: var(--accent); font-weight: 600; border-bottom: 1px solid #2A3139; }
+        .table-wrapper td { padding: 1rem 1.5rem; border-bottom: 1px solid #2A3139; color: #E6FFF6; word-break: break-word; }
+        .table-wrapper tr:hover { background-color: #252A29; }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .badge-active { background-color: rgba(24, 227, 164, 0.2); color: var(--accent); }
+        .badge-inactive { background-color: rgba(176, 185, 182, 0.2); color: var(--muted); }
+        .action-buttons { display: flex; gap: 0.5rem; }
+        .action-buttons a { padding: 4px 12px; font-size: 0.85rem; text-decoration: none; border-radius: 3px; }
+        .btn-edit { background-color: var(--accent); color: #0B0F0E; }
+        .btn-delete { background-color: #BD3B44; color: #E6FFF6; }
+
+        /* Responsive tweaks: reduce sidebar width on very small screens but keep behavior consistent */
+        @media (max-width: 480px) {
+            :root { --sidebar-width: 200px; }
+            .admin-sidebar { width: var(--sidebar-width); }
+            .admin-content { margin-left: var(--sidebar-width); }
+        }
+    </style>
+</head>
+<body style="margin: 0;">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="logo" style="color: #18E3A4; font-weight: 700; font-size: 1.2rem;">Admin</div>
+            <nav>
+                <ul>
+                    <li><a href="/admin/dashboard">Tableau de bord</a></li>
+                    <li><a href="/admin/users" class="active">Utilisateurs</a></li>
+                    <li><a href="/admin/quiz-questions">Quiz</a></li>
+                    <li><a href="/admin/produits">Shop</a></li>
+                    <li><a href="/admin/challenges">Défis</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div class="admin-content">
+            <div class="admin-header">
+                <h1>Gestion des Utilisateurs</h1>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th>Rôle</th>
+                            <th>Statut</th>
+                            <th>Créé le</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#1</td>
+                            <td>Martin</td>
+                            <td>Élodie</td>
+                            <td>elodie.mage@example.com</td>
+                            <td>elodie.m</td>
+                            <td>Creator</td>
+                            <td><span class="badge badge-active">Actif</span></td>
+                            <td>2025-06-15</td>
+                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
+                        </tr>
+                        <tr>
+                            <td>#2</td>
+                            <td>Dupont</td>
+                            <td>Alexis</td>
+                            <td>alex.dupont@example.com</td>
+                            <td>alex.dup</td>
+                            <td>User</td>
+                            <td><span class="badge badge-active">Actif</span></td>
+                            <td>2025-08-22</td>
+                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
+                        </tr>
+                        <tr>
+                            <td>#3</td>
+                            <td>Leroux</td>
+                            <td>Marie</td>
+                            <td>marie.leroux@example.com</td>
+                            <td>marie.l</td>
+                            <td>Moderator</td>
+                            <td><span class="badge badge-inactive">Inactif</span></td>
+                            <td>2025-09-10</td>
+                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
+                        </tr>
+                        <tr>
+                            <td>#4</td>
+                            <td>Phoenix</td>
+                            <td>Jean</td>
+                            <td>jean.phoenix@example.com</td>
+                            <td>jean.p</td>
+                            <td>Creator</td>
+                            <td><span class="badge badge-active">Actif</span></td>
+                            <td>2025-10-05</td>
+                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add user form (visual only) -->
+        </div>
+    </div>
+</body>
+</html>
+=======
     <title>Admin · Utilisateurs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -791,6 +954,8 @@
         </div>
           <ul>
         <li><a href="{{ path('admin_users') }}" class="active"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+        <li><a href="{{ path('admin_oeuvres') }}"><i class="fas fa-book"></i><span>Œuvres</span></a></li>
+        <li><a href="{{ path('admin_artefacts') }}"><i class="fas fa-gem"></i><span>Artefacts</span></a></li>
         <li><a href="{{ path('admin_quiz_questions') }}"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
         <li><a href="{{ path('admin_produits') }}"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
         <li><a href="{{ path('admin_challenges') }}"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
@@ -921,3 +1086,4 @@
 
 </body>
 </html>
+>>>>>>> validation-final-2

@@ -3,13 +3,23 @@
 namespace App\Controller;
 
 use App\Entity\Artefact;
+<<<<<<< HEAD
+use App\Repository\ArtefactRepository;
+=======
 use App\Entity\User;
 use App\Repository\ArtefactRepository;
+use App\Repository\CommentaireRepository;
+use App\Repository\UserRepository;
+>>>>>>> validation-final-2
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+<<<<<<< HEAD
+=======
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+>>>>>>> validation-final-2
 
 #[Route('/artefact', name: 'artefact_')]
 class ArtefactController extends AbstractController
@@ -20,6 +30,42 @@ class ArtefactController extends AbstractController
         $search = $request->query->get('search', '');
         $type = $request->query->get('type', '');
         $myItems = $request->query->get('my_items', 0);
+<<<<<<< HEAD
+        
+        $queryBuilder = $repository->createQueryBuilder('a');
+        
+        // Filter by current user if "my items" is selected
+        if ($myItems) {
+            $currentUser = $request->getSession()->get('username') ?? 'anonymous';
+            $queryBuilder->where('a.createdBy = :createdBy')
+                ->setParameter('createdBy', $currentUser);
+        }
+        
+        if ($search) {
+            if ($myItems) {
+                $queryBuilder->andWhere('a.name LIKE :search');
+            } else {
+                $queryBuilder->where('a.name LIKE :search');
+            }
+            $queryBuilder->setParameter('search', '%' . $search . '%');
+        }
+        
+        if ($type) {
+            if ($search || $myItems) {
+                $queryBuilder->andWhere('a.type = :type');
+            } else {
+                $queryBuilder->where('a.type = :type');
+            }
+            $queryBuilder->setParameter('type', $type);
+        }
+        
+        // Apply sorting by type
+        $queryBuilder->orderBy('a.type', 'ASC');
+        
+        $artefacts = $queryBuilder->getQuery()->getResult();
+        
+        // Get all available types
+=======
 
         $queryBuilder = $repository->createQueryBuilder('a');
 
@@ -38,92 +84,116 @@ class ArtefactController extends AbstractController
         $artefacts = $queryBuilder->getQuery()->getResult();
 
         $currentUser = $this->getUser();
-        if ($myItems && $currentUser) {
-            $artefacts = array_values(array_filter($artefacts, function ($a) use ($currentUser) {
+        if ($myItems && $currentUser instanceof User) {
+            $currentUserId = $currentUser->getId();
+            $artefacts = array_values(array_filter($artefacts, function ($a) use ($currentUserId) {
                 $owner = $a->getCreatedBy();
                 if ($owner instanceof User) {
-                    return $owner->getId() === $currentUser->getId();
+                    return $owner->getId() === $currentUserId;
                 }
                 return false;
             }));
         }
 
+>>>>>>> validation-final-2
         $allTypes = $repository->createQueryBuilder('a')
             ->select('DISTINCT a.type')
             ->orderBy('a.type', 'ASC')
             ->getQuery()
             ->getResult();
         $types = array_map(fn($row) => $row['type'], $allTypes);
+<<<<<<< HEAD
+        
+        $currentUser = $request->getSession()->get('username');
+        
+=======
 
         $sessionUser = $request->getSession()->get('username') ?? null;
         $currentUserIdentifier = $currentUser ? (method_exists($currentUser, 'getUserIdentifier') ? $currentUser->getUserIdentifier() : null) : $sessionUser;
 
+>>>>>>> validation-final-2
         return $this->render('artefact/index.html.twig', [
             'artefacts' => $artefacts,
             'search' => $search,
             'type' => $type,
             'types' => $types,
             'myItems' => $myItems,
+<<<<<<< HEAD
+            'currentUser' => $currentUser,
+=======
             'currentUser' => $currentUserIdentifier,
+>>>>>>> validation-final-2
         ]);
     }
 
     #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
+<<<<<<< HEAD
     public function create(Request $request, EntityManagerInterface $em): Response
     {
         if ($request->isMethod('POST')) {
             $errors = [];
+=======
+    public function create(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): Response
+    {
+        $artefact = new Artefact();
+        $errors = [];
+        $oldValues = [];
+
+        if ($request->isMethod('POST')) {
+>>>>>>> validation-final-2
             $name = $request->request->get('name');
             $type = $request->request->get('type');
             $universe = $request->request->get('universe');
             $origins = $request->request->get('origins');
             $powers = $request->request->get('powers');
             $rarity = $request->request->get('rarity');
-
+<<<<<<< HEAD
+            
+            // Validation
             if (!$name || strlen($name) < 3) {
-                $errors[] = "Le nom doit contenir au moins 3 caractères";
+                $errors[] = 'Le nom doit contenir au moins 3 caractères';
             }
-            if ($name && !preg_match('/^\p{L}[\p{L}\s\'\-\x{2019}]*$/u', $name)) {
-                $errors[] = "Le nom ne doit contenir que des lettres (espaces, tirets et apostrophes autorisés)";
+                if ($name && !preg_match('/^\p{L}[\p{L}\s\'\-\x{2019}]*$/u', $name)) {
+                    $errors[] = 'Le nom ne doit contenir que des lettres (espaces, tirets et apostrophes autorisés)';
             }
             if (!$type) {
-                $errors[] = "Le type est requis";
+                $errors[] = 'Le type est requis';
             }
             if (!$universe || strlen($universe) < 2) {
-                $errors[] = "L univers est requis";
+                $errors[] = 'L\'univers est requis';
             }
             if (!$origins || strlen($origins) < 10) {
-                $errors[] = "Les origines doivent contenir au moins 10 caractères";
+                $errors[] = 'Les origines doivent contenir au moins 10 caractères';
             }
-            if ($origins && !preg_match('/^\p{L}[\p{L}0-9\s\-\.,!?\'\\x{2019}]*$/u', $origins)) {
-                $errors[] = "Les origines doivent commencer par une lettre et contenir que des lettres et chiffres";
-            }
+                if ($origins && !preg_match('/^\p{L}[\p{L}0-9\s\-\.,!?\'\\x{2019}]*$/u', $origins)) {
+                    $errors[] = 'Les origines doivent commencer par une lettre et contenir que des lettres et chiffres';
+                }
             if (!$powers || strlen($powers) < 10) {
-                $errors[] = "Les pouvoirs doivent contenir au moins 10 caractères";
+                $errors[] = 'Les pouvoirs doivent contenir au moins 10 caractères';
             }
-            if ($powers && !preg_match('/^\p{L}[\p{L}0-9\s\-\.,!?\'\\x{2019}]*$/u', $powers)) {
-                $errors[] = "Les pouvoirs doivent commencer par une lettre et contenir que des lettres et chiffres";
-            }
+                if ($powers && !preg_match('/^\p{L}[\p{L}0-9\s\-\.,!?\'\\x{2019}]*$/u', $powers)) {
+                    $errors[] = 'Les pouvoirs doivent commencer par une lettre et contenir que des lettres et chiffres';
+                }
             if (!$rarity) {
-                $errors[] = "La rareté est requise";
+                $errors[] = 'La rareté est requise';
             }
             if (!$request->files->get('image')) {
-                $errors[] = "L image est requise";
+                $errors[] = 'L\'image est requise';
             } else {
                 $validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
                 $extension = strtolower(pathinfo($request->files->get('image')->getClientOriginalName(), PATHINFO_EXTENSION));
                 if (!in_array($extension, $validExtensions)) {
-                    $errors[] = "Les formats autorisés sont: jpg, png, webp, gif";
+                    $errors[] = 'Les formats autorisés sont: jpg, png, webp, gif';
                 }
             }
-
+            
             if (count($errors) > 0) {
                 foreach ($errors as $error) {
                     $this->addFlash('error', $error);
                 }
                 return $this->redirectToRoute('artefact_create');
             }
-
+            
             $artefact = new Artefact();
             $artefact->setName($name);
             $artefact->setType($type);
@@ -131,12 +201,7 @@ class ArtefactController extends AbstractController
             $artefact->setOrigins($origins);
             $artefact->setPowers($powers);
             $artefact->setRarity($rarity);
-            $currentUser = $this->getUser();
-            if ($currentUser instanceof User) {
-                $artefact->setCreatedBy($currentUser);
-            } else {
-                $artefact->setCreatedBy(null);
-            }
+            $artefact->setCreatedBy($request->getSession()->get('username') ?? 'anonymous');
 
             $imageFile = $request->files->get('image');
             if ($imageFile) {
@@ -162,11 +227,114 @@ class ArtefactController extends AbstractController
     {
         return $this->render('artefact/show.html.twig', [
             'artefact' => $artefact,
+=======
+
+            // Store old values to repopulate form
+            $oldValues = [
+                'name' => $name,
+                'type' => $type,
+                'universe' => $universe,
+                'origins' => $origins,
+                'powers' => $powers,
+                'rarity' => $rarity,
+            ];
+
+            $artefact->setName($name ?? '');
+            $artefact->setType($type ?? '');
+            $artefact->setUniverse($universe ?? '');
+            $artefact->setOrigins($origins ?? '');
+            $artefact->setPowers($powers ?? '');
+            $artefact->setRarity($rarity ?? '');
+
+            $errors = $validator->validate($artefact);
+
+            // Validate image
+            $imageFile = $request->files->get('image');
+            if (!$imageFile) {
+                $error = new \Symfony\Component\Validator\ConstraintViolation(
+                    "L'image est requise",
+                    null,
+                    [],
+                    $artefact,
+                    'image',
+                    null
+                );
+                $errors->add($error);
+            } else {
+                $validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+                $extension = strtolower(pathinfo($imageFile->getClientOriginalName(), PATHINFO_EXTENSION));
+                if (!in_array($extension, $validExtensions)) {
+                    $error = new \Symfony\Component\Validator\ConstraintViolation(
+                        "Les formats autorisés sont: jpg, png, webp, gif",
+                        null,
+                        [],
+                        $artefact,
+                        'image',
+                        null
+                    );
+                    $errors->add($error);
+                }
+            }
+
+            if (count($errors) === 0) {
+                $currentUser = $this->getUser();
+                if ($currentUser instanceof User) {
+                    $artefact->setCreatedBy($currentUser);
+                } else {
+                    $artefact->setCreatedBy(null);
+                }
+
+                if ($imageFile) {
+                    $originalName = $imageFile->getClientOriginalName();
+                    $extension = pathinfo($originalName, PATHINFO_EXTENSION);
+                    $filename = uniqid() . '.' . $extension;
+                    $imageFile->move($this->getParameter('uploads_directory'), $filename);
+                    $artefact->setImageUrl('/uploads/' . $filename);
+                }
+
+                $em->persist($artefact);
+                $em->flush();
+
+                $this->addFlash('success', 'Artefact créé avec succès!');
+                return $this->redirectToRoute('artefact_index');
+            }
+        }
+
+        return $this->render('artefact/create.html.twig', [
+            'artefact' => $artefact,
+            'errors' => $errors,
+            'oldValues' => $oldValues,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(Artefact $artefact, CommentaireRepository $commentaireRepo, UserRepository $userRepo): Response
+    {
+        $commentaires = $commentaireRepo->findByArtefact($artefact->getId());
+        
+        // Fetch user names for comments
+        $userNames = [];
+        foreach ($commentaires as $commentaire) {
+            $user = $userRepo->find($commentaire->getUserId());
+            $userNames[$commentaire->getUserId()] = $user ? ($user->getPrenom() . ' ' . $user->getNom()) : 'Utilisateur';
+        }
+        
+        return $this->render('artefact/show.html.twig', [
+            'artefact' => $artefact,
+            'commentaires' => $commentaires,
+            'userNames' => $userNames,
+>>>>>>> validation-final-2
         ]);
     }
 
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
+<<<<<<< HEAD
     public function edit(Request $request, Artefact $artefact, EntityManagerInterface $em): Response
+    {
+        if ($request->isMethod('POST')) {
+            $errors = [];
+=======
+    public function edit(Request $request, Artefact $artefact, EntityManagerInterface $em, ValidatorInterface $validator): Response
     {
         $currentUser = $this->getUser();
         $isAdmin = $this->isGranted('ROLE_ADMIN');
@@ -188,44 +356,55 @@ class ArtefactController extends AbstractController
             return $this->redirectToRoute('artefact_show', ['id' => $artefact->getId()]);
         }
 
+        $errors = [];
+        $oldValues = [];
+
         if ($request->isMethod('POST')) {
-            $errors = [];
+>>>>>>> validation-final-2
             $name = $request->request->get('name');
             $type = $request->request->get('type');
             $universe = $request->request->get('universe');
             $origins = $request->request->get('origins');
             $powers = $request->request->get('powers');
             $rarity = $request->request->get('rarity');
-
+<<<<<<< HEAD
+            
+            // Validation
             if (!$name || strlen($name) < 3) {
-                $errors[] = "Le nom doit contenir au moins 3 caractères";
+                $errors[] = 'Le nom doit contenir au moins 3 caractères';
             }
-            if ($name && !preg_match('/^[a-zA-ZÀ-ÖØ-öø-ÿ\s\-\']+$/u', $name)) {
-                $errors[] = "Le nom ne doit contenir que des lettres (espaces, tirets et apostrophes autorisés)";
+                if ($name && !preg_match('/^[a-zA-ZÀ-ÖØ-öø-ÿ\s\-\']+$/u', $name)) {
+                    $errors[] = 'Le nom ne doit contenir que des lettres (espaces, tirets et apostrophes autorisés)';
             }
             if (!$type) {
-                $errors[] = "Le type est requis";
+                $errors[] = 'Le type est requis';
             }
             if (!$universe || strlen($universe) < 2) {
-                $errors[] = "L univers est requis";
+                $errors[] = 'L\'univers est requis';
             }
             if (!$origins || strlen($origins) < 10) {
-                $errors[] = "Les origines doivent contenir au moins 10 caractères";
+                $errors[] = 'Les origines doivent contenir au moins 10 caractères';
             }
+                if ($origins && !preg_match('/^[a-zA-ZÀ-ÖØ-öø-ÿ][a-zA-ZÀ-ÖØ-öø-ÿ0-9\s\-,.!?\']*$/u', $origins)) {
+                    $errors[] = 'Les origines doivent commencer par une lettre et contenir que des lettres et chiffres';
+                }
             if (!$powers || strlen($powers) < 10) {
-                $errors[] = "Les pouvoirs doivent contenir au moins 10 caractères";
+                $errors[] = 'Les pouvoirs doivent contenir au moins 10 caractères';
             }
+                if ($powers && !preg_match('/^[a-zA-ZÀ-ÖØ-öø-ÿ][a-zA-ZÀ-ÖØ-öø-ÿ0-9\s\-,.!?\']*$/u', $powers)) {
+                    $errors[] = 'Les pouvoirs doivent commencer par une lettre et contenir que des lettres et chiffres';
+                }
             if (!$rarity) {
-                $errors[] = "La rareté est requise";
+                $errors[] = 'La rareté est requise';
             }
-
+            
             if (count($errors) > 0) {
                 foreach ($errors as $error) {
                     $this->addFlash('error', $error);
                 }
                 return $this->redirectToRoute('artefact_edit', ['id' => $artefact->getId()]);
             }
-
+            
             $artefact->setName($name);
             $artefact->setType($type);
             $artefact->setUniverse($universe);
@@ -238,7 +417,7 @@ class ArtefactController extends AbstractController
                 $validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
                 $extension = strtolower(pathinfo($imageFile->getClientOriginalName(), PATHINFO_EXTENSION));
                 if (!in_array($extension, $validExtensions)) {
-                    $this->addFlash('error', "Les formats autorisés sont: jpg, png, webp, gif");
+                    $this->addFlash('error', 'Les formats autorisés sont: jpg, png, webp, gif');
                     return $this->redirectToRoute('artefact_edit', ['id' => $artefact->getId()]);
                 }
                 if ($artefact->getImageUrl()) {
@@ -257,16 +436,75 @@ class ArtefactController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Artefact modifié avec succès!');
             return $this->redirectToRoute('artefact_show', ['id' => $artefact->getId()]);
+=======
+
+            // Store old values to repopulate form
+            $oldValues = [
+                'name' => $name,
+                'type' => $type,
+                'universe' => $universe,
+                'origins' => $origins,
+                'powers' => $powers,
+                'rarity' => $rarity,
+            ];
+
+            $artefact->setName($name ?? '');
+            $artefact->setType($type ?? '');
+            $artefact->setUniverse($universe ?? '');
+            $artefact->setOrigins($origins ?? '');
+            $artefact->setPowers($powers ?? '');
+            $artefact->setRarity($rarity ?? '');
+
+            $errors = $validator->validate($artefact);
+
+            if (count($errors) === 0) {
+                $imageFile = $request->files->get('image');
+                if ($imageFile) {
+                    $validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+                    $extension = strtolower(pathinfo($imageFile->getClientOriginalName(), PATHINFO_EXTENSION));
+                    if (!in_array($extension, $validExtensions)) {
+                        $this->addFlash('error', "Les formats autorisés sont: jpg, png, webp, gif");
+                        return $this->render('artefact/edit.html.twig', [
+                            'artefact' => $artefact,
+                            'errors' => $errors,
+                            'oldValues' => $oldValues,
+                        ]);
+                    }
+                    if ($artefact->getImageUrl()) {
+                        $oldFile = $this->getParameter('kernel.project_dir') . '/public' . $artefact->getImageUrl();
+                        if (file_exists($oldFile)) {
+                            unlink($oldFile);
+                        }
+                    }
+                    $originalName = $imageFile->getClientOriginalName();
+                    $extension = pathinfo($originalName, PATHINFO_EXTENSION);
+                    $filename = uniqid() . '.' . $extension;
+                    $imageFile->move($this->getParameter('uploads_directory'), $filename);
+                    $artefact->setImageUrl('/uploads/' . $filename);
+                }
+
+                $em->flush();
+                $this->addFlash('success', 'Artefact modifié avec succès!');
+                return $this->redirectToRoute('artefact_show', ['id' => $artefact->getId()]);
+            }
+>>>>>>> validation-final-2
         }
 
         return $this->render('artefact/edit.html.twig', [
             'artefact' => $artefact,
+<<<<<<< HEAD
+=======
+            'errors' => $errors,
+            'oldValues' => $oldValues,
+>>>>>>> validation-final-2
         ]);
     }
 
     #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, Artefact $artefact, EntityManagerInterface $em): Response
     {
+<<<<<<< HEAD
+=======
         $currentUser = $this->getUser();
         $isAdmin = $this->isGranted('ROLE_ADMIN');
         $owner = $artefact->getCreatedBy();
@@ -287,6 +525,7 @@ class ArtefactController extends AbstractController
             return $this->redirectToRoute('artefact_show', ['id' => $artefact->getId()]);
         }
 
+>>>>>>> validation-final-2
         if ($artefact->getImageUrl()) {
             $file = $this->getParameter('kernel.project_dir') . '/public' . $artefact->getImageUrl();
             if (file_exists($file)) {
