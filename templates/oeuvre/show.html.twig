@@ -220,11 +220,9 @@ main {
         <p class="oeuvre-meta">par {{ oeuvre.author }}</p>
     </div>
     <div>
-        <a href="{{ path('oeuvre_edit', {id: oeuvre.id}) }}" class="btn btn-primary">Modifier</a>
-        <form method="post" action="{{ path('oeuvre_delete', {id: oeuvre.id}) }}" style="display:inline"
-              onsubmit="return confirm('Supprimer cette œuvre ?');">
-            <button class="btn btn-danger">Supprimer</button>
-        </form>
+       
+        <a href="{{ path('oeuvre_index') }}" class="btn btn-secondary">← Retour</a>
+
     </div>
 </div>
 
@@ -255,7 +253,6 @@ main {
 </div>
 
 <br>
-<a href="{{ path('oeuvre_index') }}" class="btn btn-secondary">← Retour</a>
 
 </div>
 </section>

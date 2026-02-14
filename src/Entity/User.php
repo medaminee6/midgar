@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
+#[UniqueEntity(fields: ['googleId'], message: 'This Google account is already linked')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const ROLE_USER = 'ROLE_USER';
@@ -30,7 +31,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?string $password = null;
 
     #[ORM\Column(length: 20)]
@@ -59,15 +60,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'datetime')]
     private ?\DateTime $createdAt = null;
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $phoneNumber = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTime $resetTokenExpiresAt = null;
+
+
+    // ================= GOOGLE OAUTH =================
+    #[ORM\Column(type: 'string', length: 255, nullable: true, unique: true)]
+    private ?string $googleId = null;
+
+    #[ORM\Column(type: 'string', length: 50)]
+    private string $authProvider = 'local'; // 'local' ou 'google'
+    // =================================================
 
     public function __construct()
     {
         $this->createdAt = new \DateTime();
     }
 
+    // ================== IDENTIFIANTS ==================
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
     }
 
     public function getEmail(): ?string
@@ -81,22 +105,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUserIdentifier(): string
-    {
-        return (string) $this->email;
-    }
-
-    public function getRoles(): array
-    {
-        return [$this->getSymfonyRole()];
-    }
-
+    // ================== PASSWORD ==================
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(?string $password): static
     {
         $this->password = $password;
         return $this;
@@ -104,7 +119,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
-        // rien à faire
+        // nothing to clear
+    }
+
+    public function hasLocalPassword(): bool
+    {
+        return $this->authProvider === 'local' && !empty($this->password);
+    }
+
+    // ================== ROLES ==================
+    public function getRoles(): array
+    {
+        return [$this->getSymfonyRole()];
     }
 
     public function getRole(): string
@@ -119,7 +145,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         } elseif (in_array($role, [self::ROLE_USER, self::ROLE_ADMIN])) {
             $this->role = $role === self::ROLE_ADMIN ? 'admin' : 'user';
         } else {
-            throw new \InvalidArgumentException('Rôle invalide');
+            throw new \InvalidArgumentException('Invalid role');
         }
 
         return $this;
@@ -135,6 +161,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->getSymfonyRole() === self::ROLE_ADMIN;
     }
 
+    // ================== PROFIL ==================
     public function getNom(): ?string
     {
         return $this->nom;
@@ -190,6 +217,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // ================== STATUT ==================
     public function isBlocked(): bool
     {
         return $this->isBlocked;
@@ -212,14 +240,71 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // ================== GOOGLE ==================
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): static
+    {
+        $this->googleId = $googleId;
+        return $this;
+    }
+
+    public function getAuthProvider(): string
+    {
+        return $this->authProvider;
+    }
+
+    public function setAuthProvider(string $authProvider): static
+    {
+        $this->authProvider = $authProvider;
+        return $this;
+    }
+
+    // ================== DATE ==================
     public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): self
+    public function setCreatedAt(\DateTime $createdAt): static
     {
         $this->createdAt = $createdAt;
         return $this;
     }
+    public function getPhoneNumber(): ?string
+{
+    return $this->phoneNumber;
+}
+
+public function setPhoneNumber(?string $phoneNumber): self
+{
+    $this->phoneNumber = $phoneNumber;
+    return $this;
+}
+
+public function getResetToken(): ?string
+{
+    return $this->resetToken;
+}
+
+public function setResetToken(?string $resetToken): self
+{
+    $this->resetToken = $resetToken;
+    return $this;
+}
+
+public function getResetTokenExpiresAt(): ?\DateTime
+{
+    return $this->resetTokenExpiresAt;
+}
+
+public function setResetTokenExpiresAt(?\DateTime $date): self
+{
+    $this->resetTokenExpiresAt = $date;
+    return $this;
+}
+
 }

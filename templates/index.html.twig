@@ -7,6 +7,7 @@
     
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
+    <link rel="stylesheet" href="/css/midgar-theme.css">
     
     <style>
         /* ===== VARIABLES & RESET ===== */
@@ -705,10 +706,10 @@
                         </div>
                         <span>{{ app.user.username }}</span>
                     </a>
-                    <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm magic-btn">Déconnexion</a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-glow ">Déconnexion</a>
                 {% else %}
-                    <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm magic-btn btn-glow">Connexion</a>
-                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm magic-btn btn-glow">S'inscrire</a>
+                    <a href="{{ path('app_login') }}" class="btn btn-secondary  btn-glow">Connexion</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary  btn-glow">S'inscrire</a>
                 {% endif %}
             </div>
         </header>
