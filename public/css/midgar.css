@@ -10,9 +10,16 @@
   --text-primary: #E6FFF6;
   --text-secondary: #B0B9B6;
   --border-color: #2A3139;
+<<<<<<< HEAD
   --shadow-color: rgba(24, 227, 164, 0.2);
 }
 
+=======
+  --shadow-color: rgba(24, 227, 164, 0.25);
+}
+
+/* ===== RESET ===== */
+>>>>>>> validation-final-2
 * {
   margin: 0;
   padding: 0;
@@ -22,17 +29,25 @@
 html, body {
   width: 100%;
   height: 100%;
+<<<<<<< HEAD
   font-family: 'Inter', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
   letter-spacing: 0.3px;
+=======
+  font-family: 'Inter', 'Montserrat', system-ui, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+>>>>>>> validation-final-2
 }
 
 /* ==========================================
    TYPOGRAPHY
    ========================================== */
 
+<<<<<<< HEAD
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   text-transform: uppercase;
@@ -53,16 +68,37 @@ p, li {
   font-weight: 400;
   font-size: 0.95rem;
   line-height: 1.7;
+=======
+h1, h2, h3, h4 {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+}
+
+h1 { font-size: 3.5rem; }
+h2 { font-size: 2.2rem; }
+h3 { font-size: 1.4rem; }
+
+p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+>>>>>>> validation-final-2
 }
 
 a {
   color: var(--accent-primary);
   text-decoration: none;
+<<<<<<< HEAD
   transition: color 0.3s ease;
+=======
+  transition: 0.3s;
+>>>>>>> validation-final-2
 }
 
 a:hover {
   color: var(--accent-hover);
+<<<<<<< HEAD
   text-shadow: 0 0 8px var(--shadow-color);
 }
 
@@ -137,10 +173,17 @@ a:hover {
 
 /* ==========================================
    HEADER & NAVIGATION
+=======
+}
+
+/* ==========================================
+   HEADER
+>>>>>>> validation-final-2
    ========================================== */
 
 header {
   position: fixed;
+<<<<<<< HEAD
   top: 0;
   left: 0;
   right: 0;
@@ -151,6 +194,15 @@ header {
   z-index: 1000;
   padding: 0 2rem;
   height: 80px;
+=======
+  inset: 0 0 auto 0;
+  height: 80px;
+  background: rgba(11, 15, 14, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 1000;
+  padding: 0 2rem;
+>>>>>>> validation-final-2
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -159,6 +211,7 @@ header {
 .logo {
   display: flex;
   align-items: center;
+<<<<<<< HEAD
   gap: 12px;
   font-size: 1.2rem;
   font-weight: 700;
@@ -166,21 +219,35 @@ header {
   letter-spacing: 1px;
   color: var(--accent-primary);
   text-shadow: 0 0 12px var(--shadow-color);
+=======
+  gap: 10px;
+  font-weight: 700;
+  color: var(--accent-primary);
+>>>>>>> validation-final-2
 }
 
 .logo svg {
   width: 40px;
   height: 40px;
+<<<<<<< HEAD
   filter: drop-shadow(0 0 8px rgba(24, 227, 164, 0.4));
 }
 
 nav ul {
   display: flex;
   list-style: none;
+=======
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+>>>>>>> validation-final-2
   gap: 2rem;
 }
 
 nav a {
+<<<<<<< HEAD
   font-size: 0.9rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -202,20 +269,67 @@ nav a::after {
 
 nav a:hover::after {
   width: 100%;
+=======
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+>>>>>>> validation-final-2
 }
 
 .auth-buttons {
   display: flex;
   gap: 1rem;
+<<<<<<< HEAD
   align-items: center;
 }
 
 /* ==========================================
    MAIN LAYOUT
+=======
+}
+
+/* ==========================================
+   BUTTONS
+   ========================================== */
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  box-shadow: 0 0 20px var(--shadow-color);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  border: 2px solid var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.btn-secondary:hover {
+  background: rgba(24, 227, 164, 0.1);
+}
+
+/* ==========================================
+   MAIN
+>>>>>>> validation-final-2
    ========================================== */
 
 main {
   margin-top: 80px;
+<<<<<<< HEAD
   min-height: calc(100vh - 80px);
   position: relative;
 }
@@ -232,10 +346,54 @@ main {
 
 .hero {
   min-height: 600px;
+=======
+}
+
+/* ==========================================
+   HERO VIDEO SECTION
+   ========================================== */
+
+.hero.hero-video {
+  position: relative;
+  height: calc(100vh - 80px);
+  overflow: hidden;
+}
+
+/* Vidéo en background */
+.hero-bg-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+}
+
+/* Overlay noir semi-transparent */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2;
+}
+
+/* Contenu */
+.hero-content {
+  position: relative;
+  z-index: 3;
+  height: 100%;
+  max-width: 800px;
+  margin: auto;
+>>>>>>> validation-final-2
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+<<<<<<< HEAD
   background: linear-gradient(135deg, rgba(11, 15, 14, 0.8), rgba(26, 31, 30, 0.6)),
               url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><rect id="silhouette" x="50" y="200" width="150" height="350" fill="none"/><circle cx="100" cy="100" r="8" fill="%23333"/></defs><ellipse cx="100" cy="80" rx="60" ry="30" fill="%23222" opacity="0.3"/><path d="M 50 500 Q 100 400 150 500" stroke="%23333" stroke-width="1" fill="none" opacity="0.3"/><circle cx="150" cy="50" r="3" fill="%23333" opacity="0.4"/><circle cx="800" cy="80" r="4" fill="%23333" opacity="0.3"/></svg>');
   background-size: cover;
@@ -261,10 +419,15 @@ main {
   position: relative;
   z-index: 2;
   max-width: 800px;
+=======
+  text-align: center;
+  padding: 2rem;
+>>>>>>> validation-final-2
 }
 
 .logo-large {
   width: 120px;
+<<<<<<< HEAD
   height: 120px;
   margin: 0 auto 2rem;
   filter: drop-shadow(0 0 20px rgba(24, 227, 164, 0.5));
@@ -282,11 +445,25 @@ main {
   color: var(--text-secondary);
   margin-bottom: 3rem;
   font-style: italic;
+=======
+  margin-bottom: 2rem;
+}
+
+.hero h1 {
+  color: var(--accent-primary);
+  margin-bottom: 1rem;
+}
+
+.hero-tagline {
+  font-style: italic;
+  margin-bottom: 3rem;
+>>>>>>> validation-final-2
 }
 
 .hero-buttons {
   display: flex;
   gap: 1.5rem;
+<<<<<<< HEAD
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -299,6 +476,28 @@ main {
   display: grid;
   gap: 2rem;
   margin: 3rem 0;
+=======
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ==========================================
+   SECTIONS & CARDS
+   ========================================== */
+
+.section {
+  padding: 4rem 2rem;
+}
+
+.container {
+  max-width: 1400px;
+  margin: auto;
+}
+
+.grid {
+  display: grid;
+  gap: 2rem;
+>>>>>>> validation-final-2
 }
 
 .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
@@ -306,6 +505,7 @@ main {
 .grid-4 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
 
 .card {
+<<<<<<< HEAD
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -337,12 +537,32 @@ main {
   width: 100%;
   height: 100%;
   object-fit: cover;
+=======
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 30px var(--shadow-color);
+}
+
+.card-image {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+>>>>>>> validation-final-2
 }
 
 .card-body {
   padding: 1.5rem;
 }
 
+<<<<<<< HEAD
 .card-title {
   font-size: 1.1rem;
   font-weight: 700;
@@ -591,22 +811,31 @@ tbody tr:hover {
   padding: 2rem;
 }
 
+=======
+>>>>>>> validation-final-2
 /* ==========================================
    FOOTER
    ========================================== */
 
 footer {
+<<<<<<< HEAD
   background-color: var(--bg-secondary);
   border-top: 1px solid var(--border-color);
   padding: 3rem 2rem;
   margin-top: 5rem;
   color: var(--text-secondary);
+=======
+  background: var(--bg-secondary);
+  padding: 3rem 2rem;
+  border-top: 1px solid var(--border-color);
+>>>>>>> validation-final-2
 }
 
 .footer-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 2rem;
+<<<<<<< HEAD
   margin-bottom: 2rem;
 }
 
@@ -627,10 +856,18 @@ footer {
   border-top: 1px solid var(--border-color);
   padding-top: 2rem;
   text-align: center;
+=======
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 2rem;
+>>>>>>> validation-final-2
   font-size: 0.85rem;
 }
 
 /* ==========================================
+<<<<<<< HEAD
    UTILITIES
    ========================================== */
 
@@ -672,10 +909,23 @@ footer {
     height: 70px;
   }
 
+=======
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 1024px) {
+  .hero h1 {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+>>>>>>> validation-final-2
   nav ul {
     display: none;
   }
 
+<<<<<<< HEAD
   h1 { font-size: 2rem; }
   h2 { font-size: 1.5rem; }
   
@@ -685,11 +935,16 @@ footer {
 
   .hero h1 {
     font-size: 2rem;
+=======
+  h1 {
+    font-size: 2.2rem;
+>>>>>>> validation-final-2
   }
 
   .hero-buttons {
     flex-direction: column;
   }
+<<<<<<< HEAD
 
   .admin-layout {
     flex-direction: column;
@@ -707,4 +962,6 @@ footer {
   .grid-2, .grid-3, .grid-4 {
     grid-template-columns: 1fr;
   }
+=======
+>>>>>>> validation-final-2
 }

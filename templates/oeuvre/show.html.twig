@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ oeuvre.title }} - Midgar{% endblock %}
@@ -56,3 +57,409 @@
     </section>
 </main>
 {% endblock %}
+=======
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ oeuvre.title }} - Midgar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ===== VARIABLES ===== */
+:root {
+    --primary-color: #18E3A4;
+    --primary-dark: #13c891;
+    --text-color: #E6FFF6;
+    --text-secondary: #B0B9B6;
+    --bg-primary: #1A1F1E;
+    --bg-dark: #0D0F0F;
+    --card-bg: rgba(26, 31, 30, 0.7);
+    --glass-bg: rgba(26, 31, 30, 0.5);
+    --border-radius: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: system-ui, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-color);
+}
+
+/* ===== BACKGROUND ===== */
+.video-background {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+}
+
+.video-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: -1;
+}
+
+.gradient-background {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, var(--bg-primary), var(--bg-dark));
+    display: none;
+    z-index: -3;
+}
+
+/* ===== LAYOUT ===== */
+main {
+    min-height: 100vh;
+    padding: 4rem 1rem;
+}
+
+.section {
+    max-width: 1100px;
+    margin: auto;
+    background: var(--glass-bg);
+    border-radius: 16px;
+    padding: 3rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(24,227,164,0.15);
+}
+
+.oeuvre-container {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.oeuvre-title {
+    color: var(--primary-color);
+    font-size: 2.2rem;
+}
+
+.oeuvre-meta {
+    color: var(--text-secondary);
+}
+
+/* ===== IMAGE ===== */
+.oeuvre-image {
+    margin: 2rem 0;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.oeuvre-image img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    transition: transform .4s;
+}
+
+.oeuvre-image:hover img {
+    transform: scale(1.03);
+}
+
+/* ===== INFO ===== */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.info-item h3 {
+    font-size: .9rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+}
+
+.description p {
+    line-height: 1.8;
+    color: var(--text-secondary);
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    padding: .8rem 1.6rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: #000;
+}
+
+.btn-secondary {
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    background: transparent;
+}
+
+.btn-danger {
+    background: #c62828;
+    color: white;
+}
+
+/* ===== MODAL IMAGE ===== */
+.image-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.9);
+    backdrop-filter: blur(6px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.image-modal.active {
+    display: flex;
+}
+
+.image-modal img {
+    max-width: 92vw;
+    max-height: 92vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(24,227,164,.4);
+    animation: zoom .3s ease;
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 3rem;
+    color: white;
+    cursor: pointer;
+}
+
+@keyframes zoom {
+    from { transform: scale(.85); opacity: 0 }
+    to { transform: scale(1); opacity: 1 }
+}
+
+/* ===== MOBILE ===== */
+@media (max-width:768px){
+    .section { padding: 2rem 1rem; }
+    .oeuvre-container { padding: 1.5rem; }
+    .oeuvre-title { font-size: 1.7rem; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="gradient-background" id="gradient-bg"></div>
+<div class="video-overlay"></div>
+<video class="video-background" autoplay muted loop playsinline>
+    <source src="{{ asset('uploads/dragon.mp4') }}" type="video/mp4">
+</video>
+
+<main>
+<section class="section">
+<div class="oeuvre-container">
+
+<div class="header">
+    <div>
+        <h1 class="oeuvre-title">{{ oeuvre.title }}</h1>
+        <p class="oeuvre-meta">par {{ oeuvre.author }}</p>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        {% if app.user %}
+        <button id="likeBtn" class="btn" onclick="toggleLike('oeuvre', {{ oeuvre.id }})"
+                style="background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color);">
+            <i id="likeIcon" class="far fa-heart"></i>
+            <span id="likeCount">0</span>
+        </button>
+        {% endif %}
+        <a href="{{ path('oeuvre_index') }}" class="btn btn-secondary">← Retour</a>
+    </div>
+</div>
+
+{% if oeuvre.imageUrl %}
+<div class="oeuvre-image">
+    <img src="{{ asset(oeuvre.imageUrl) }}" alt="{{ oeuvre.title }}" id="openImage">
+</div>
+{% endif %}
+
+<div class="info-grid">
+    <div class="info-item">
+        <h3>Type</h3>
+        <p>{{ oeuvre.type|capitalize }}</p>
+    </div>
+    <div class="info-item">
+        <h3>Publication</h3>
+        <p>{{ oeuvre.datePublication ? oeuvre.datePublication|date('d/m/Y') : 'Non spécifiée' }}</p>
+    </div>
+    <div class="info-item">
+        <h3>Créée le</h3>
+        <p>{{ oeuvre.createdAt|date('d/m/Y H:i') }}</p>
+    </div>
+</div>
+
+<div class="description">
+    <h2>Description</h2>
+    <p>{{ oeuvre.description|nl2br }}</p>
+</div>
+
+<br>
+
+<!-- COMMENTAIRES -->
+<section class="commentaires-section" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(24,227,164,0.2);">
+    <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">
+        <i class="fas fa-comments"></i> Commentaires
+        {% if commentaires|length > 0 %}
+            <span style="font-size: 1rem; color: var(--text-secondary);">({{ commentaires|length }})</span>
+        {% endif %}
+    </h2>
+    
+    <!-- Formulaire de commentaire -->
+    {% if app.user %}
+        <form method="post" action="{{ path('oeuvre_commenter', {id: oeuvre.id}) }}" style="margin-bottom: 2rem;">
+            <div style="background: rgba(26,31,30,0.5); padding: 1.5rem; border-radius: var(--border-radius); border: 1px solid rgba(24,227,164,0.2);">
+                <label for="contenu" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Ajouter un commentaire</label>
+                <textarea 
+                    id="contenu" 
+                    name="contenu" 
+                    rows="4" 
+                    placeholder="Partagez votre avis sur cette œuvre..."
+                    style="width: 100%; padding: 1rem; border-radius: 8px; border: 1px solid rgba(24,227,164,0.3); background: rgba(13,15,15,0.8); color: var(--text-color); font-family: inherit; resize: vertical;"
+                    required
+                ></textarea>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                    <i class="fas fa-paper-plane"></i> Publier
+                </button>
+            </div>
+        </form>
+    {% else %}
+        <div style="background: rgba(26,31,30,0.5); padding: 1.5rem; border-radius: var(--border-radius); margin-bottom: 2rem; text-align: center;">
+            <p style="color: var(--text-secondary);">
+                <a href="{{ path('app_login') }}" style="color: var(--primary-color);">Connectez-vous</a> pour laisser un commentaire
+            </p>
+        </div>
+    {% endif %}
+    
+    <!-- Liste des commentaires -->
+    {% if commentaires|length > 0 %}
+        <div class="commentaires-list" style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for commentaire in commentaires %}
+                <div style="background: rgba(26,31,30,0.5); padding: 1.5rem; border-radius: var(--border-radius); border-left: 3px solid var(--primary-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-color); color: #000; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                {{ commentaire.userId|default('U')|slice(0,1)|upper }}
+                            </div>
+                            <span style="font-weight: 600; color: var(--primary-color);">{{ userNames[commentaire.userId]|default('Utilisateur') }}</span>
+                        </div>
+                        <span style="color: var(--text-secondary); font-size: 0.85rem;">
+                            {{ commentaire.createdAt|date('d/m/Y à H:i') }}
+                        </span>
+                    </div>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">{{ commentaire.contenu }}</p>
+                    {% if is_granted('ROLE_ADMIN') or (app.user and commentaire.userId == app.user.id) %}
+                        <form method="post" action="{{ path('commentaire_supprimer', {id: commentaire.id}) }}" style="margin-top: 1rem;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire?')">
+                            <button type="submit" style="background: transparent; border: none; color: #c62828; cursor: pointer; font-size: 0.85rem;">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            <i class="fas fa-comment-slash" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+            <p>Aucun commentaire pour le moment. Soyez le premier à donner votre avis!</p>
+        </div>
+    {% endif %}
+</section>
+
+</div>
+</section>
+</main>
+
+<!-- MODAL -->
+<div class="image-modal" id="imageModal">
+    <span class="close-modal">&times;</span>
+    <img id="modalImg">
+</div>
+
+<script>
+const img = document.getElementById('openImage');
+const modal = document.getElementById('imageModal');
+const modalImg = document.getElementById('modalImg');
+const closeBtn = document.querySelector('.close-modal');
+
+if (img) {
+    img.onclick = () => {
+        modalImg.src = img.src;
+        modal.classList.add('active');
+    };
+}
+
+closeBtn.onclick = () => modal.classList.remove('active');
+modal.onclick = e => { if (e.target === modal) modal.classList.remove('active'); };
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') modal.classList.remove('active');
+});
+
+// Like functionality
+function toggleLike(type, id) {
+    fetch('/favoris/' + type + '/' + id + '/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const icon = document.getElementById('likeIcon');
+            const count = document.getElementById('likeCount');
+            if (data.favorited) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                icon.style.color = '#18E3A4';
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                icon.style.color = '';
+            }
+            count.textContent = data.count;
+        }
+    });
+}
+
+// Check if already liked on page load
+{% if app.user %}
+fetch('/favoris/check/oeuvre/{{ oeuvre.id }}')
+    .then(response => response.json())
+    .then(data => {
+        const icon = document.getElementById('likeIcon');
+        const count = document.getElementById('likeCount');
+        count.textContent = data.count;
+        if (data.favorited) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            icon.style.color = '#18E3A4';
+        }
+    });
+{% endif %}
+</script>
+
+</body>
+</html>
+>>>>>>> validation-final-2

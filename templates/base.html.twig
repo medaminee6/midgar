@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>{% block title %}Midgar{% endblock %}</title>
     <link rel="stylesheet" href="/css/midgar.css">
     <style>
@@ -17,10 +18,154 @@
             --shadow-color: rgba(24, 227, 164, 0.15);
         }
 
+=======
+    <title>{% block title %}Midgar - Plateforme de Création Fantasy{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0d1117 0%, #0b0f10 100%);
+            color: #ddd;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0b0f10 0%, #071011 100%);
+            color: white;
+            padding: 0.6rem 0;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.35);
+        }
+        
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Nav links styling to match Midgar header */
+        header nav a {
+            color: #18E3A4;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: opacity 0.15s, transform 0.15s;
+            font-size: 0.95rem;
+        }
+
+        header nav a:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        /* Header nav list */
+        header nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+
+        header nav ul li a {
+            color: #18E3A4;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: opacity 0.15s, transform 0.15s;
+            font-size: 0.95rem;
+        }
+
+        header nav ul li a:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 800;
+            color: #18E3A4;
+            font-size: 1.25rem;
+        }
+
+        .logo svg {
+            width: 36px;
+            height: 36px;
+            display: block;
+        }
+
+        .auth-buttons a.btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+        }
+        
+        footer {
+            background: linear-gradient(180deg, #0b0f10 0%, #0d1117 100%);
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            color: #999;
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .btn-primary {
+            background: #18E3A4;
+            border: none;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #10c985;
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #18E3A4;
+            color: #18E3A4;
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(24,227,164,0.06);
+            color: #18E3A4;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+   <style>
+        /* ===== VARIABLES & RESET ===== */
+        :root {
+            --primary-color: #18E3A4;
+            --primary-dark: #13c891;
+            --text-color: #E6FFF6;
+            --text-secondary: #B0B9B6;
+            --bg-primary: #1A1F1E;
+            --bg-dark: #0D0F0F;
+            --card-bg: rgba(26, 31, 30, 0.7);
+            --glass-bg: rgba(26, 31, 30, 0.5);
+            --border-radius: 12px;
+        }
+        
+>>>>>>> validation-final-2
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+<<<<<<< HEAD
         }
 
         body {
@@ -191,10 +336,640 @@
                 justify-content: center;
                 gap: 1rem;
             }
+=======
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            color: var(--text-color);
+            background: var(--bg-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* ===== BOUTONS ANIMÉS ===== */
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color), 
+                        0 0 30px var(--primary-color), 
+                        0 0 50px var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color), 
+                        0 0 30px var(--primary-color);
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        /* ===== BOUTONS MAGIQUES (magic-btn) ===== */
+        .magic-btn {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid transparent;
+        }
+        
+        .magic-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color), 
+                        0 0 30px var(--primary-color), 
+                        0 0 50px var(--primary-dark);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .magic-btn.active {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        /* ===== ANIMATION PARTICULES ===== */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, var(--primary-color), var(--primary-dark));
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fly 0.6s forwards;
+            opacity: 0.8;
+            z-index: 1;
+        }
+        
+        @keyframes fly {
+            0% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translate(var(--x), var(--y)) scale(0); 
+                opacity: 0; 
+            }
+        }
+        
+        /* ===== GLOW ANIMATION ===== */
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px var(--primary-color),
+                            0 0 10px var(--primary-color);
+            }
+            50% {
+                box-shadow: 0 0 15px var(--primary-color),
+                            0 0 30px var(--primary-color),
+                            0 0 45px var(--primary-dark);
+            }
+        }
+        
+        .btn-glow {
+            animation: glow 2s infinite;
+        }
+        
+        /* ===== VIDEO BACKGROUND ===== */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            pointer-events: none;
+        }
+        
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: -1;
+        }
+        
+        /* ===== HEADER ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(26, 31, 30, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .logo:hover {
+            animation: glow 1.5s infinite;
+        }
+        
+        .logo svg {
+            width: 32px;
+            height: 32px;
+        }
+        
+        nav ul {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.3rem 0.6rem;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary-color);
+            transition: transform 0.3s;
+        }
+        
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* ===== HERO SECTION ===== */
+        .hero {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin: 1rem 0;
+            text-shadow: 0 0 10px rgba(24, 227, 164, 0.5);
+        }
+        
+        .hero-tagline {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .hero-buttons {
+            margin-top: 1.5rem;
+        }
+        
+        .hero-buttons a {
+            margin: 0 0.5rem;
+        }
+        
+        /* ===== SECTIONS ===== */
+        .section {
+            padding: 4rem 0;
+            background-color: var(--glass-bg);
+            border-radius: 16px;
+            margin: 2rem auto;
+            backdrop-filter: blur(10px);
+            max-width: 1200px;
+            border: 1px solid rgba(24, 227, 164, 0.1);
+            transition: border-color 0.3s;
+        }
+        
+        .section:hover {
+            border-color: rgba(24, 227, 164, 0.3);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+        
+        /* ===== CARDS ===== */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            height: 100%;
+            position: relative;
+            border: 1px solid transparent;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6),
+                        0 0 20px rgba(24, 227, 164, 0.3);
+            border-color: rgba(24, 227, 164, 0.2);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(24, 227, 164, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .card:hover::before {
+            left: 100%;
+        }
+        
+        .card-image {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .card:hover .card-image img {
+            transform: scale(1.1);
+        }
+        
+        .card-body {
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card-body h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+        
+        .card-body p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            flex-grow: 1;
+        }
+        
+        .card-tags {
+            margin: 0.5rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            justify-content: center;
+        }
+        
+        .tag {
+            background-color: var(--primary-color);
+            color: #000;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+        
+        .tag:hover {
+            transform: scale(1.1);
+        }
+        
+        /* ===== SWIPER AVEC EFFET COVERFLOW ===== */
+        .swiper-container {
+            padding: 3rem 0;
+            position: relative;
+        }
+        
+        .swiper-coverflow {
+            padding: 4rem 0;
+        }
+        
+        .swiper-coverflow .swiper-slide {
+            transition: all 0.3s ease;
+        }
+        
+        .swiper-coverflow .swiper-slide-active {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: var(--primary-color);
+            background: rgba(26, 31, 30, 0.7);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+        
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 15px var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        .swiper-button-next:after,
+        .swiper-button-prev:after {
+            font-size: 1.2rem;
+        }
+        
+        .swiper-pagination-bullet {
+            background: var(--primary-color);
+            opacity: 0.7;
+            width: 12px;
+            height: 12px;
+            transition: all 0.3s;
+        }
+        
+        .swiper-pagination-bullet:hover {
+            transform: scale(1.3);
+        }
+        
+        .swiper-pagination-bullet-active {
+            opacity: 1;
+            transform: scale(1.2);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        
+        /* ===== DÉFIS SECTION ===== */
+        .defis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .defi-card {
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .defi-card:hover .view-defi {
+            animation: glow 1.5s infinite;
+        }
+        
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: var(--bg-primary);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            border: 1px solid var(--primary-color);
+            animation: slideUp 0.4s;
+            box-shadow: 0 0 50px rgba(24, 227, 164, 0.3);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-color);
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            transition: all 0.3s;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: var(--primary-color);
+            color: #000;
+            transform: rotate(90deg);
+        }
+        
+        .modal-title {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(24, 227, 164, 0.3);
+        }
+        
+        /* ===== FOOTER ===== */
+        footer {
+            background-color: rgba(13, 15, 15, 0.5);
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            text-align: center;
+            border-top: 1px solid rgba(24, 227, 164, 0.1);
+        }
+        
+        footer:hover {
+            border-top-color: rgba(24, 227, 164, 0.3);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                justify-content: center;
+            }
+            
+            .auth-buttons {
+                justify-content: center;
+            }
+            
+            .hero {
+                padding: 1rem;
+            }
+            
+            .section {
+                margin: 1rem;
+                padding: 2rem 0;
+            }
+            
+            .defis-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .swiper-coverflow {
+                padding: 2rem 0;
+            }
+            
+            .swiper-button-next,
+            .swiper-button-prev {
+                display: none;
+            }
+            
+            .magic-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* ===== PULSE ANIMATION ===== */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(24, 227, 164, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(24, 227, 164, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(24, 227, 164, 0);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+>>>>>>> validation-final-2
         }
     </style>
 </head>
 <body>
+<<<<<<< HEAD
     <header>
         <div class="logo">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -255,5 +1030,124 @@
             </div>
         </div>
     </footer>
+=======
+    <!-- VIDEO BACKGROUND -->
+    <video id="bg-video" class="video-background" autoplay muted loop playsinline>
+        <source src="/uploads/dragon.mp4" type="video/mp4">
+        Votre navigateur ne supporte pas la vidéo HTML5.
+    </video>
+    <div class="video-overlay"></div>
+
+    <!-- SITE CONTENT -->
+    <div class="site-content">
+        <!-- HEADER -->
+        <header>
+        <div class="logo">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+                <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+                <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+                <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+                <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+                <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+            </svg>
+            Midgar
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="/" class="magic-btn active">Accueil</a></li>
+                    <li><a href="/discover" class="magic-btn">Découvrir</a></li>
+                    <li><a href="/universes" class="magic-btn">Univers</a></li>
+                    <li><a href="/personnages" class="magic-btn">Personnages</a></li>
+                    <li><a href="/oeuvre" class="magic-btn">Œuvre</a></li>
+                    <li><a href="/artefact" class="magic-btn">Artefacts</a></li>
+                    <li><a href="/shop" class="magic-btn">Boutique</a></li>
+                    <li><a href="/challenges" class="magic-btn">Défis</a></li>
+                </ul>
+            </nav>
+            
+            <div class="auth-buttons">
+                {% if app.user %}
+                    <a href="{{ path('profile') }}" class="profile-link magic-btn">
+                        <div class="avatar">
+                            {% if app.user.avatar %}
+                                <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}">
+                            {% else %}
+                                <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}">
+                            {% endif %}
+                        </div>
+                        <span>{{ app.user.username }}</span>
+                    </a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm magic-btn">Déconnexion</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm magic-btn btn-glow">Connexion</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm magic-btn btn-glow">S'inscrire</a>
+                {% endif %}
+            </div>
+        </header>
+
+
+    <main>
+        <div class="container">
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('warning') %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>À propos de Midgar</h6>
+                    <p>La plateforme ultime pour créer, partager et explorer des univers fantasy uniques.</p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Navigation</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/" style="color: #667eea; text-decoration: none;">Accueil</a></li>
+                        <li><a href="/shop" style="color: #667eea; text-decoration: none;">Boutique</a></li>
+                        <li><a href="/universes" style="color: #667eea; text-decoration: none;">Univers</a></li>
+                        <li><a href="/challenges" style="color: #667eea; text-decoration: none;">Défis</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contact</h6>
+                    <p>
+                        <i class="fas fa-envelope"></i> contact@midgar.com<br>
+                        <i class="fas fa-phone"></i> +33 (0) 1 23 45 67 89
+                    </p>
+                </div>
+            </div>
+            <hr>
+            <p class="text-center text-muted mb-0">
+                © 2026 Midgar - Plateforme de Création Fantasy. Tous droits réservés.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+>>>>>>> validation-final-2
 </body>
 </html>

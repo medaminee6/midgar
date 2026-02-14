@@ -3,8 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\OeuvreRepository;
+<<<<<<< HEAD
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+=======
+use App\Entity\User;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+>>>>>>> validation-final-2
 
 #[ORM\Entity(repositoryClass: OeuvreRepository::class)]
 #[ORM\Table(name: 'oeuvres')]
@@ -17,6 +24,7 @@ class Oeuvre
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+<<<<<<< HEAD
 
     private ?string $title = null;
 
@@ -24,6 +32,21 @@ class Oeuvre
     private ?string $type = null;
 
     #[ORM\Column(type: Types::TEXT)]
+=======
+    #[Assert\NotBlank(message: "Le titre est requis")]
+    #[Assert\Length(min: 2, minMessage: "Le titre doit contenir au moins 2 caractères")]
+    #[Assert\Regex(pattern: '/^[\p{L}][\p{L}\s\-\']*$/u', message: "Le titre ne doit contenir que des lettres (espaces, tirets et apostrophes autorisés)")]
+    private ?string $title = null;
+
+    #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Le type est requis")]
+    private ?string $type = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: "La description est requise")]
+    #[Assert\Length(min: 10, minMessage: "La description doit contenir au moins 10 caractères")]
+    #[Assert\Regex(pattern: '/^[\p{L}][\p{L}0-9\s\-,.!?\']*$/u', message: "La description doit commencer par une lettre")]
+>>>>>>> validation-final-2
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
@@ -33,10 +56,19 @@ class Oeuvre
     private ?string $imageUrl = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+<<<<<<< HEAD
     private ?string $author = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $createdBy = null;
+=======
+    #[Assert\Regex(pattern: '/^[\p{L}][\p{L}\s\-\']*$/u', message: "Le nom de l'auteur ne doit contenir que des lettres (espaces, tirets et apostrophes autorisés)")]
+    private ?string $author = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?User $createdBy = null;
+>>>>>>> validation-final-2
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -137,12 +169,20 @@ class Oeuvre
         return $this;
     }
 
+<<<<<<< HEAD
     public function getCreatedBy(): ?string
+=======
+    public function getCreatedBy(): ?User
+>>>>>>> validation-final-2
     {
         return $this->createdBy;
     }
 
+<<<<<<< HEAD
     public function setCreatedBy(?string $createdBy): static
+=======
+    public function setCreatedBy(?User $createdBy): static
+>>>>>>> validation-final-2
     {
         $this->createdBy = $createdBy;
         return $this;
