@@ -547,49 +547,59 @@
                         <p style="color: var(--text-secondary); margin-bottom: 2rem;">{{ artefact.name }}</p>
 
                         <div class="form-container">
+                            {% for flash_message in app.flashes('error') %}
+                                <div style="background-color: rgba(255, 107, 107, 0.2); color: #ff6b6b; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-weight: 600; border: 1px solid #ff6b6b;">{{ flash_message }}</div>
+                            {% endfor %}
+                            
                             <form method="POST" enctype="multipart/form-data">
                                 <div style="margin-bottom: 1.5rem;">
                                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem; color: var(--text-color);">Nom de l'Artefact *</label>
-                                    <input type="text" name="name" value="{{ artefact.name }}" class="form-input" required>
+                                    <input type="text" name="name" value="{{ oldValues.name ?? artefact.name }}" class="form-input" required>
+                                    {% for error in errors %}{% if error.propertyPath == 'name' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                 </div>
 
                                 <div style="margin-bottom: 1.5rem;">
                                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem; color: var(--text-color);">Type d'Artefact *</label>
                                     <select name="type" class="form-select" required>
                                         <option value="">Sélectionner un type</option>
-                                        <option value="Arme" {% if artefact.type == 'Arme' %}selected{% endif %}>Arme</option>
-                                        <option value="Armure" {% if artefact.type == 'Armure' %}selected{% endif %}>Armure</option>
-                                        <option value="Bijoux" {% if artefact.type == 'Bijoux' %}selected{% endif %}>Bijoux</option>
-                                        <option value="Relique" {% if artefact.type == 'Relique' %}selected{% endif %}>Relique</option>
-                                        <option value="Outil Magique" {% if artefact.type == 'Outil Magique' %}selected{% endif %}>Outil Magique</option>
+                                        <option value="Arme" {% if (oldValues.type ?? artefact.type) == 'Arme' %}selected{% endif %}>Arme</option>
+                                        <option value="Armure" {% if (oldValues.type ?? artefact.type) == 'Armure' %}selected{% endif %}>Armure</option>
+                                        <option value="Bijoux" {% if (oldValues.type ?? artefact.type) == 'Bijoux' %}selected{% endif %}>Bijoux</option>
+                                        <option value="Relique" {% if (oldValues.type ?? artefact.type) == 'Relique' %}selected{% endif %}>Relique</option>
+                                        <option value="Outil Magique" {% if (oldValues.type ?? artefact.type) == 'Outil Magique' %}selected{% endif %}>Outil Magique</option>
                                     </select>
+                                    {% for error in errors %}{% if error.propertyPath == 'type' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                 </div>
 
                                 <div style="margin-bottom: 1.5rem;">
                                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem; color: var(--text-color);">Univers *</label>
-                                    <input type="text" name="universe" value="{{ artefact.universe }}" class="form-input" required>
+                                    <input type="text" name="universe" value="{{ oldValues.universe ?? artefact.universe }}" class="form-input" required>
+                                    {% for error in errors %}{% if error.propertyPath == 'universe' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                 </div>
 
                                 <div style="margin-bottom: 1.5rem;">
                                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem; color: var(--text-color);">Origines & Histoire *</label>
-                                    <textarea name="origins" class="form-textarea" required>{{ artefact.origins }}</textarea>
+                                    <textarea name="origins" class="form-textarea" required>{{ oldValues.origins ?? artefact.origins }}</textarea>
+                                    {% for error in errors %}{% if error.propertyPath == 'origins' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                 </div>
 
                                 <div style="margin-bottom: 1.5rem;">
                                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem; color: var(--text-color);">Pouvoirs & Propriétés *</label>
-                                    <textarea name="powers" class="form-textarea" required>{{ artefact.powers }}</textarea>
+                                    <textarea name="powers" class="form-textarea" required>{{ oldValues.powers ?? artefact.powers }}</textarea>
+                                    {% for error in errors %}{% if error.propertyPath == 'powers' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                 </div>
 
                                 <div style="margin-bottom: 1.5rem;">
                                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem; color: var(--text-color);">Rareté *</label>
                                     <select name="rarity" class="form-select" required>
                                         <option value="">Sélectionner une rareté</option>
-                                        <option value="Commune" {% if artefact.rarity == 'Commune' %}selected{% endif %}>Commune</option>
-                                        <option value="Rare" {% if artefact.rarity == 'Rare' %}selected{% endif %}>Rare</option>
-                                        <option value="Épique" {% if artefact.rarity == 'Épique' %}selected{% endif %}>Épique</option>
-                                        <option value="Légendaire" {% if artefact.rarity == 'Légendaire' %}selected{% endif %}>Légendaire</option>
-                                        <option value="Mythique" {% if artefact.rarity == 'Mythique' %}selected{% endif %}>Mythique</option>
+                                        <option value="Commune" {% if (oldValues.rarity ?? artefact.rarity) == 'Commune' %}selected{% endif %}>Commune</option>
+                                        <option value="Rare" {% if (oldValues.rarity ?? artefact.rarity) == 'Rare' %}selected{% endif %}>Rare</option>
+                                        <option value="Épique" {% if (oldValues.rarity ?? artefact.rarity) == 'Épique' %}selected{% endif %}>Épique</option>
+                                        <option value="Légendaire" {% if (oldValues.rarity ?? artefact.rarity) == 'Légendaire' %}selected{% endif %}>Légendaire</option>
+                                        <option value="Mythique" {% if (oldValues.rarity ?? artefact.rarity) == 'Mythique' %}selected{% endif %}>Mythique</option>
                                     </select>
+                                    {% for error in errors %}{% if error.propertyPath == 'rarity' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                 </div>
 
                                 <div style="margin-bottom: 1.5rem;">
@@ -601,6 +611,7 @@
                                         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Laissez vide pour conserver l'image actuelle</p>
                                     {% endif %}
                                     <input type="file" name="image" class="form-input" accept="image/*">
+                                    {% for error in errors %}{% if error.propertyPath == 'image' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                 </div>
 
                                 <div style="display: flex; gap: 1rem;">

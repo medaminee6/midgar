@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Artefact;
 use App\Entity\Oeuvre;
+use App\Entity\Favoris;
 use App\Form\ProfileType;
 use App\Form\ChangePasswordType;
 use App\Repository\ArtefactRepository;
@@ -105,11 +106,39 @@ class ProfileController extends AbstractController
                 ->getResult();
         }
 
+        // Load user's favorites (oeuvres and artefacts)
+        $favoriOeuvres = [];
+        $favoriArtefacts = [];
+        if ($currentUser instanceof User) {
+            /** @var \App\Repository\FavorisRepository $favorisRepo */
+            $favorisRepo = $em->getRepository(Favoris::class);
+            $favorisOeuvres = $favorisRepo->findFavoriOeuvresByUser($currentUser->getId());
+            $favorisArtefacts = $favorisRepo->findFavoriArtefactsByUser($currentUser->getId());
+            
+            // Fetch actual Oeuvre entities from IDs
+            foreach ($favorisOeuvres as $favori) {
+                $oeuvre = $oeuvreRepo->find($favori->getOeuvreId());
+                if ($oeuvre) {
+                    $favoriOeuvres[] = $oeuvre;
+                }
+            }
+            
+            // Fetch actual Artefact entities from IDs
+            foreach ($favorisArtefacts as $favori) {
+                $artefact = $artefactRepo->find($favori->getArtefactId());
+                if ($artefact) {
+                    $favoriArtefacts[] = $artefact;
+                }
+            }
+        }
+
         return $this->render('profile/profile.html.twig', [
             'profileForm' => $profileForm->createView(),
             'passwordForm' => $passwordForm->createView(),
             'artefacts' => $artefacts,
             'oeuvres' => $oeuvres,
+            'favoriOeuvres' => $favoriOeuvres,
+            'favoriArtefacts' => $favoriArtefacts,
         ]);
     }
 

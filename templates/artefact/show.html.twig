@@ -619,12 +619,13 @@
                                     <h1 class="artefact-title">{{ artefact.name }}</h1>
                                     <p class="artefact-meta">{{ artefact.type }} • {{ artefact.rarity }}</p>
                                 </div>
-                                <div style="display: flex; gap: 1rem;">
-                                    <a href="{{ path('artefact_edit', {id: artefact.id}) }}" class="btn btn-primary magic-btn">Modifier</a>
-                                    <form method="POST" action="{{ path('artefact_delete', {id: artefact.id}) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet artefact ?');">
-                                        <button type="submit" class="btn btn-danger magic-btn">Supprimer</button>
-                                    </form>
-                                </div>
+                                {% if app.user %}
+                                <button id="likeBtn" class="btn magic-btn" onclick="toggleLike('artefact', {{ artefact.id }})"
+                                        style="background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color);">
+                                    <i id="likeIcon" class="far fa-heart"></i>
+                                    <span id="likeCount">0</span>
+                                </button>
+                                {% endif %}
                             </div>
 
                             {% if artefact.imageUrl %}
@@ -661,6 +662,74 @@
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255, 107, 107, 0.2);">
                                 <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">Créé le {{ artefact.createdAt|date('d/m/Y H:i') }}</p>
                                 <a href="{{ path('artefact_index') }}" class="btn btn-secondary magic-btn">← Retour à la liste</a>
+                            </div>
+                            
+                            <!-- COMMENTAIRES -->
+                            <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(24,227,164,0.2);">
+                                <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">
+                                    <i class="fas fa-comments"></i> Commentaires
+                                    {% if commentaires|length > 0 %}
+                                        <span style="font-size: 1rem; color: var(--text-secondary);">({{ commentaires|length }})</span>
+                                    {% endif %}
+                                </h2>
+                                
+                                {% if app.user %}
+                                    <form method="post" action="{{ path('artefact_commenter', {id: artefact.id}) }}" style="margin-bottom: 2rem;">
+                                        <div style="background: rgba(26,31,30,0.5); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(24,227,164,0.2);">
+                                            <label for="contenu" style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Ajouter un commentaire</label>
+                                            <textarea 
+                                                id="contenu" 
+                                                name="contenu" 
+                                                rows="4" 
+                                                placeholder="Partagez votre avis sur cet artefact..."
+                                                style="width: 100%; padding: 1rem; border-radius: 8px; border: 1px solid rgba(24,227,164,0.3); background: rgba(13,15,15,0.8); color: var(--text-color); font-family: inherit; resize: vertical;"
+                                                required
+                                            ></textarea>
+                                            <button type="submit" class="btn btn-primary magic-btn" style="margin-top: 1rem;">
+                                                <i class="fas fa-paper-plane"></i> Publier
+                                            </button>
+                                        </div>
+                                    </form>
+                                {% else %}
+                                    <div style="background: rgba(26,31,30,0.5); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; text-align: center;">
+                                        <p style="color: var(--text-secondary);">
+                                            <a href="{{ path('app_login') }}" style="color: var(--primary-color);">Connectez-vous</a> pour laisser un commentaire
+                                        </p>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if commentaires|length > 0 %}
+                                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                        {% for commentaire in commentaires %}
+                                            <div style="background: rgba(26,31,30,0.5); padding: 1.5rem; border-radius: 12px; border-left: 3px solid var(--primary-color);">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-color); color: #000; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                                            {{ commentaire.userId|default('U')|slice(0,1)|upper }}
+                                                        </div>
+                                                        <span style="font-weight: 600; color: var(--primary-color);">{{ userNames[commentaire.userId]|default('Utilisateur') }}</span>
+                                                    </div>
+                                                    <span style="color: var(--text-secondary); font-size: 0.85rem;">
+                                                        {{ commentaire.createdAt|date('d/m/Y à H:i') }}
+                                                    </span>
+                                                </div>
+                                                <p style="color: var(--text-secondary); line-height: 1.6;">{{ commentaire.contenu }}</p>
+                                                {% if is_granted('ROLE_ADMIN') or (app.user and commentaire.userId == app.user.id) %}
+                                                    <form method="post" action="{{ path('commentaire_supprimer', {id: commentaire.id}) }}" style="margin-top: 1rem;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire?')">
+                                                        <button type="submit" style="background: transparent; border: none; color: #c62828; cursor: pointer; font-size: 0.85rem;">
+                                                            <i class="fas fa-trash"></i> Supprimer
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                        <i class="fas fa-comment-slash" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                        <p>Aucun commentaire pour le moment. Soyez le premier à donner votre avis!</p>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -804,6 +873,47 @@
                 link.classList.add('active');
             }
         });
+
+        // Like functionality
+        function toggleLike(type, id) {
+            fetch('/favoris/' + type + '/' + id + '/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const icon = document.getElementById('likeIcon');
+                    const count = document.getElementById('likeCount');
+                    if (data.favorited) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        icon.style.color = '#18E3A4';
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        icon.style.color = '';
+                    }
+                    count.textContent = data.count;
+                }
+            });
+        }
+
+        // Check if already liked on page load
+        {% if app.user %}
+        fetch('/favoris/check/artefact/{{ artefact.id }}')
+            .then(response => response.json())
+            .then(data => {
+                const icon = document.getElementById('likeIcon');
+                const count = document.getElementById('likeCount');
+                count.textContent = data.count;
+                if (data.favorited) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    icon.style.color = '#18E3A4';
+                }
+            });
+        {% endif %}
     </script>
 </body>
 </html>

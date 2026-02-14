@@ -943,6 +943,90 @@
                                     {% endif %}
                                 </div>
                             </div>
+
+                            <!-- MES FAVORIS - ŒUVRES -->
+                            <div class="content-section">
+                                <h2>❤️ Favoris - Œuvres</h2>
+                                <div class="items-grid">
+                                    {% if favoriOeuvres is defined and favoriOeuvres|length > 0 %}
+                                        {% for o in favoriOeuvres %}
+                                            <div class="card" onclick="window.location.href='{{ path('oeuvre_show', {'id': o.id}) }}'">
+                                                <div class="card-image">
+                                                    {% if o.imageUrl is defined and o.imageUrl %}
+                                                        <img src="{{ asset(o.imageUrl) }}" alt="{{ o.title|default('Œuvre') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            🎨
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3 class="card-title">{{ o.title|default('Sans titre') }}</h3>
+                                                    <p class="card-text">{{ o.description|default('Aucune description')|slice(0, 100) ~ (o.description|default('')|length > 100 ? '...' : '') }}</p>
+                                                    <button class="btn btn-sm magic-btn remove-favorite-btn" 
+                                                            style="width: 100%; margin-top: 0.5rem; border-color: #dc3545; color: #dc3545;"
+                                                            onclick="event.stopPropagation(); removeFavorite('oeuvre', {{ o.id }}, this)">
+                                                        ❌ Retirer des favoris
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="card">
+                                            <div class="card-image" style="display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                                                ❤️
+                                            </div>
+                                            <div class="card-body">
+                                                <h3 class="card-title">Aucun favori</h3>
+                                                <p class="card-text">Vous n'avez pas encore ajouté d'œuvres aux favoris</p>
+                                                <a href="{{ path('oeuvre_index') }}" class="btn btn-primary btn-sm magic-btn" style="width: 100%; margin-top: 1rem;">Découvrir des œuvres</a>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- MES FAVORIS - ARTEFACTS -->
+                            <div class="content-section">
+                                <h2>❤️ Favoris - Artefacts</h2>
+                                <div class="items-grid">
+                                    {% if favoriArtefacts is defined and favoriArtefacts|length > 0 %}
+                                        {% for a in favoriArtefacts %}
+                                            <div class="card" onclick="window.location.href='{{ path('artefact_show', {'id': a.id}) }}'">
+                                                <div class="card-image">
+                                                    {% if a.imageUrl is defined and a.imageUrl %}
+                                                        <img src="{{ asset(a.imageUrl) }}" alt="{{ a.name|default('Artefact') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            ⚔️
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3 class="card-title">{{ a.name|default('Sans nom') }}</h3>
+                                                    <p class="card-text">{{ a.origins|default('Aucune description')|slice(0, 100) ~ (a.origins|default('')|length > 100 ? '...' : '') }}</p>
+                                                    <button class="btn btn-sm magic-btn remove-favorite-btn" 
+                                                            style="width: 100%; margin-top: 0.5rem; border-color: #dc3545; color: #dc3545;"
+                                                            onclick="event.stopPropagation(); removeFavorite('artefact', {{ a.id }}, this)">
+                                                        ❌ Retirer des favoris
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="card">
+                                            <div class="card-image" style="display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                                                ❤️
+                                            </div>
+                                            <div class="card-body">
+                                                <h3 class="card-title">Aucun favori</h3>
+                                                <p class="card-text">Vous n'avez pas encore ajouté d'artefacts aux favoris</p>
+                                                <a href="{{ path('artefact_index') }}" class="btn btn-primary btn-sm magic-btn" style="width: 100%; margin-top: 1rem;">Découvrir des artefacts</a>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1116,7 +1200,8 @@
                 </div>
                 <div class="modal-actions">
                     <button class="btn btn-secondary magic-btn" onclick="closeModal('artefactModal')">Fermer</button>
-                    <button class="btn btn-primary magic-btn">Éditer</button>
+                    <button id="artefactDeleteBtn" class="btn btn-danger magic-btn" onclick="deleteArtefact()">Supprimer</button>
+                    <a id="artefactEditBtn" href="#" class="btn btn-primary magic-btn">Éditer</a>
                 </div>
             </div>
         </div>
@@ -1346,6 +1431,9 @@
 
         // Fonction pour ouvrir la modale d'artefact
         function openArtefactModal(id) {
+            window.currentArtefactId = id;
+            const editBtn = document.getElementById('artefactEditBtn');
+            editBtn.href = '/artefact/' + id + '/edit';
             {% if artefacts is defined and artefacts|length > 0 %}
                 {% set artefact = artefacts[0] %}
                 const artefactData = {
@@ -1381,6 +1469,17 @@
             document.getElementById('artefactDescription').textContent = artefactData.description;
             
             openModal('artefactModal');
+        }
+
+        // Fonction pour supprimer un artefact
+        function deleteArtefact() {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet artefact ? Cette action est irréversible.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/artefact/' + window.currentArtefactId + '/delete';
+                document.body.appendChild(form);
+                form.submit();
+            }
         }
 
         // Fonction pour ouvrir la modale d'univers
@@ -1467,6 +1566,65 @@
                 });
             }
         });
+
+        // Fonction pour supprimer un favori
+        async function removeFavorite(type, id, button) {
+            if (!confirm('Voulez-vous vraiment retirer cet élément de vos favoris ?')) {
+                return;
+            }
+            
+            try {
+                const url = `/favoris/${type}/${id}/toggle`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Remove the card from the DOM
+                    const card = button.closest('.card');
+                    card.style.transition = 'opacity 0.3s, transform 0.3s';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8)';
+                    
+                    setTimeout(() => {
+                        card.remove();
+                        // Check if no more favorites
+                        const grid = card.parentElement;
+                        if (grid.querySelectorAll('.card').length === 0) {
+                            grid.innerHTML = `
+                                <div class="card">
+                                    <div class="card-image" style="display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                                        ❤️
+                                    </div>
+                                    <div class="card-body">
+                                        <h3 class="card-title">Aucun favori</h3>
+                                        <p class="card-text">Vous n'avez pas encore ajouté de ${type === 'oeuvre' ? 'œuvres' : 'artefacts'} aux favoris</p>
+                                        <a href="${type === 'oeuvre' ? '/oeuvre' : '/artefact'}" class="btn btn-primary btn-sm magic-btn" style="width: 100%; margin-top: 1rem;">Découvrir des ${type === 'oeuvre' ? 'œuvres' : 'artefacts'}</a>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }, 300);
+                    
+                    // Update the heart button on the item page if user navigates there
+                    const heartBtn = document.querySelector(`.favorite-btn[data-${type}-id="${id}"]`);
+                    if (heartBtn) {
+                        heartBtn.classList.remove('favorited');
+                        heartBtn.innerHTML = '🤍';
+                    }
+                } else {
+                    alert('Erreur lors de la suppression des favoris');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue');
+            }
+        }
     </script>
 </body>
 </html>

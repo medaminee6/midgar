@@ -478,6 +478,11 @@
             border: 1px solid #ff6b6b;
         }
         
+        .form-error-input {
+            border-color: #ff6b6b !important;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+        }
+        
         /* ===== MODALES STANDARD ===== */
         .modal {
             display: none;
@@ -714,46 +719,52 @@
                                 <form method="POST" enctype="multipart/form-data">
                                     <div class="form-group">
                                         <label class="form-label">Nom de l'Artefact *</label>
-                                        <input type="text" name="name" class="form-input" placeholder="Ex: L'Épée de Cristal" minlength="3" required>
+                                        <input type="text" name="name" class="form-input" placeholder="Ex: L'Épée de Cristal" minlength="3" required value="{{ oldValues.name ?? '' }}">
+                                        {% for error in errors %}{% if error.propertyPath == 'name' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Type d'Artefact *</label>
                                         <select name="type" class="form-select" required>
                                             <option value="">Sélectionner un type</option>
-                                            <option value="Arme">Arme</option>
-                                            <option value="Armure">Armure</option>
-                                            <option value="Bijoux">Bijoux</option>
-                                            <option value="Relique">Relique</option>
-                                            <option value="Outil Magique">Outil Magique</option>
+                                            <option value="Arme" {% if (oldValues.type ?? '') == 'Arme' %}selected{% endif %}>Arme</option>
+                                            <option value="Armure" {% if (oldValues.type ?? '') == 'Armure' %}selected{% endif %}>Armure</option>
+                                            <option value="Bijoux" {% if (oldValues.type ?? '') == 'Bijoux' %}selected{% endif %}>Bijoux</option>
+                                            <option value="Relique" {% if (oldValues.type ?? '') == 'Relique' %}selected{% endif %}>Relique</option>
+                                            <option value="Outil Magique" {% if (oldValues.type ?? '') == 'Outil Magique' %}selected{% endif %}>Outil Magique</option>
                                         </select>
+                                        {% for error in errors %}{% if error.propertyPath == 'type' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Univers *</label>
-                                        <input type="text" name="universe" class="form-input" placeholder="Ex: Midgard, Asgard..." minlength="2" required>
+                                        <input type="text" name="universe" class="form-input" placeholder="Ex: Midgard, Asgard..." minlength="2" required value="{{ oldValues.universe ?? '' }}">
+                                        {% for error in errors %}{% if error.propertyPath == 'universe' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Origines & Histoire *</label>
-                                        <textarea name="origins" class="form-textarea" placeholder="Racontez l'histoire et les origines de cet artefact..." minlength="10" required></textarea>
+                                        <textarea name="origins" class="form-textarea" placeholder="Racontez l'histoire et les origines de cet artefact..." required>{{ oldValues.origins ?? '' }}</textarea>
+                                        {% for error in errors %}{% if error.propertyPath == 'origins' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Pouvoirs & Propriétés *</label>
-                                        <textarea name="powers" class="form-textarea" placeholder="Décrivez les pouvoirs et propriétés magiques..." minlength="10" required></textarea>
+                                        <textarea name="powers" class="form-textarea" placeholder="Décrivez les pouvoirs et propriétés magiques..." required>{{ oldValues.powers ?? '' }}</textarea>
+                                        {% for error in errors %}{% if error.propertyPath == 'powers' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Rareté *</label>
                                         <select name="rarity" class="form-select" required>
                                             <option value="">Sélectionner une rareté</option>
-                                            <option value="Commune">Commune</option>
-                                            <option value="Rare">Rare</option>
-                                            <option value="Épique">Épique</option>
-                                            <option value="Légendaire">Légendaire</option>
-                                            <option value="Mythique">Mythique</option>
+                                            <option value="Commune" {% if (oldValues.rarity ?? '') == 'Commune' %}selected{% endif %}>Commune</option>
+                                            <option value="Rare" {% if (oldValues.rarity ?? '') == 'Rare' %}selected{% endif %}>Rare</option>
+                                            <option value="Épique" {% if (oldValues.rarity ?? '') == 'Épique' %}selected{% endif %}>Épique</option>
+                                            <option value="Légendaire" {% if (oldValues.rarity ?? '') == 'Légendaire' %}selected{% endif %}>Légendaire</option>
+                                            <option value="Mythique" {% if (oldValues.rarity ?? '') == 'Mythique' %}selected{% endif %}>Mythique</option>
                                         </select>
+                                        {% for error in errors %}{% if error.propertyPath == 'rarity' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-group file-upload">
@@ -767,7 +778,8 @@
                                             <div class="file-text">Déposer une image ou cliquer</div>
                                             <div class="file-hint">PNG, JPG jusqu'à 5MB</div>
                                         </label>
-                                        <input type="file" id="imageInput" name="image" accept="image/*" required style="display: none;">
+                                        <input type="file" id="imageInput" name="image" accept="image/*" style="display: none;">
+                                        {% for error in errors %}{% if error.propertyPath == 'image' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-actions">

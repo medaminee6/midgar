@@ -486,6 +486,11 @@
             border: 1px solid #ff6b6b; 
         }
         
+        .form-error-input {
+            border-color: #ff6b6b !important;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+        }
+        
         /* ===== MODALES STANDARD ===== */
         .modal {
             display: none;
@@ -748,30 +753,33 @@
                                 <form method="POST" enctype="multipart/form-data" id="oeuvreForm">
                                     <div class="form-group">
                                         <label class="form-label">Titre de l'Œuvre *</label>
-                                        <input type="text" name="title" class="form-input" placeholder="Ex: La Chute de la Tour Céleste" minlength="3" required>
+                                        <input type="text" name="title" class="form-input" placeholder="Ex: La Chute de la Tour Céleste" minlength="3" required value="{{ oldValues.title ?? '' }}">
+                                        {% for error in errors %}{% if error.propertyPath == 'title' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Type d'Œuvre *</label>
                                         <select name="type" class="form-select" required>
                                             <option value="">Sélectionner un type</option>
-                                            <option value="roman">Roman</option>
-                                            <option value="nouvelle">Nouvelle</option>
-                                            <option value="poesie">Poésie</option>
-                                            <option value="artwork">Illustration</option>
-                                            <option value="musique">Musique</option>
-                                            <option value="autre">Autre</option>
+                                            <option value="roman" {% if (oldValues.type ?? '') == 'roman' %}selected{% endif %}>Roman</option>
+                                            <option value="nouvelle" {% if (oldValues.type ?? '') == 'nouvelle' %}selected{% endif %}>Nouvelle</option>
+                                            <option value="poesie" {% if (oldValues.type ?? '') == 'poesie' %}selected{% endif %}>Poésie</option>
+                                            <option value="artwork" {% if (oldValues.type ?? '') == 'artwork' %}selected{% endif %}>Illustration</option>
+                                            <option value="musique" {% if (oldValues.type ?? '') == 'musique' %}selected{% endif %}>Musique</option>
+                                            <option value="autre" {% if (oldValues.type ?? '') == 'autre' %}selected{% endif %}>Autre</option>
                                         </select>
+                                        {% for error in errors %}{% if error.propertyPath == 'type' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Description *</label>
-                                        <textarea name="description" class="form-textarea" placeholder="Décrivez votre œuvre, son contexte, ses inspirations..." minlength="10" required></textarea>
+                                        <textarea name="description" class="form-textarea" placeholder="Décrivez votre œuvre, son contexte, ses inspirations..." required>{{ oldValues.description ?? '' }}</textarea>
+                                        {% for error in errors %}{% if error.propertyPath == 'description' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Date de Publication</label>
-                                        <input type="date" name="datePublication" class="form-input">
+                                        <input type="date" name="datePublication" class="form-input" value="{{ oldValues.datePublication ?? '' }}">
                                     </div>
 
                                     <div class="form-group file-upload">
@@ -785,8 +793,9 @@
                                             <div class="file-text">Déposer une image ou cliquer</div>
                                             <div class="file-hint">PNG, JPG jusqu'à 5MB</div>
                                         </label>
-                                        <input type="file" id="imageInput" name="image" accept="image/*" required style="display: none;">
+                                        <input type="file" id="imageInput" name="image" accept="image/*" style="display: none;">
                                         <input type="hidden" id="drawnImageInput" name="drawnImage" value="">
+                                        {% for error in errors %}{% if error.propertyPath == 'image' or error.propertyPath == 'drawnImage' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <button type="button" id="toggleDrawBtn" class="btn btn-secondary magic-btn" style="margin-bottom: 1rem;">Dessiner votre image</button>
@@ -805,7 +814,8 @@
 
                                     <div class="form-group">
                                         <label class="form-label">Auteur/Artiste</label>
-                                        <input type="text" name="author" class="form-input" placeholder="Votre nom ou pseudonyme" value="{{ app.user.username ?? '' }}">
+                                        <input type="text" name="author" class="form-input" placeholder="Votre nom ou pseudonyme" value="{{ oldValues.author ?? app.user.username ?? '' }}">
+                                        {% for error in errors %}{% if error.propertyPath == 'author' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
                                     </div>
 
                                     <div class="form-actions">
