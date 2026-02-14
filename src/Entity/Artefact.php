@@ -6,6 +6,7 @@ use App\Repository\ArtefactRepository;
 use App\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ArtefactRepository::class)]
 #[ORM\Table(name: 'artefacts')]
@@ -18,21 +19,34 @@ class Artefact
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom est requis")]
+    #[Assert\Length(min: 3, minMessage: "Le nom doit contenir au moins 3 caractères")]
+    #[Assert\Regex(pattern: '/^[\p{L}][\p{L}\s\'\-\x{2019}]*$/u', message: "Le nom ne doit contenir que des lettres (espaces, tirets et apostrophes autorisés)")]
     private ?string $name = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Le type est requis")]
     private ?string $type = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "L'univers est requis")]
+    #[Assert\Length(min: 2, minMessage: "L'univers doit contenir au moins 2 caractères")]
     private ?string $universe = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: "Les origines sont requises")]
+    #[Assert\Length(min: 10, minMessage: "Les origines doivent contenir au moins 10 caractères")]
+    #[Assert\Regex(pattern: '/^[\p{L}][\p{L}0-9\s\-\.,!?\'\\x{2019}]*$/u', message: "Les origines doivent commencer par une lettre")]
     private ?string $origins = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: "Les pouvoirs sont requis")]
+    #[Assert\Length(min: 10, minMessage: "Les pouvoirs doivent contenir au moins 10 caractères")]
+    #[Assert\Regex(pattern: '/^[\p{L}][\p{L}0-9\s\-\.,!?\'\\x{2019}]*$/u', message: "Les pouvoirs doivent commencer par une lettre")]
     private ?string $powers = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "La rareté est requise")]
     private ?string $rarity = null;
 
     #[ORM\Column(length: 500, nullable: true)]

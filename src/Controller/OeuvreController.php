@@ -5,11 +5,14 @@ namespace App\Controller;
 use App\Entity\Oeuvre;
 use App\Entity\User;
 use App\Repository\OeuvreRepository;
+use App\Repository\CommentaireRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/oeuvre', name: 'oeuvre_')]
 class OeuvreController extends AbstractController
@@ -78,117 +81,162 @@ class OeuvreController extends AbstractController
     }
 
     #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
-    public function create(Request $request, EntityManagerInterface $em): Response
+    public function create(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): Response
     {
+        $oeuvre = new Oeuvre();
+        $errors = [];
+        $oldValues = [];
+
         if ($request->isMethod('POST')) {
-            $errors = [];
             $title = $request->request->get('title');
             $type = $request->request->get('type');
             $description = $request->request->get('description');
             $author = $request->request->get('author');
             $dateStr = $request->request->get('datePublication');
 
-            if (!$title || strlen($title) < 2) {
-                $errors[] = "Le titre doit contenir au moins 2 caractères";
-            }
-            if ($author && !preg_match('/^[\p{L}][\p{L}\s\-\']*$/u', $author)) {
-                $errors[] = "Le nom de l auteur ne doit contenir que des lettres (espaces, tirets et apostrophes autorisés)";
-            }
-            if (!$type) {
-                $errors[] = "Le type est requis";
-            }
-            if (!$description || strlen($description) < 10) {
-                $errors[] = "La description doit contenir au moins 10 caractères";
-            }
+            // Store old values to repopulate form
+            $oldValues = [
+                'title' => $title,
+                'type' => $type,
+                'description' => $description,
+                'author' => $author,
+                'datePublication' => $dateStr,
+            ];
+
+            $oeuvre->setTitle($title ?? '');
+            $oeuvre->setType($type ?? '');
+            $oeuvre->setDescription($description ?? '');
+            $oeuvre->setAuthor($author);
+
+            $errors = $validator->validate($oeuvre);
+
+            // Validate image (either uploaded or drawn)
             $drawnImage = $request->request->get('drawnImage');
             $uploadedImage = $request->files->get('image');
+            
             if (!$uploadedImage && !$drawnImage) {
-                $errors[] = "L image est requise (téléchargement ou dessin)";
-            }
-            if ($uploadedImage) {
-                $validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-                $extension = strtolower(pathinfo($uploadedImage->getClientOriginalName(), PATHINFO_EXTENSION));
-                if (!in_array($extension, $validExtensions)) {
-                    $errors[] = "Les formats autorisés sont: jpg, png, webp, gif";
-                }
-            } else if ($drawnImage) {
-                if (!preg_match('/^data:image\/(\w+);base64,/', $drawnImage, $m)) {
-                    $errors[] = "Image dessinée invalide";
-                } else {
-                    $ext = strtolower($m[1]);
-                    $ext = $ext === 'jpeg' ? 'jpg' : $ext;
+                $error = new \Symfony\Component\Validator\ConstraintViolation(
+                    "L'image est requise (téléchargement ou dessin)",
+                    null,
+                    [],
+                    $oeuvre,
+                    'image',
+                    null
+                );
+                $errors->add($error);
+            } else {
+                if ($uploadedImage) {
                     $validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-                    if (!in_array($ext, $validExtensions)) {
-                        $errors[] = "Le dessin doit produire une image au format PNG/JPG";
+                    $extension = strtolower(pathinfo($uploadedImage->getClientOriginalName(), PATHINFO_EXTENSION));
+                    if (!in_array($extension, $validExtensions)) {
+                        $error = new \Symfony\Component\Validator\ConstraintViolation(
+                            "Les formats autorisés sont: jpg, png, webp, gif",
+                            null,
+                            [],
+                            $oeuvre,
+                            'image',
+                            null
+                        );
+                        $errors->add($error);
+                    }
+                } elseif ($drawnImage) {
+                    if (!preg_match('/^data:image\/(\w+);base64,/', $drawnImage, $m)) {
+                        $error = new \Symfony\Component\Validator\ConstraintViolation(
+                            "Image dessinée invalide",
+                            null,
+                            [],
+                            $oeuvre,
+                            'drawnImage',
+                            null
+                        );
+                        $errors->add($error);
+                    } else {
+                        $ext = strtolower($m[1]);
+                        $ext = $ext === 'jpeg' ? 'jpg' : $ext;
+                        $validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+                        if (!in_array($ext, $validExtensions)) {
+                            $error = new \Symfony\Component\Validator\ConstraintViolation(
+                                "Le dessin doit produire une image au format PNG/JPG",
+                                null,
+                                [],
+                                $oeuvre,
+                                'drawnImage',
+                                null
+                            );
+                            $errors->add($error);
+                        }
                     }
                 }
             }
 
-            if (count($errors) > 0) {
-                foreach ($errors as $error) {
-                    $this->addFlash('error', $error);
+            if (count($errors) === 0) {
+                $currentUser = $this->getUser();
+                if ($currentUser instanceof User) {
+                    $oeuvre->setCreatedBy($currentUser);
+                } else {
+                    $oeuvre->setCreatedBy(null);
                 }
-                return $this->redirectToRoute('oeuvre_create');
-            }
 
-            $oeuvre = new Oeuvre();
-            $oeuvre->setTitle($title);
-            $oeuvre->setType($type);
-            $oeuvre->setDescription($description);
-            $oeuvre->setAuthor($author);
-            $currentUser = $this->getUser();
-            if ($currentUser instanceof User) {
-                $oeuvre->setCreatedBy($currentUser);
-            } else {
-                $oeuvre->setCreatedBy(null);
-            }
+                if ($dateStr) {
+                    $oeuvre->setDatePublication(new \DateTimeImmutable($dateStr));
+                }
 
-            $dateStr = $request->request->get('datePublication');
-            if ($dateStr) {
-                $oeuvre->setDatePublication(new \DateTimeImmutable($dateStr));
-            }
-
-            if ($uploadedImage) {
-                $originalName = $uploadedImage->getClientOriginalName();
-                $extension = pathinfo($originalName, PATHINFO_EXTENSION);
-                $filename = uniqid() . '.' . $extension;
-                $uploadedImage->move($this->getParameter('uploads_directory'), $filename);
-                $oeuvre->setImageUrl('/uploads/' . $filename);
-            } elseif ($drawnImage) {
-                if (preg_match('/^data:image\/(\w+);base64,/', $drawnImage, $m)) {
-                    $data = substr($drawnImage, strpos($drawnImage, ',') + 1);
-                    $data = base64_decode($data);
-                    $ext = strtolower($m[1]);
-                    $ext = $ext === 'jpeg' ? 'jpg' : $ext;
-                    $filename = uniqid() . '.' . $ext;
-                    $target = rtrim($this->getParameter('uploads_directory'), '\\/') . DIRECTORY_SEPARATOR . $filename;
-                    file_put_contents($target, $data);
+                if ($uploadedImage) {
+                    $originalName = $uploadedImage->getClientOriginalName();
+                    $extension = pathinfo($originalName, PATHINFO_EXTENSION);
+                    $filename = uniqid() . '.' . $extension;
+                    $uploadedImage->move($this->getParameter('uploads_directory'), $filename);
                     $oeuvre->setImageUrl('/uploads/' . $filename);
+                } elseif ($drawnImage) {
+                    if (preg_match('/^data:image\/(\w+);base64,/', $drawnImage, $m)) {
+                        $data = substr($drawnImage, strpos($drawnImage, ',') + 1);
+                        $data = base64_decode($data);
+                        $ext = strtolower($m[1]);
+                        $ext = $ext === 'jpeg' ? 'jpg' : $ext;
+                        $filename = uniqid() . '.' . $ext;
+                        $target = rtrim($this->getParameter('uploads_directory'), '\\/') . DIRECTORY_SEPARATOR . $filename;
+                        file_put_contents($target, $data);
+                        $oeuvre->setImageUrl('/uploads/' . $filename);
+                    }
                 }
+
+                $em->persist($oeuvre);
+                $em->flush();
+
+                $this->addFlash('success', 'Œuvre créée avec succès!');
+                return $this->redirectToRoute('oeuvre_index');
             }
-
-            $em->persist($oeuvre);
-            $em->flush();
-
-            $this->addFlash('success', 'Œuvre créée avec succès!');
-            return $this->redirectToRoute('oeuvre_index');
         }
 
         return $this->render('oeuvre/create.html.twig', [
+            'oeuvre' => $oeuvre,
+            'errors' => $errors,
+            'oldValues' => $oldValues,
             'currentUser' => $this->getUser(),
         ]);
     }
 
     #[Route('/{id}', name: 'show', methods: ['GET'])]
-    public function show(Oeuvre $oeuvre): Response
+    public function show(Oeuvre $oeuvre, CommentaireRepository $commentaireRepo, UserRepository $userRepo): Response
     {
+        $commentaires = $commentaireRepo->findByOeuvre($oeuvre->getId());
+        
+        // Fetch user names for comments
+        $userNames = [];
+        foreach ($commentaires as $commentaire) {
+            $user = $userRepo->find($commentaire->getUserId());
+            $userNames[$commentaire->getUserId()] = $user ? ($user->getPrenom() . ' ' . $user->getNom()) : 'Utilisateur';
+        }
+        
         return $this->render('oeuvre/show.html.twig', [
             'oeuvre' => $oeuvre,
+            'commentaires' => $commentaires,
+            'userNames' => $userNames,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Oeuvre $oeuvre, EntityManagerInterface $em): Response
+    public function edit(Request $request, Oeuvre $oeuvre, EntityManagerInterface $em, ValidatorInterface $validator): Response
     {
         $currentUser = $this->getUser();
         $isAdmin = $this->isGranted('ROLE_ADMIN');
@@ -207,72 +255,68 @@ class OeuvreController extends AbstractController
             return $this->redirectToRoute('oeuvre_show', ['id' => $oeuvre->getId()]);
         }
 
+        $errors = [];
+        $oldValues = [];
+
         if ($request->isMethod('POST')) {
-            $errors = [];
             $title = $request->request->get('title');
             $type = $request->request->get('type');
             $description = $request->request->get('description');
 
-            if (!$title || strlen($title) < 2) {
-                $errors[] = "Le titre doit contenir au moins 2 caractères";
-            }
-            if ($title && !preg_match('/^[a-zA-ZÀ-ÿ\s\-\']+$/u', $title)) {
-                $errors[] = "Le titre ne doit contenir que des lettres (espaces, tirets et apostrophes autorisés)";
-            }
-            if (!$type) {
-                $errors[] = "Le type est requis";
-            }
-            if (!$description || strlen($description) < 10) {
-                $errors[] = "La description doit contenir au moins 10 caractères";
-            }
-            if ($description && !preg_match('/^[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ0-9\s\-,.!?\']*$/u', $description)) {
-                $errors[] = "La description doit commencer par une lettre et contenir que des lettres, chiffres et espaces";
-            }
+            // Store old values to repopulate form
+            $oldValues = [
+                'title' => $title,
+                'type' => $type,
+                'description' => $description,
+            ];
 
-            if (count($errors) > 0) {
-                foreach ($errors as $error) {
-                    $this->addFlash('error', $error);
+            $oeuvre->setTitle($title ?? '');
+            $oeuvre->setType($type ?? '');
+            $oeuvre->setDescription($description ?? '');
+
+            $errors = $validator->validate($oeuvre);
+
+            if (count($errors) === 0) {
+                $dateStr = $request->request->get('datePublication');
+                if ($dateStr) {
+                    $oeuvre->setDatePublication(new \DateTimeImmutable($dateStr));
                 }
-                return $this->redirectToRoute('oeuvre_edit', ['id' => $oeuvre->getId()]);
-            }
 
-            $oeuvre->setTitle($title);
-            $oeuvre->setType($type);
-            $oeuvre->setDescription($description);
-
-            $dateStr = $request->request->get('datePublication');
-            if ($dateStr) {
-                $oeuvre->setDatePublication(new \DateTimeImmutable($dateStr));
-            }
-
-            $imageFile = $request->files->get('image');
-            if ($imageFile) {
-                $validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-                $extension = strtolower(pathinfo($imageFile->getClientOriginalName(), PATHINFO_EXTENSION));
-                if (!in_array($extension, $validExtensions)) {
-                    $this->addFlash('error', "Les formats autorisés sont: jpg, png, webp, gif");
-                    return $this->redirectToRoute('oeuvre_edit', ['id' => $oeuvre->getId()]);
-                }
-                if ($oeuvre->getImageUrl()) {
-                    $oldFile = $this->getParameter('kernel.project_dir') . '/public' . $oeuvre->getImageUrl();
-                    if (file_exists($oldFile)) {
-                        unlink($oldFile);
+                $imageFile = $request->files->get('image');
+                if ($imageFile) {
+                    $validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+                    $extension = strtolower(pathinfo($imageFile->getClientOriginalName(), PATHINFO_EXTENSION));
+                    if (!in_array($extension, $validExtensions)) {
+                        $this->addFlash('error', "Les formats autorisés sont: jpg, png, webp, gif");
+                        return $this->render('oeuvre/edit.html.twig', [
+                            'oeuvre' => $oeuvre,
+                            'errors' => $errors,
+                            'oldValues' => $oldValues,
+                        ]);
                     }
+                    if ($oeuvre->getImageUrl()) {
+                        $oldFile = $this->getParameter('kernel.project_dir') . '/public' . $oeuvre->getImageUrl();
+                        if (file_exists($oldFile)) {
+                            unlink($oldFile);
+                        }
+                    }
+                    $originalName = $imageFile->getClientOriginalName();
+                    $extension = pathinfo($originalName, PATHINFO_EXTENSION);
+                    $filename = uniqid() . '.' . $extension;
+                    $imageFile->move($this->getParameter('uploads_directory'), $filename);
+                    $oeuvre->setImageUrl('/uploads/' . $filename);
                 }
-                $originalName = $imageFile->getClientOriginalName();
-                $extension = pathinfo($originalName, PATHINFO_EXTENSION);
-                $filename = uniqid() . '.' . $extension;
-                $imageFile->move($this->getParameter('uploads_directory'), $filename);
-                $oeuvre->setImageUrl('/uploads/' . $filename);
-            }
 
-            $em->flush();
-            $this->addFlash('success', 'Œuvre modifiée avec succès!');
-            return $this->redirectToRoute('oeuvre_show', ['id' => $oeuvre->getId()]);
+                $em->flush();
+                $this->addFlash('success', 'Œuvre modifiée avec succès!');
+                return $this->redirectToRoute('oeuvre_show', ['id' => $oeuvre->getId()]);
+            }
         }
 
         return $this->render('oeuvre/edit.html.twig', [
             'oeuvre' => $oeuvre,
+            'errors' => $errors,
+            'oldValues' => $oldValues,
         ]);
     }
 

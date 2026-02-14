@@ -33,10 +33,7 @@ security:
                 lifetime: 604800
                 path: /
 
-    access_control:
-        # Exemple de contrôle d'accès (optionnel)
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/profile, roles: ROLE_USER }
+    
 
 # Config pour les tests
 when@test:

@@ -169,6 +169,17 @@ textarea {
     .section { padding: 2rem 1rem; }
     .card { padding: 1.5rem; }
 }
+
+/* ===== ERROR STYLES ===== */
+.form-error {
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+input.error, textarea.error, select.error {
+    border-color: #ff6b6b !important;
+}
 </style>
 </head>
 
@@ -192,7 +203,8 @@ textarea {
 
     <div class="form-group">
         <label>Titre *</label>
-        <input type="text" name="title" value="{{ oeuvre.title }}" required>
+        <input type="text" name="title" value="{{ oldValues.title ?? oeuvre.title }}" required>
+        {% for error in errors %}{% if error.propertyPath == 'title' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
     </div>
 
     <div class="form-group">
@@ -200,16 +212,18 @@ textarea {
         <select name="type" required>
             <option value="">Choisir</option>
             {% for t in ['roman','nouvelle','poesie','artwork','musique','autre'] %}
-                <option value="{{ t }}" {% if oeuvre.type == t %}selected{% endif %}>
+                <option value="{{ t }}" {% if (oldValues.type ?? oeuvre.type) == t %}selected{% endif %}>
                     {{ t|capitalize }}
                 </option>
             {% endfor %}
         </select>
+        {% for error in errors %}{% if error.propertyPath == 'type' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
     </div>
 
     <div class="form-group">
         <label>Description *</label>
-        <textarea name="description" required>{{ oeuvre.description }}</textarea>
+        <textarea name="description" required>{{ oldValues.description ?? oeuvre.description }}</textarea>
+        {% for error in errors %}{% if error.propertyPath == 'description' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
     </div>
 
     <div class="form-group">
@@ -227,11 +241,13 @@ textarea {
             </div>
         {% endif %}
         <input type="file" name="image" accept="image/*">
+        {% for error in errors %}{% if error.propertyPath == 'image' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
     </div>
 
     <div class="form-group">
         <label>Auteur</label>
         <input type="text" name="author" value="{{ oeuvre.author }}">
+        {% for error in errors %}{% if error.propertyPath == 'author' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
     </div>
 
     <div class="actions">
