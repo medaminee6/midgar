@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ commande.referenceCommande }} - Détails de commande</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* ===== VARIABLES & RESET ===== */
+        :root {
+            --primary-color: #18E3A4;
+            --primary-dark: #13c891;
+            --text-color: #E6FFF6;
+            --text-secondary: #B0B9B6;
+            --bg-primary: #1A1F1E;
+            --bg-dark: #0D0F0F;
+            --card-bg: rgba(26, 31, 30, 0.7);
+            --glass-bg: rgba(26, 31, 30, 0.5);
+            --border-radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* ===== BOUTONS ANIMÉS ===== */
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn-danger {
+            background-color: #d32f2f;
+            color: white;
+            border: 2px solid #d32f2f;
+        }
+        
+        .btn-danger:hover {
+            background-color: #b71c1c;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(211, 47, 47, 0.5);
+        }
+        
+        /* ===== BOUTONS MAGIQUES (magic-btn) ===== */
+        .magic-btn {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid transparent;
+        }
+        
+        .magic-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        .magic-btn.active {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        /* ===== ANIMATION PARTICULES ===== */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, var(--primary-color), var(--primary-dark));
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fly 0.6s forwards;
+            opacity: 0.8;
+            z-index: 1;
+        }
+        
+        @keyframes fly {
+            0% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translate(var(--x), var(--y)) scale(0); 
+                opacity: 0; 
+            }
+        }
+        
+        /* ===== VIDEO BACKGROUND ===== */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            pointer-events: none;
+        }
+        
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: -1;
+        }
+        
+        .gradient-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-dark) 100%);
+            z-index: -3;
+            pointer-events: none;
+            display: none;
+        }
+        
+        /* ===== HEADER STANDARD ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(26, 31, 30, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(24, 227, 164, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .logo:hover {
+            animation: glow 1.5s infinite;
+        }
+        
+        .logo svg {
+            width: 32px;
+            height: 32px;
+            filter: drop-shadow(0 0 5px rgba(24, 227, 164, 0.3));
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 5px var(--primary-color);
+            }
+            50% {
+                text-shadow: 0 0 15px var(--primary-color), 0 0 30px var(--primary-color);
+            }
+        }
+        
+        nav ul {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.3rem 0.6rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .profile-link:hover {
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary-color);
+            transition: transform 0.3s;
+        }
+        
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* ===== SITE CONTENT ===== */
+        .site-content {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+        }
+        
+        main {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+        
+        .shop-section {
+            background: linear-gradient(135deg, #0d1117 0%, #1a1f1e 100%);
+            min-height: 80vh;
+            padding: 3rem 0;
+            border-radius: 16px;
+            margin: 2rem auto;
+            max-width: 1200px;
+            border: 1px solid rgba(24, 227, 164, 0.1);
+        }
+        
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -1rem;
+        }
+        
+        .col-md-8 {
+            width: 66.666%;
+            padding: 0 1rem;
+        }
+        
+        .col-md-6 {
+            width: 50%;
+            padding: 0 1rem;
+        }
+        
+        .col-md-4 {
+            width: 33.333%;
+            padding: 0 1rem;
+        }
+        
+        /* ===== STYLES SPÉCIFIQUES DÉTAIL COMMANDE ===== */
+        h1, h2, h3, h4, h5 {
+            color: white;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
+            margin-bottom: 1rem;
+            list-style: none;
+            background: transparent;
+        }
+        
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "/";
+            padding: 0 0.5rem;
+            color: #999;
+        }
+        
+        .breadcrumb-item a {
+            color: var(--primary-color);
+        }
+        
+        .breadcrumb-item.active {
+            color: #ddd;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .table {
+            width: 100%;
+            color: #ddd;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            border-top: 1px solid #222;
+        }
+        
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #222;
+        }
+        
+        .table-sm th,
+        .table-sm td {
+            padding: 0.3rem;
+        }
+        
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+        
+        .mb-3 {
+            margin-bottom: 1rem;
+        }
+        
+        .mt-4 {
+            margin-top: 1.5rem;
+        }
+        
+        /* ===== FOOTER ===== */
+        footer {
+            background-color: rgba(13, 15, 15, 0.5);
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            text-align: center;
+            border-top: 1px solid rgba(24, 227, 164, 0.1);
+        }
+        
+        footer:hover {
+            border-top-color: rgba(24, 227, 164, 0.3);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            color: var(--text-secondary);
+            padding-top: 2rem;
+            border-top: 1px solid rgba(24, 227, 164, 0.1);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                justify-content: center;
+            }
+            
+            .auth-buttons {
+                justify-content: center;
+            }
+            
+            main {
+                padding-top: 120px;
+            }
+            
+            .col-md-8, .col-md-6, .col-md-4 {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .shop-section {
+                margin: 1rem;
+                padding: 2rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== BACKGROUND STANDARD ===== -->
+    <div class="gradient-background" id="gradient-bg"></div>
+    <div class="video-overlay"></div>
+    <video id="bg-video" class="video-background" autoplay muted loop playsinline>
+        <source src="{{ asset('uploads/dragon.mp4') }}" type="video/mp4">
+        Votre navigateur ne supporte pas la vidéo HTML5.
+    </video>
+
+    <!-- ===== SITE CONTENT ===== -->
+    <div class="site-content">
+        <!-- ===== HEADER STANDARD AVEC MAGIC-BTN ===== -->
+        <header>
+            <div class="logo">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+                    <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+                    <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+                    <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+                    <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+                    <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+                </svg>
+                Midgar
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="{{ path('home') }}" class="magic-btn">Accueil</a></li>
+                    <li><a href="/discover" class="magic-btn">Découvrir</a></li>
+                    <li><a href="{{ path('universe_index') }}" class="magic-btn">Univers</a></li>
+                    <li><a href="{{ path('personnage_index') }}" class="magic-btn">Personnages</a></li>
+                    <li><a href="{{ path('oeuvre_index') }}" class="magic-btn">Œuvre</a></li>
+                    <li><a href="{{ path('artefact_index') }}" class="magic-btn">Artefacts</a></li>
+                    <li><a href="{{ path('shop_index') }}" class="magic-btn active">Boutique</a></li>
+                    <li><a href="{{ path('challenges_index') }}" class="magic-btn">Défis</a></li>
+                </ul>
+            </nav>
+            
+            <div class="auth-buttons">
+                {% if app.user %}
+                    <a href="{{ path('profile') }}" class="profile-link magic-btn">
+                        <div class="avatar">
+                            {% if app.user.avatar %}
+                                <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}">
+                            {% else %}
+                                <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}">
+                            {% endif %}
+                        </div>
+                        <span>{{ app.user.username }}</span>
+                    </a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm magic-btn">Déconnexion</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm magic-btn">Connexion</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm magic-btn">S'inscrire</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main>
+            <section class="shop-section">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb" style="background:transparent; padding:0; margin-bottom:1rem;">
+                                    <li class="breadcrumb-item"><a href="{{ path('shop_commandes') }}" style="color: var(--primary-color);">Commandes</a></li>
+                                    <li class="breadcrumb-item active" style="color: #ddd;">{{ commande.referenceCommande }}</li>
+                                </ol>
+                            </nav>
+
+                            <div style="background:#0d1117; padding:1rem; border-radius:8px; border:1px solid #222; margin-bottom:1rem; color:#ddd;">
+                                <h5 style="color:#fff;">Informations de commande</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong>Référence:</strong> {{ commande.referenceCommande }}
+                                        </p>
+                                        <p>
+                                            <strong>Acheteur:</strong> {{ commande.acheteur }}
+                                        </p>
+                                        <p>
+                                            <strong>Date:</strong> {{ commande.dateCommande|date('d/m/Y H:i') }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong>État:</strong>
+                                            <span class="badge {{ commande.etat.getBadgeClass() }}">
+                                                {{ commande.etat.getLabel() }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background:#0d1117; padding:1rem; border-radius:8px; border:1px solid #222; margin-bottom:1rem; color:#ddd;">
+                                <h5 style="color:#fff;">Détails du produit</h5>
+                                <table class="table table-sm" style="color:#ddd;">
+                                    <thead>
+                                        <tr>
+                                            <th>Produit</th>
+                                            <th>Type</th>
+                                            <th>Prix unitaire</th>
+                                            <th>Quantité</th>
+                                            <th>Sous-total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <strong style="color:#fff;">{{ commande.produit.nomProduit }}</strong><br>
+                                                <small style="color:#999;">{{ commande.produit.description|slice(0, 100) }}...</small>
+                                            </td>
+                                            <td>{{ commande.produit.typeProduit }}</td>
+                                            <td>{{ commande.produit.prix }}€</td>
+                                            <td>{{ commande.quantite }}</td>
+                                            <td><strong>{{ commande.prixTotal }}€</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="background:#0d1117; padding:1rem; border-radius:8px; border:1px solid #222; margin-bottom:1rem; color:#ddd;">
+                                <h5 style="color:#fff;">Total</h5>
+                                <h3 style="color: var(--primary-color);">Total TTC: {{ commande.prixTotal }}€</h3>
+                            </div>
+
+                            <div class="mt-4" style="display:flex; gap:0.5rem;">
+                                <a href="{{ path('shop_commandes') }}" class="btn btn-secondary magic-btn">
+                                    <i class="fas fa-arrow-left"></i> Retour aux commandes
+                                </a>
+                                <a href="{{ path('shop_commande_edit', {id: commande.id}) }}" class="btn btn-secondary magic-btn">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                <form action="{{ path('shop_commande_delete', {id: commande.id}) }}" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande?');">
+                                    <button type="submit" class="btn btn-danger magic-btn">
+                                        <i class="fas fa-trash"></i> Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ===== FOOTER ===== -->
+        <footer>
+            <div class="container">
+                <div class="footer-bottom">
+                    <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ===== MAGIC BUTTON PARTICLE EFFECT =====
+        document.querySelectorAll('.magic-btn, .btn-primary, .btn-secondary, .btn-danger').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                for(let i = 0; i < 8; i++) {
+                    const particle = document.createElement('span');
+                    particle.classList.add('particle');
+                    const x = (Math.random() - 0.5) * 80 + 'px';
+                    const y = (Math.random() - 0.5) * 80 + 'px';
+                    particle.style.setProperty('--x', x);
+                    particle.style.setProperty('--y', y);
+                    
+                    const rect = btn.getBoundingClientRect();
+                    particle.style.left = (e.clientX - rect.left) + 'px';
+                    particle.style.top = (e.clientY - rect.top) + 'px';
+                    
+                    btn.appendChild(particle);
+                    setTimeout(() => particle.remove(), 600);
+                }
+            });
+        });
+
+        // ===== BACKGROUND INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const bgVideo = document.getElementById('bg-video');
+            const gradientBg = document.getElementById('gradient-bg');
+            
+            if (bgVideo) {
+                bgVideo.addEventListener('error', function() {
+                    console.log('Background video failed to load, using gradient fallback');
+                    if (gradientBg) gradientBg.style.display = 'block';
+                });
+                
+                bgVideo.play().catch(function(error) {
+                    console.log('Video autoplay prevented:', error);
+                    if (gradientBg) gradientBg.style.display = 'block';
+                });
+            }
+            
+            document.addEventListener('visibilitychange', function() {
+                if (bgVideo) {
+                    if (document.hidden) {
+                        bgVideo.pause();
+                    } else {
+                        bgVideo.play().catch(e => console.log('Video play error:', e));
+                    }
+                }
+            });
+            
+            // ACTIVE NAV LINK HIGHLIGHT
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('nav .magic-btn').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPath || 
+                    (link.getAttribute('href') === '{{ path('home') }}' && currentPath === '/') ||
+                    (link.getAttribute('href') === '{{ path('shop_index') }}' && currentPath.includes('/shop'))) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

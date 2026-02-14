@@ -299,6 +299,10 @@
                 <li><a href="/">Accueil</a></li>
                 <li><a href="/discover">Découvrir</a></li>
                 <li><a href="/universes">Univers</a></li>
+<<<<<<< HEAD
+=======
+                <li><a href="/personnages">Personnages</a></li>
+>>>>>>> validation-final-2
                 <li><a href="/oeuvre">Œuvre</a></li>
                 <li><a href="/artefact">Artefacts</a></li>
                 <li><a href="/shop">Boutique</a></li>
@@ -306,8 +310,30 @@
             </ul>
         </nav>
         <div class="auth-buttons">
+<<<<<<< HEAD
             <a href="/login" class="btn btn-secondary btn-sm">Connexion</a>
             <a href="/register" class="btn btn-primary btn-sm">S'inscrire</a>
+=======
+            {% if app.user %}
+                <!-- Profil -->
+                <a href="{{ path('profile') }}" class="profile-link" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+                    <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; border:2px solid #18E3A4;">
+                        {% if app.user.avatar %}
+                            <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}" style="width:100%; height:100%; object-fit:cover;">
+                        {% else %}
+                            <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}" style="width:100%; height:100%; object-fit:cover;">
+                        {% endif %}
+                    </div>
+                    <span style="color:#E6FFF6; font-weight:500;">{{ app.user.username }}</span>
+                </a>
+                <!-- Déconnexion -->
+                <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm">Déconnexion</a>
+            {% else %}
+                <!-- Connexion / Inscription -->
+                <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm">Connexion</a>
+                <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm">S'inscrire</a>
+            {% endif %}
+>>>>>>> validation-final-2
         </div>
     </header>
 
@@ -321,7 +347,11 @@
                     </div>
                     <div class="create-ctas">
                         <a href="/create-oeuvre" class="create-cta">+ Créer une Œuvre</a>
+<<<<<<< HEAD
                         
+=======
+                        <a href="/create-artifact" class="create-cta" style="background-color: transparent; border: 1px solid #18E3A4; color: #18E3A4;">+ Créer un Artefact</a>
+>>>>>>> validation-final-2
                     </div>
                 </div>
 
@@ -331,6 +361,7 @@
                             <input type="text" class="search-box" id="searchInput" placeholder="Chercher...">
                         </div>
 
+<<<<<<< HEAD
                         
 
                         <div class="filter-group">
@@ -376,6 +407,71 @@
     </div>
 </div>
 
+=======
+                        <div class="filter-group">
+                            <h4>Genre</h4>
+                            <div class="filter-option">
+                                <input type="checkbox" id="genre-high-fantasy" value="high-fantasy" class="genre-filter">
+                                <label for="genre-high-fantasy">Haute Fantaisie</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="genre-dark-fantasy" value="dark-fantasy" class="genre-filter">
+                                <label for="genre-dark-fantasy">Sombre</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="genre-scifi-fantasy" value="scifi-fantasy" class="genre-filter">
+                                <label for="genre-scifi-fantasy">Sci-Fi</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="genre-urban-fantasy" value="urban-fantasy" class="genre-filter">
+                                <label for="genre-urban-fantasy">Urban</label>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <h4>Thèmes</h4>
+                            <div class="filter-option">
+                                <input type="checkbox" id="theme-magie" value="magie" class="theme-filter">
+                                <label for="theme-magie">Magie</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="theme-guerre" value="guerre" class="theme-filter">
+                                <label for="theme-guerre">Guerre</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="theme-politique" value="politique" class="theme-filter">
+                                <label for="theme-politique">Politique</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="theme-nature" value="nature" class="theme-filter">
+                                <label for="theme-nature">Nature</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="theme-mystere" value="mystere" class="theme-filter">
+                                <label for="theme-mystere">Mystère</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="theme-aventure" value="aventure" class="theme-filter">
+                                <label for="theme-aventure">Aventure</label>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <h4>Tri</h4>
+                            <div class="filter-option">
+                                <input type="radio" id="sort-newest" name="sort" value="newest" class="sort-filter" checked>
+                                <label for="sort-newest">Récent</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="radio" id="sort-popular" name="sort" value="popular" class="sort-filter">
+                                <label for="sort-popular">Populaire</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="radio" id="sort-trending" name="sort" value="trending" class="sort-filter">
+                                <label for="sort-trending">Tendance</label>
+                            </div>
+                        </div>
+>>>>>>> validation-final-2
 
                         <button class="filter-reset" id="resetFilters">Réinitialiser</button>
                     </div>
@@ -439,6 +535,7 @@
     </footer>
 
     <script>
+<<<<<<< HEAD
         const mockOeuvres = [];
 
         let filtered = [...mockOeuvres];
@@ -447,17 +544,47 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderOeuvres();
+=======
+        const mockUniverses = [
+            {id:1,name:"Nuit Éternelle",genre:["dark-fantasy"],themes:["mystere","magie"],desc:"Monde plongé dans une nuit perpétuelle",banner:"🌙",creator:"Léa M.",avatar:"L",personnages:12,oeuvres:28,artefacts:7,likes:1240,date:new Date(2026,0,20)},
+            {id:2,name:"Châteaux Flottants",genre:["high-fantasy"],themes:["aventure","magie"],desc:"Forteresses majestueuses flottent dans les nuages",banner:"☁️",creator:"Léa M.",avatar:"L",personnages:18,oeuvres:45,artefacts:12,likes:892,date:new Date(2026,0,18)},
+            {id:3,name:"Dragons de Lumière",genre:["high-fantasy"],themes:["aventure","nature"],desc:"Univers dominé par les dragons",banner:"🐲",creator:"Alexis S.",avatar:"A",personnages:14,oeuvres:32,artefacts:9,likes:654,date:new Date(2026,0,15)},
+            {id:4,name:"Techno-Mystique",genre:["scifi-fantasy"],themes:["magie","guerre"],desc:"Technologie avancée rencontre magie ancienne",banner:"⚡",creator:"Marcus T.",avatar:"M",personnages:22,oeuvres:51,artefacts:15,likes:1120,date:new Date(2026,0,25)},
+            {id:5,name:"Forêt Éternelle",genre:["high-fantasy"],themes:["nature","magie"],desc:"Forêt ancienne où les arbres parlent",banner:"🌲",creator:"Elena R.",avatar:"E",personnages:16,oeuvres:37,artefacts:8,likes:756,date:new Date(2026,0,22)},
+            {id:6,name:"Royaumes Souterrains",genre:["dark-fantasy","high-fantasy"],themes:["guerre","politique"],desc:"Empires dwarves et gnomes sous les montagnes",banner:"⛏️",creator:"Thor N.",avatar:"T",personnages:20,oeuvres:48,artefacts:14,likes:892,date:new Date(2026,0,19)},
+            {id:7,name:"Cités Flottantes",genre:["scifi-fantasy"],themes:["aventure","politique"],desc:"Villes futuristes flottant au-dessus d'un monde post-apocalyptique",banner:"🏙️",creator:"Luna K.",avatar:"L",personnages:19,oeuvres:42,artefacts:11,likes:978,date:new Date(2026,0,17)},
+            {id:8,name:"Océan Enchanté",genre:["high-fantasy","urban-fantasy"],themes:["magie","mystere"],desc:"Royaumes sous-marins remplis de créatures magiques",banner:"🌊",creator:"Nerida M.",avatar:"N",personnages:13,oeuvres:29,artefacts:10,likes:645,date:new Date(2026,0,16)},
+            {id:9,name:"Domaine des Ombres",genre:["dark-fantasy"],themes:["guerre","mystere"],desc:"Où les ombres ont pris vie",banner:"🌑",creator:"Victor D.",avatar:"V",personnages:17,oeuvres:40,artefacts:13,likes:834,date:new Date(2026,0,14)},
+            {id:10,name:"Empire Cristallin",genre:["high-fantasy"],themes:["magie","aventure"],desc:"Empire construit entièrement de cristaux magiques",banner:"💎",creator:"Sylvia P.",avatar:"S",personnages:15,oeuvres:35,artefacts:9,likes:723,date:new Date(2026,0,21)},
+            {id:11,name:"Steppes Sauvages",genre:["high-fantasy"],themes:["nature","aventure"],desc:"Prairies infinies peuplées de tribus guerrières",banner:"🏜️",creator:"Khan B.",avatar:"K",personnages:21,oeuvres:44,artefacts:8,likes:567,date:new Date(2026,0,13)},
+            {id:12,name:"Métropole Gothique",genre:["urban-fantasy"],themes:["mystere","politique"],desc:"Grande ville moderne cachant secrets magiques",banner:"🏛️",creator:"Isabelle V.",avatar:"I",personnages:18,oeuvres:39,artefacts:7,likes:891,date:new Date(2026,0,12)}
+        ];
+
+        let filtered = [...mockUniverses];
+        let displayedItems = 12;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUniverses();
+>>>>>>> validation-final-2
             attachListeners();
         });
 
         function attachListeners(){
+<<<<<<< HEAD
             document.querySelectorAll('.type-filter').forEach(cb => cb.addEventListener('change', filterAndSortOeuvres));
             document.querySelectorAll('.sort-filter').forEach(r => r.addEventListener('change', filterAndSortOeuvres));
             document.getElementById('searchInput').addEventListener('input', filterAndSortOeuvres);
+=======
+            document.querySelectorAll('.genre-filter').forEach(cb => cb.addEventListener('change', filterUniverses));
+            document.querySelectorAll('.theme-filter').forEach(cb => cb.addEventListener('change', filterUniverses));
+            document.querySelectorAll('.sort-filter').forEach(r => r.addEventListener('change', filterUniverses));
+            document.getElementById('searchInput').addEventListener('input', filterUniverses);
+>>>>>>> validation-final-2
             document.getElementById('resetFilters').addEventListener('click', () => {
                 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
                 document.getElementById('sort-newest').checked = true;
                 document.getElementById('searchInput').value = '';
+<<<<<<< HEAD
                 currentSort = 'newest';
                 filtered = [...mockOeuvres];
                 displayedItems = 12;
@@ -473,10 +600,29 @@
 
             filtered = mockOeuvres.filter(item => {
                 if(types.length > 0 && !types.includes(item.type)) return false;
+=======
+                filtered = [...mockUniverses];
+                displayedItems = 12;
+                renderUniverses();
+            });
+            document.getElementById('loadMoreBtn')?.addEventListener('click', () => { displayedItems += 12; renderUniverses(); });
+        }
+
+        function filterUniverses(){
+            const genres = Array.from(document.querySelectorAll('.genre-filter:checked')).map(cb => cb.value);
+            const themes = Array.from(document.querySelectorAll('.theme-filter:checked')).map(cb => cb.value);
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const sort = document.querySelector('.sort-filter:checked').value;
+
+            filtered = mockUniverses.filter(item => {
+                if(genres.length > 0 && !genres.some(g => item.genre.includes(g))) return false;
+                if(themes.length > 0 && !themes.some(t => item.themes.includes(t))) return false;
+>>>>>>> validation-final-2
                 if(search && !item.name.toLowerCase().includes(search)) return false;
                 return true;
             });
 
+<<<<<<< HEAD
             // Appliquer le tri
             if(currentSort === 'newest') {
                 filtered.sort((a,b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
@@ -489,6 +635,17 @@
         }
 
         function renderOeuvres(){
+=======
+            if(sort === 'newest') filtered.sort((a,b) => b.date - a.date);
+            else if(sort === 'popular') filtered.sort((a,b) => (b.likes || b.personnages) - (a.likes || a.personnages));
+            else filtered.sort((a,b) => (b.likes || 0) - (a.likes || 0));
+
+            displayedItems = 12;
+            renderUniverses();
+        }
+
+        function renderUniverses(){
+>>>>>>> validation-final-2
             const grid = document.getElementById('universesGrid');
             const empty = document.getElementById('emptyState');
             const more = document.getElementById('loadMoreContainer');
@@ -500,19 +657,35 @@
                 filtered.slice(0, displayedItems).forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'universe-card';
+<<<<<<< HEAD
+=======
+                    const genreMap = {'high-fantasy':'Haute Fantaisie','dark-fantasy':'Sombre','scifi-fantasy':'Sci-Fi','urban-fantasy':'Urban'};
+                    const genreTags = item.genre.map(g => `<span class="genre-tag">${genreMap[g] || g}</span>`).join('');
+>>>>>>> validation-final-2
                     card.innerHTML = `
                         <div class="card-banner">${item.banner}</div>
                         <div class="card-content">
                             <h3 class="card-title">${item.name}</h3>
+<<<<<<< HEAD
                             <div class="card-genre-tags"><span class="genre-tag">${item.type}</span></div>
                             <p class="card-description">${item.desc}</p>
                             <div class="card-footer">
                                 <div class="card-stats"><div class="stat">Likes ${item.likes || 0}</div><div class="stat">By ${item.author || 'Anonyme'}</div></div>
+=======
+                            <div class="card-genre-tags">${genreTags}</div>
+                            <p class="card-description">${item.desc}</p>
+                            <div class="card-footer">
+                                <div class="card-stats"><div class="stat">Characters ${item.personnages}</div><div class="stat">Works ${item.oeuvres}</div><div class="stat">Artifacts ${item.artefacts}</div></div>
+>>>>>>> validation-final-2
                                 <div class="creator-info"><div class="creator-avatar">${item.avatar}</div><span>${item.creator}</span></div>
                             </div>
                         </div>
                     `;
+<<<<<<< HEAD
                     card.addEventListener('click', () => window.location.href = `/oeuvre-detail?id=${item.id}`);
+=======
+                    card.addEventListener('click', () => window.location.href = `/universe-detail?id=${item.id}`);
+>>>>>>> validation-final-2
                     grid.appendChild(card);
                 });
                 more.style.display = filtered.length > displayedItems ? 'flex' : 'none';

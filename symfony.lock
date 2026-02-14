@@ -35,6 +35,21 @@
             "./migrations/.gitignore"
         ]
     },
+<<<<<<< HEAD
+=======
+    "knpuniversity/oauth2-client-bundle": {
+        "version": "2.20",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.20",
+            "ref": "1ff300d8c030f55c99219cc55050b97a695af3f6"
+        },
+        "files": [
+            "./config/packages/knpu_oauth2_client.yaml"
+        ]
+    },
+>>>>>>> validation-final-2
     "symfony/console": {
         "version": "6.4",
         "recipe": {
@@ -79,6 +94,30 @@
             "./src/Kernel.php"
         ]
     },
+<<<<<<< HEAD
+=======
+    "symfony/mailer": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.3",
+            "ref": "09051cfde49476e3c12cd3a0e44289ace1c75a4f"
+        },
+        "files": [
+            "./config/packages/mailer.yaml"
+        ]
+    },
+    "symfony/maker-bundle": {
+        "version": "1.65",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
+        }
+    },
+>>>>>>> validation-final-2
     "symfony/routing": {
         "version": "6.4",
         "recipe": {
@@ -92,6 +131,22 @@
             "./config/routes.yaml"
         ]
     },
+<<<<<<< HEAD
+=======
+    "symfony/security-bundle": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.4",
+            "ref": "2ae08430db28c8eb4476605894296c82a642028f"
+        },
+        "files": [
+            "./config/packages/security.yaml",
+            "./config/routes/security.yaml"
+        ]
+    },
+>>>>>>> validation-final-2
     "symfony/twig-bundle": {
         "version": "6.4",
         "recipe": {
@@ -104,5 +159,29 @@
             "./config/packages/twig.yaml",
             "./templates/base.html.twig"
         ]
+<<<<<<< HEAD
+=======
+    },
+    "symfony/validator": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.3",
+            "ref": "c32cfd98f714894c4f128bb99aa2530c1227603c"
+        },
+        "files": [
+            "./config/packages/validator.yaml"
+        ]
+    },
+    "vich/uploader-bundle": {
+        "version": "2.9",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.13",
+            "ref": "1b3064c2f6b255c2bc2f56461aaeb76b11e07e36"
+        }
+>>>>>>> validation-final-2
     }
 }

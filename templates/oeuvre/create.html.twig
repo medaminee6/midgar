@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends 'base.html.twig' %}
 
 {% block title %}Créer une Œuvre - Midgar{% endblock %}
@@ -181,3 +182,994 @@
         })();
     </script>
 {% endblock %}
+=======
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer une Œuvre - Midgar</title>
+    
+    <style>
+        /* ===== VARIABLES & RESET ===== */
+        :root {
+            --primary-color: #18E3A4;
+            --primary-dark: #13c891;
+            --text-color: #E6FFF6;
+            --text-secondary: #B0B9B6;
+            --bg-primary: #1A1F1E;
+            --bg-dark: #0D0F0F;
+            --card-bg: rgba(26, 31, 30, 0.7);
+            --glass-bg: rgba(26, 31, 30, 0.5);
+            --border-radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* ===== BOUTONS ANIMÉS ===== */
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        /* ===== BOUTONS MAGIQUES (magic-btn) ===== */
+        .magic-btn {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid transparent;
+        }
+        
+        .magic-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        .magic-btn.active {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        /* ===== ANIMATION PARTICULES ===== */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, var(--primary-color), var(--primary-dark));
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fly 0.6s forwards;
+            opacity: 0.8;
+            z-index: 1;
+        }
+        
+        @keyframes fly {
+            0% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translate(var(--x), var(--y)) scale(0); 
+                opacity: 0; 
+            }
+        }
+        
+        /* ===== VIDEO BACKGROUND ===== */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            pointer-events: none;
+        }
+        
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: -1;
+        }
+        
+        .gradient-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-dark) 100%);
+            z-index: -3;
+            pointer-events: none;
+            display: none;
+        }
+        
+        /* ===== HEADER STANDARD ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(26, 31, 30, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .logo:hover {
+            animation: glow 1.5s infinite;
+        }
+        
+        .logo svg {
+            width: 32px;
+            height: 32px;
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 5px var(--primary-color);
+            }
+            50% {
+                text-shadow: 0 0 15px var(--primary-color), 0 0 30px var(--primary-color);
+            }
+        }
+        
+        nav ul {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.3rem 0.6rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .profile-link:hover {
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary-color);
+            transition: transform 0.3s;
+        }
+        
+        .avatar:hover {
+            transform: scale(1.1);
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* ===== SITE CONTENT ===== */
+        .site-content {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+        }
+        
+        main {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+        
+        .section {
+            padding: 4rem 0;
+            background-color: var(--glass-bg);
+            border-radius: 16px;
+            margin: 2rem auto;
+            backdrop-filter: blur(10px);
+            max-width: 1200px;
+            border: 1px solid rgba(24, 227, 164, 0.1);
+            transition: border-color 0.3s;
+        }
+        
+        .section:hover {
+            border-color: rgba(24, 227, 164, 0.3);
+        }
+        
+        /* ===== STYLES SPÉCIFIQUES CRÉATION ===== */
+        .creation-container { 
+            display: grid; 
+            grid-template-columns: 250px 1fr; 
+            gap: 2rem; 
+            min-height: 100vh; 
+        }
+        
+        .sidebar { 
+            position: sticky; 
+            top: 100px; 
+            height: calc(100vh - 120px);
+            background-color: var(--card-bg); 
+            border-right: 2px solid rgba(24, 227, 164, 0.1); 
+            overflow-y: auto; 
+            padding: 2rem 1.5rem; 
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+        }
+        
+        .sidebar-title { 
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            color: var(--primary-color); 
+            margin-bottom: 1.5rem; 
+            letter-spacing: 1px; 
+        }
+        
+        .sidebar-nav { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.75rem; 
+        }
+        
+        .sidebar-link { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+            padding: 0.75rem 1rem; 
+            color: var(--text-secondary); 
+            text-decoration: none; 
+            border-radius: 8px; 
+            transition: all 0.3s; 
+            font-size: 0.9rem; 
+        }
+        
+        .sidebar-link:hover, .sidebar-link.active { 
+            background-color: rgba(24, 227, 164, 0.1); 
+            color: var(--primary-color); 
+            border-left: 3px solid var(--primary-color); 
+            padding-left: calc(1rem - 3px); 
+            transform: translateX(5px);
+        }
+        
+        .sidebar-icon { 
+            width: 20px; 
+            height: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .main-content { 
+            padding: 0rem; 
+        }
+        
+        .form-container { 
+            background-color: var(--card-bg); 
+            border: 1px solid rgba(24, 227, 164, 0.1); 
+            border-radius: var(--border-radius); 
+            padding: 2.5rem; 
+            max-width: 700px; 
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-title { 
+            font-size: 2.2rem; 
+            margin-bottom: 0.5rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            color: var(--primary-color);
+        }
+        
+        .form-subtitle { 
+            color: var(--text-secondary); 
+            margin-bottom: 2rem; 
+            font-size: 0.95rem; 
+        }
+        
+        .form-group { 
+            margin-bottom: 1.5rem; 
+        }
+        
+        .form-label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 0.5rem; 
+            text-transform: uppercase; 
+            font-size: 0.85rem; 
+            letter-spacing: 0.5px; 
+            color: var(--text-color); 
+        }
+        
+        .form-input, .form-textarea, .form-select { 
+            width: 100%; 
+            padding: 0.875rem; 
+            background-color: rgba(0, 0, 0, 0.3); 
+            border: 1px solid rgba(24, 227, 164, 0.3); 
+            border-radius: 6px; 
+            color: var(--text-color); 
+            font-family: inherit; 
+            font-size: 0.95rem; 
+            transition: all 0.3s; 
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus { 
+            outline: none; 
+            border-color: var(--primary-color); 
+            box-shadow: 0 0 10px rgba(24, 227, 164, 0.3); 
+        }
+        
+        .form-textarea { 
+            resize: vertical; 
+            min-height: 120px; 
+        }
+        
+        .file-upload { 
+            position: relative; 
+        }
+        
+        .file-label { 
+            display: block; 
+            padding: 2rem; 
+            border: 2px dashed rgba(24, 227, 164, 0.3); 
+            border-radius: 8px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            background-color: rgba(24, 227, 164, 0.05); 
+        }
+        
+        .file-label:hover { 
+            border-color: var(--primary-color); 
+            background-color: rgba(24, 227, 164, 0.1); 
+            transform: scale(1.02);
+        }
+        
+        .file-icon { 
+            width: 48px; 
+            height: 48px; 
+            margin: 0 auto 0.75rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background-color: rgba(24, 227, 164, 0.15); 
+            border-radius: 8px; 
+        }
+        
+        .file-text { 
+            font-weight: 600; 
+            margin-bottom: 0.25rem; 
+            color: var(--primary-color); 
+        }
+        
+        .file-hint { 
+            font-size: 0.85rem; 
+            color: var(--text-secondary); 
+        }
+        
+        #fileInput { 
+            display: none; 
+        }
+        
+        .form-actions { 
+            display: flex; 
+            gap: 1rem; 
+            margin-top: 2rem; 
+        }
+        
+        .form-error { 
+            color: #ff6b6b; 
+            font-size: 0.85rem; 
+            margin-top: 0.5rem; 
+        }
+        
+        .flash-error { 
+            background-color: rgba(220, 53, 69, 0.2); 
+            color: #ff6b6b; 
+            padding: 1rem; 
+            border-radius: var(--border-radius); 
+            margin-bottom: 1rem; 
+            font-weight: 600; 
+            border: 1px solid #ff6b6b; 
+        }
+        
+        .form-error-input {
+            border-color: #ff6b6b !important;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+        }
+        
+        /* ===== MODALES STANDARD ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: var(--bg-primary);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            border: 1px solid var(--primary-color);
+            animation: slideUp 0.4s;
+            box-shadow: 0 0 50px rgba(24, 227, 164, 0.3);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-color);
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            transition: all 0.3s;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: var(--primary-color);
+            color: #000;
+            transform: rotate(90deg);
+        }
+        
+        /* ===== FOOTER ===== */
+        footer {
+            background-color: rgba(13, 15, 15, 0.5);
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            text-align: center;
+            border-top: 1px solid rgba(24, 227, 164, 0.1);
+        }
+        
+        footer:hover {
+            border-top-color: rgba(24, 227, 164, 0.3);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) { 
+            .creation-container { 
+                grid-template-columns: 1fr; 
+            } 
+            .sidebar { 
+                position: static; 
+                height: auto; 
+                border-right: none; 
+                border-bottom: 2px solid rgba(24, 227, 164, 0.1); 
+            } 
+            .sidebar-nav { 
+                flex-direction: row; 
+                gap: 1rem; 
+                overflow-x: auto; 
+            } 
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                justify-content: center;
+            }
+            
+            .auth-buttons {
+                justify-content: center;
+            }
+            
+            main {
+                padding-top: 120px;
+            }
+            
+            .section {
+                margin: 1rem;
+                padding: 2rem 0;
+            }
+            
+            .form-container {
+                padding: 1.5rem;
+            }
+            
+            .form-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== BACKGROUND STANDARD ===== -->
+    <div class="gradient-background" id="gradient-bg"></div>
+    <div class="video-overlay"></div>
+    <video id="bg-video" class="video-background" autoplay muted loop playsinline>
+        <source src="{{ asset('uploads/dragon.mp4') }}" type="video/mp4">
+        Votre navigateur ne supporte pas la vidéo HTML5.
+    </video>
+    
+    <!-- ===== SITE CONTENT ===== -->
+    <div class="site-content">
+        <!-- ===== HEADER STANDARD AVEC MAGIC-BTN ===== -->
+    <header>
+            <div class="logo">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+                    <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+                    <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+                    <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+                    <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+                    <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+                </svg>
+                Midgar
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="{{ path('home') }}" class="magic-btn">Accueil</a></li>
+                    <li><a href="/discover" class="magic-btn">Découvrir</a></li>
+                    <li><a href="/universes" class="magic-btn">Univers</a></li>
+                    <li><a href="/personnages" class="magic-btn">Personnages</a></li>
+                    <li><a href="{{ path('oeuvre_index') }}" class="magic-btn active">Œuvre</a></li>
+                    <li><a href="/artefact" class="magic-btn">Artefacts</a></li>
+                    <li><a href="/shop" class="magic-btn">Boutique</a></li>
+                    <li><a href="/challenges" class="magic-btn">Défis</a></li>
+                </ul>
+            </nav>
+            
+            <div class="auth-buttons">
+                {% if app.user %}
+                    <a href="{{ path('profile') }}" class="profile-link magic-btn">
+                        <div class="avatar">
+                            {% if app.user.avatar %}
+                                <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}">
+                            {% else %}
+                                <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}">
+                            {% endif %}
+                        </div>
+                        <span>{{ app.user.username }}</span>
+                    </a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm magic-btn">Déconnexion</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm magic-btn">Connexion</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm magic-btn">S'inscrire</a>
+                {% endif %}
+            </div>
+        </header>
+            
+            <nav>
+                <ul>
+                    <li><a href="{{ path('home') }}" class="magic-btn">Accueil</a></li>
+                    <li><a href="/discover" class="magic-btn">Découvrir</a></li>
+                    <li><a href="/universes" class="magic-btn">Univers</a></li>
+                    <li><a href="/personnages" class="magic-btn">Personnages</a></li>
+                    <li><a href="{{ path('oeuvre_index') }}" class="magic-btn active">Œuvre</a></li>
+                    <li><a href="/artefact" class="magic-btn">Artefacts</a></li>
+                    <li><a href="/shop" class="magic-btn">Boutique</a></li>
+                    <li><a href="/challenges" class="magic-btn">Défis</a></li>
+                </ul>
+            </nav>
+            
+            <div class="auth-buttons">
+                {% if app.user %}
+                    <a href="{{ path('profile') }}" class="profile-link magic-btn">
+                        <div class="avatar">
+                            {% if app.user.avatar %}
+                                <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}">
+                            {% else %}
+                                <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}">
+                            {% endif %}
+                        </div>
+                        <span>{{ app.user.username }}</span>
+                    </a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm magic-btn">Déconnexion</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm magic-btn">Connexion</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm magic-btn">S'inscrire</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main>
+            <section class="section">
+                <div class="container">
+                    <div class="creation-container">
+                        <aside class="sidebar">
+                            <div class="sidebar-title">◇ Créer du Contenu</div>
+                            <nav class="sidebar-nav">
+                                <a href="{{ path('oeuvre_create') }}" class="sidebar-link active magic-btn">
+                                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4h16v12H4z"/>
+                                    </svg>
+                                    Œuvre
+                                </a>
+                                <a href="{{ path('artefact_create') }}" class="sidebar-link magic-btn">
+                                    <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2l3.5 10h10.5l-8.5 6 3 9.5L12 21l-8.5 6 3-9.5-8.5-6h10.5z"/>
+                                    </svg>
+                                    Artefact
+                                </a>
+                            </nav>
+                        </aside>
+
+                        <main class="main-content">
+                            <div class="form-container">
+                                <h1 class="form-title">Créer une Œuvre</h1>
+                                <p class="form-subtitle">Partagez votre création littéraire ou artistique</p>
+                                
+                                {% for flash_message in app.flashes('error') %}
+                                    <div class="flash-error">{{ flash_message }}</div>
+                                {% endfor %}
+                                
+                                <form method="POST" enctype="multipart/form-data" id="oeuvreForm">
+                                    <div class="form-group">
+                                        <label class="form-label">Titre de l'Œuvre *</label>
+                                        <input type="text" name="title" class="form-input" placeholder="Ex: La Chute de la Tour Céleste" minlength="3" required value="{{ oldValues.title ?? '' }}">
+                                        {% for error in errors %}{% if error.propertyPath == 'title' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Type d'Œuvre *</label>
+                                        <select name="type" class="form-select" required>
+                                            <option value="">Sélectionner un type</option>
+                                            <option value="roman" {% if (oldValues.type ?? '') == 'roman' %}selected{% endif %}>Roman</option>
+                                            <option value="nouvelle" {% if (oldValues.type ?? '') == 'nouvelle' %}selected{% endif %}>Nouvelle</option>
+                                            <option value="poesie" {% if (oldValues.type ?? '') == 'poesie' %}selected{% endif %}>Poésie</option>
+                                            <option value="artwork" {% if (oldValues.type ?? '') == 'artwork' %}selected{% endif %}>Illustration</option>
+                                            <option value="musique" {% if (oldValues.type ?? '') == 'musique' %}selected{% endif %}>Musique</option>
+                                            <option value="autre" {% if (oldValues.type ?? '') == 'autre' %}selected{% endif %}>Autre</option>
+                                        </select>
+                                        {% for error in errors %}{% if error.propertyPath == 'type' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Description *</label>
+                                        <textarea name="description" class="form-textarea" placeholder="Décrivez votre œuvre, son contexte, ses inspirations..." required>{{ oldValues.description ?? '' }}</textarea>
+                                        {% for error in errors %}{% if error.propertyPath == 'description' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Date de Publication</label>
+                                        <input type="date" name="datePublication" class="form-input" value="{{ oldValues.datePublication ?? '' }}">
+                                    </div>
+
+                                    <div class="form-group file-upload">
+                                        <label class="form-label">Image *</label>
+                                        <label class="file-label" for="imageInput">
+                                            <div class="file-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 28px; height: 28px;">
+                                                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                                                </svg>
+                                            </div>
+                                            <div class="file-text">Déposer une image ou cliquer</div>
+                                            <div class="file-hint">PNG, JPG jusqu'à 5MB</div>
+                                        </label>
+                                        <input type="file" id="imageInput" name="image" accept="image/*" style="display: none;">
+                                        <input type="hidden" id="drawnImageInput" name="drawnImage" value="">
+                                        {% for error in errors %}{% if error.propertyPath == 'image' or error.propertyPath == 'drawnImage' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
+                                    </div>
+
+                                    <button type="button" id="toggleDrawBtn" class="btn btn-secondary magic-btn" style="margin-bottom: 1rem;">Dessiner votre image</button>
+                                    <div id="drawArea" style="display:none; background: var(--bg-primary); border:1px solid rgba(24, 227, 164, 0.3); padding:1rem; border-radius:6px; margin-bottom: 1rem;">
+                                        <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem; flex-wrap: wrap;">
+                                            <label style="font-weight:600; font-size:0.85rem; color: var(--text-color);">Couleur</label>
+                                            <input type="color" id="brushColor" value="#18E3A4">
+                                            <label style="font-weight:600; font-size:0.85rem; color: var(--text-color);">Taille</label>
+                                            <input type="range" id="brushSize" min="1" max="50" value="4">
+                                            <button type="button" id="clearCanvas" class="btn btn-secondary magic-btn">Effacer</button>
+                                            <button type="button" id="saveCanvas" class="btn btn-primary magic-btn">Utiliser ce dessin</button>
+                                        </div>
+                                        <canvas id="drawCanvas" width="600" height="360" style="width:100%; max-width:100%; background:#fff; border:1px solid #ddd; touch-action: none; border-radius:4px;"></canvas>
+                                        <p style="color: var(--text-secondary); font-size:0.85rem; margin-top:0.5rem;">Utilisez la souris ou le doigt pour dessiner.</p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Auteur/Artiste</label>
+                                        <input type="text" name="author" class="form-input" placeholder="Votre nom ou pseudonyme" value="{{ oldValues.author ?? app.user.username ?? '' }}">
+                                        {% for error in errors %}{% if error.propertyPath == 'author' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <a href="{{ path('oeuvre_index') }}" class="btn btn-secondary magic-btn">Annuler</a>
+                                        <button type="submit" class="btn btn-primary magic-btn">Créer l'Œuvre</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ===== FOOTER ===== -->
+        <footer>
+            <div class="container">
+                <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // ===== MAGIC BUTTON PARTICLE EFFECT =====
+        document.querySelectorAll('.magic-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                for(let i = 0; i < 8; i++) {
+                    const particle = document.createElement('span');
+                    particle.classList.add('particle');
+                    const x = (Math.random() - 0.5) * 80 + 'px';
+                    const y = (Math.random() - 0.5) * 80 + 'px';
+                    particle.style.setProperty('--x', x);
+                    particle.style.setProperty('--y', y);
+                    
+                    const rect = btn.getBoundingClientRect();
+                    particle.style.left = (e.clientX - rect.left) + 'px';
+                    particle.style.top = (e.clientY - rect.top) + 'px';
+                    
+                    const hue = Math.floor(Math.random() * 60) + 140;
+                    particle.style.background = `radial-gradient(circle, hsl(${hue}, 100%, 60%), hsl(${hue}, 100%, 30%))`;
+                    
+                    btn.appendChild(particle);
+                    setTimeout(() => particle.remove(), 600);
+                }
+            });
+        });
+
+        // ===== BACKGROUND INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const bgVideo = document.getElementById('bg-video');
+            const gradientBg = document.getElementById('gradient-bg');
+            
+            if (bgVideo) {
+                bgVideo.addEventListener('error', function() {
+                    console.log('Background video failed to load, using gradient fallback');
+                    if (gradientBg) {
+                        gradientBg.style.display = 'block';
+                    }
+                });
+                
+                bgVideo.play().catch(function(error) {
+                    console.log('Video autoplay prevented:', error);
+                    if (gradientBg) {
+                        gradientBg.style.display = 'block';
+                    }
+                });
+            }
+            
+            document.addEventListener('visibilitychange', function() {
+                if (bgVideo) {
+                    if (document.hidden) {
+                        bgVideo.pause();
+                    } else {
+                        bgVideo.play().catch(e => console.log('Video play error:', e));
+                    }
+                }
+            });
+        });
+
+        // ===== DRAWING FUNCTIONS =====
+        document.getElementById('imageInput')?.addEventListener('change', (e) => {
+            const label = document.querySelector('.file-label');
+            if(e.target.files.length) {
+                label.innerHTML = `<div class="file-icon" style="background-color: rgba(24, 227, 164, 0.2);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 28px; height: 28px; stroke: var(--primary-color);">
+                    <polyline points="20 6 9 17 4 12"/></svg></div>
+                    <div class="file-text" style="color: var(--primary-color);">✓ ${e.target.files[0].name}</div>`;
+                document.getElementById('drawnImageInput').value = '';
+            }
+        });
+        
+        document.querySelector('.file-label').addEventListener('click', (e) => {
+            if(e.target.closest('.file-label')) document.getElementById('imageInput').click();
+        });
+
+        document.getElementById('toggleDrawBtn')?.addEventListener('click', () => {
+            const drawArea = document.getElementById('drawArea');
+            if (drawArea.style.display === 'none') {
+                drawArea.style.display = 'block';
+                document.getElementById('toggleDrawBtn').textContent = 'Cacher le dessin';
+            } else {
+                drawArea.style.display = 'none';
+                document.getElementById('toggleDrawBtn').textContent = 'Dessiner votre image';
+            }
+        });
+
+        const canvas = document.getElementById('drawCanvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            let lastX = 0, lastY = 0;
+
+            canvas.addEventListener('pointerdown', (e) => {
+                drawing = true;
+                const rect = canvas.getBoundingClientRect();
+                lastX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                lastY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                canvas.setPointerCapture(e.pointerId);
+            });
+            
+            canvas.addEventListener('pointermove', (e) => {
+                if (!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+                ctx.strokeStyle = document.getElementById('brushColor').value;
+                ctx.lineWidth = document.getElementById('brushSize').value;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                lastX = x; lastY = y;
+            });
+            
+            canvas.addEventListener('pointerup', () => { drawing = false; });
+            canvas.addEventListener('pointercancel', () => { drawing = false; });
+
+            document.getElementById('clearCanvas')?.addEventListener('click', () => {
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                document.getElementById('drawnImageInput').value = '';
+            });
+
+            document.getElementById('saveCanvas')?.addEventListener('click', () => {
+                const dataUrl = canvas.toDataURL('image/png');
+                document.getElementById('drawnImageInput').value = dataUrl;
+                document.getElementById('imageInput').value = '';
+                alert('Dessin prêt. Il sera utilisé comme image de l\'œuvre.');
+            });
+        }
+
+        document.getElementById('oeuvreForm')?.addEventListener('submit', (e) => {
+            const hasFile = document.getElementById('imageInput').files.length > 0;
+            const hasDraw = document.getElementById('drawnImageInput').value.length > 10;
+            if (!hasFile && !hasDraw) {
+                e.preventDefault();
+                alert('Veuillez télécharger une image ou dessiner une image.');
+            }
+        });
+
+        // ===== HIGHLIGHT ACTIVE NAV LINK =====
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('nav .magic-btn').forEach(link => {
+            if (link.getAttribute('href') === currentPath || 
+                (link.getAttribute('href') === '{{ path('home') }}' && currentPath === '/')) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
+>>>>>>> validation-final-2

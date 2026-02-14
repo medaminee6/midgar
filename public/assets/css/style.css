@@ -12,6 +12,34 @@
 @import "swiper-bundle.min.css";
 @import "../font/font.css";
 @import "bootstrap.css";
+<<<<<<< HEAD
+=======
+
+/* ===================================================== 
+   MIDGAR - Custom Styles
+===================================================== */
+
+/* Form Validation Error Messages */
+.form-error,
+div.form-error,
+.form-group .form-error {
+    color: #ff0000 !important;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 0, 0, 0.15) !important;
+    border-left: 3px solid #ff0000;
+    border-radius: 0 4px 4px 0;
+    animation: fadeIn 0.3s ease;
+    font-weight: 500;
+    display: block;
+}
+
+.form-error:empty {
+    display: none;
+}
+
+>>>>>>> validation-final-2
 /**
   	* Reset Browsers
     * General
