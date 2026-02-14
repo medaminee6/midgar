@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Profil - Midgar</title>
+    <title>{% if isOwner %}Mon Profil{% else %}Profil de {{ user.username }}{% endif %} - Midgar</title>
     
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         /* ===== VARIABLES & RESET ===== */
@@ -50,7 +52,7 @@
             margin: 0 auto;
         }
         
-        /* ===== BOUTONS ANIMÉS SANS CLIGNOTEMENT ===== */
+        /* ===== BOUTONS ANIMÉS ===== */
         .btn {
             display: inline-block;
             padding: 0.6rem 1.2rem;
@@ -72,7 +74,9 @@
         .btn-primary:hover {
             background-color: var(--primary-dark);
             transform: scale(1.05);
-            box-shadow: 0 0 15px var(--primary-color);
+            box-shadow: 0 0 15px var(--primary-color), 
+                        0 0 30px var(--primary-color), 
+                        0 0 50px var(--primary-dark);
         }
         
         .btn-secondary {
@@ -85,7 +89,8 @@
             background-color: var(--primary-color);
             color: #000;
             transform: scale(1.05);
-            box-shadow: 0 0 15px var(--primary-color);
+            box-shadow: 0 0 15px var(--primary-color), 
+                        0 0 30px var(--primary-color);
         }
         
         .btn-sm {
@@ -108,7 +113,7 @@
             color: white;
         }
         
-        /* ===== BOUTONS MAGIQUES (magic-btn) SANS CLIGNOTEMENT ===== */
+        /* ===== BOUTONS MAGIQUES ===== */
         .magic-btn {
             position: relative;
             overflow: hidden;
@@ -194,7 +199,7 @@
             display: none;
         }
         
-        /* ===== HEADER MISE À JOUR ===== */
+        /* ===== HEADER ===== */
         header {
             position: fixed;
             top: 0;
@@ -327,7 +332,6 @@
             height: 100%;
             position: relative;
             border: 1px solid transparent;
-            cursor: pointer;
         }
         
         .card:hover {
@@ -417,27 +421,39 @@
         /* ===== PROFILE SPECIFIC ===== */
         .profile-layout {
             display: grid;
-            grid-template-columns: 250px 1fr;
+            grid-template-columns: 300px 1fr;
             gap: 2rem;
             margin-bottom: 3rem;
         }
         
-        .avatar-container {
-            width: 100px;
-            height: 100px;
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
             margin: 0 auto 1rem;
             border-radius: 50%;
-            background: linear-gradient(135deg, #18E3A4, #0DCF92);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
+            border: 3px solid var(--primary-color);
         }
         
-        .avatar-container img {
+        .profile-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+        
+        .profile-avatar-placeholder {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 2.5rem;
+            border: 3px solid var(--primary-color);
         }
         
         .content-grid {
@@ -462,6 +478,32 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 1.5rem;
+        }
+        
+        .bio-container {
+            background: rgba(24, 227, 164, 0.05);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(24, 227, 164, 0.2);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge.bg-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+        }
+        
+        .badge.bg-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
         }
         
         /* ===== MODAL STYLES ===== */
@@ -538,98 +580,6 @@
             padding-right: 2rem;
         }
         
-        /* ===== MODALES DÉTAILLÉES ===== */
-        .modal-detail {
-            max-width: 800px;
-            width: 95%;
-        }
-        
-        .modal-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(24, 227, 164, 0.2);
-        }
-        
-        .modal-header h2 {
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-            font-size: 1.8rem;
-        }
-        
-        .modal-subtitle {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-        
-        .modal-body {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .modal-image {
-            width: 100%;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-        
-        .modal-image img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            display: block;
-        }
-        
-        .modal-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .info-group {
-            margin-bottom: 1rem;
-        }
-        
-        .info-label {
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-            display: block;
-        }
-        
-        .info-value {
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-        
-        .modal-description {
-            grid-column: 1 / -1;
-            padding: 1.5rem;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: var(--border-radius);
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .modal-description h3 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-        
-        .modal-description p {
-            color: var(--text-secondary);
-            line-height: 1.8;
-        }
-        
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(24, 227, 164, 0.2);
-        }
-        
         /* ===== FORM STYLES ===== */
         .form-group {
             margin-bottom: 1.5rem;
@@ -655,6 +605,22 @@
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 10px rgba(24, 227, 164, 0.3);
+        }
+        
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(24, 227, 164, 0.05);
+            border-radius: var(--border-radius);
+            border: 1px dashed rgba(24, 227, 164, 0.3);
+        }
+        
+        .empty-icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
         
         /* ===== FOOTER ===== */
@@ -701,15 +667,24 @@
                 margin: 20% auto;
                 padding: 1.5rem;
             }
-            
-            .modal-body {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-            
-            .modal-image img {
-                height: 200px;
-            }
+        }
+        
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(24, 227, 164, 0.3);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
         }
     </style>
 </head>
@@ -753,6 +728,10 @@
             
             <div class="auth-buttons">
                 {% if app.user %}
+                    <button class="magic-btn" onclick="openModal('searchUserModal')" title="Rechercher un utilisateur">
+                        <i class="fas fa-search"></i>
+                    </button>
+
                     <a href="{{ path('profile') }}" class="profile-link magic-btn">
                         <div class="avatar">
                             {% if app.user.avatar %}
@@ -763,9 +742,11 @@
                         </div>
                         <span>{{ app.user.username }}</span>
                     </a>
+                    
                     {% if is_granted('ROLE_ADMIN') %}
-                        <a href="{{ path('admin_users') }}" class="btn btn-warning btn-sm magic-btn">Dashboard Admin</a>
+                        <a href="{{ path('admin_users') }}" class="btn btn-warning btn-sm magic-btn">Admin</a>
                     {% endif %}
+                    
                     <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm magic-btn">Déconnexion</a>
                 {% else %}
                     <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm magic-btn">Connexion</a>
@@ -776,142 +757,96 @@
 
         <!-- MAIN CONTENT -->
         <main>
-            {% if app.user %}
             <section class="section">
                 <div class="container">
-                    <h1 class="section-title">Mon Profil</h1>
+                    <h1 class="section-title">
+                        {% if isOwner %}
+                            Mon Profil
+                        {% else %}
+                            Profil de {{ user.username }}
+                        {% endif %}
+                    </h1>
                     
                     <div class="profile-layout">
-                        <!-- SIDEBAR -->
+                        <!-- SIDEBAR - INFOS UTILISATEUR -->
                         <div>
                             <div class="card">
-                                <div class="card-body" style="text-align: center;">
-                                    <div style="
-                                        width: 100px;
-                                        height: 100px;
-                                        margin: 0 auto 1rem;
-                                        border-radius: 50%;
-                                        background: linear-gradient(135deg, #18E3A4, #0DCF92);
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                        overflow: hidden;
-                                    ">
-                                        {% if app.user.avatar %}
-                                            <img
-                                                src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}"
-                                                alt="Avatar de {{ app.user.username }}"
-                                                style="
-                                                    width: 100%;
-                                                    height: 100%;
-                                                    object-fit: cover;
-                                                "
-                                            >
-                                        {% else %}
-                                            <span style="font-size: 3rem;">🧙</span>
-                                        {% endif %}
+                                <div class="card-body">
+                                    <!-- Avatar -->
+                                    {% if user.avatar %}
+                                        <div class="profile-avatar">
+                                            <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="Avatar de {{ user.username }}">
+                                        </div>
+                                    {% else %}
+                                        <div class="profile-avatar-placeholder">
+                                            {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Infos de base -->
+                                    <h2 class="text-primary mb-1">{{ user.username }}</h2>
+                                    <p class="text-secondary mb-2">{{ user.prenom }} {{ user.nom }}</p>
+                                    <p class="text-secondary small mb-3">
+                                        <i class="fas fa-envelope"></i> {{ user.email }}
+                                    </p>
+                                    
+                                    {% if user.phoneNumber %}
+                                        <p class="text-secondary small mb-3">
+                                            <i class="fas fa-phone"></i> {{ user.phoneNumber }}
+                                        </p>
+                                    {% endif %}
+                                    
+                                    <div class="d-flex justify-content-center gap-2 mb-3">
+                                        <span class="badge bg-primary">
+                                            {% if isOwner %}Mon compte{% else %}Membre{% endif %}
+                                        </span>
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            {{ user.createdAt|date('d/m/Y') }}
+                                        </span>
                                     </div>
-                                    <h3 style="margin-bottom: 0.5rem;">{{ app.user.username }}</h3>
-                                    <p style="color: #B0B9B6; margin-bottom: 1rem;">{{ '@' ~ app.user.username|lower }}</p>
-                                    <p style="color: #B0B9B6; margin-bottom: 1rem;">{{ app.user.email }}</p>
-                                    <button class="btn btn-secondary btn-sm" style="width: 100%; margin-bottom: 1rem;" onclick="openModal('editProfileModal')">Éditer le Profil</button>
-                                    <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="openModal('settingsModal')">Paramètres</button>
+                                    
+                                    <!-- Bio -->
+                                    {% if user.bio %}
+                                        <div class="bio-container">
+                                            <h4 class="text-primary mb-2">À propos</h4>
+                                            <p class="text-secondary mb-0">{{ user.bio|nl2br }}</p>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Boutons d'action (uniquement si c'est le propriétaire) -->
+                                    {% if isOwner %}
+                                        <div class="mt-4">
+                                            <button class="btn btn-primary w-100 mb-2" onclick="openModal('editProfileModal')">
+                                                <i class="fas fa-edit me-2"></i> Éditer le profil
+                                            </button>
+                                            <button class="btn btn-secondary w-100" onclick="openModal('settingsModal')">
+                                                <i class="fas fa-cog me-2"></i> Paramètres
+                                            </button>
+                                        </div>
+                                    {% else %}
+                                        <div class="mt-4">
+                                            <a href="{{ path('profile') }}" class="btn btn-secondary w-100">
+                                                <i class="fas fa-arrow-left me-2"></i> Retour à mon profil
+                                            </a>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
 
-                        <!-- MAIN CONTENT AVEC NOUVELLES MODALES -->
+                        <!-- MAIN CONTENT - CRÉATIONS -->
                         <div class="content-grid">
-                            <!-- MES UNIVERS -->
+                                            <!-- ARTEFACTS -->
                             <div class="content-section">
-                                <h2>Mes Univers</h2>
+                                <h2><i class="fas fa-gem me-2"></i> Artefacts</h2>
                                 <div class="items-grid">
-                                    <div class="card" onclick="openUniverseModal('universe-1')">
-                                        <div class="card-image" style="font-size: 3rem; display: flex; align-items: center; justify-content: center;">🌙</div>
-                                        <div class="card-body">
-                                            <h3 class="card-title">Nuit Éternelle</h3>
-                                            <p class="card-text">Un monde plongé dans une nuit perpétuelle</p>
-                                            <div class="card-tags">
-                                                <span class="tag">Sombre</span>
-                                                <span class="tag">Mystère</span>
-                                            </div>
-                                            <p style="color: var(--primary-color); font-size: 0.9rem; margin: 1rem 0;">📊 1,240 favoris</p>
-                                            <button class="btn btn-primary btn-sm magic-btn" style="width: 100%;">Voir</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="card" onclick="openUniverseModal('universe-2')">
-                                        <div class="card-image" style="font-size: 3rem; display: flex; align-items: center; justify-content: center;">🏰</div>
-                                        <div class="card-body">
-                                            <h3 class="card-title">Châteaux Flottants</h3>
-                                            <p class="card-text">Des forteresses dans les nuages</p>
-                                            <div class="card-tags">
-                                                <span class="tag">Épic</span>
-                                                <span class="tag">Magie</span>
-                                            </div>
-                                            <p style="color: var(--primary-color); font-size: 0.9rem; margin: 1rem 0;">📊 892 favoris</p>
-                                            <button class="btn btn-primary btn-sm magic-btn" style="width: 100%;">Voir</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <a href="/universes" class="btn btn-secondary magic-btn" style="margin-top: 1rem;">Voir tous mes univers (12)</a>
-                            </div>
-
-                            <!-- MES ŒUVRES -->
-                            <div class="content-section">
-                                <h2>Mes Œuvres Récentes</h2>
-                                <div class="items-grid">
-                                    {% if oeuvres is defined and oeuvres|length > 0 %}
-                                        {% for o in oeuvres %}
-                                            <div class="card" onclick="openOeuvreModal({{ o.id|default(loop.index0) }})">
+                                    {% if artefacts|length > 0 %}
+                                        {% for artefact in artefacts %}
+                                            <div class="card">
                                                 <div class="card-image">
-                                                    {% if o.imageUrl is defined and o.imageUrl %}
-                                                        <img src="{{ asset(o.imageUrl) }}" alt="{{ o.title|default('Œuvre') }}">
-                                                    {% else %}
-                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
-                                                            🎨
-                                                        </div>
-                                                    {% endif %}
-                                                </div>
-                                                <div class="card-body">
-                                                    <h3 class="card-title">{{ o.title|default('Sans titre') }}</h3>
-                                                    <p class="card-text">{{ o.description|default('Aucune description')|slice(0, 100) ~ (o.description|default('')|length > 100 ? '...' : '') }}</p>
-                                                    <small style="color: var(--text-secondary);">
-                                                        {% if o.createdAt is defined and o.createdAt %}
-                                                            {{ o.createdAt|date('d/m/Y') }}
-                                                        {% endif %}
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    {% else %}
-                                        <div class="card" onclick="openOeuvreModal('empty')">
-                                            <div class="card-image" style="display: flex; align-items: center; justify-content: center; font-size: 3rem;">
-                                                📝
-                                            </div>
-                                            <div class="card-body">
-                                                <h3 class="card-title">Aucune œuvre</h3>
-                                                <p class="card-text">Vous n'avez pas encore créé d'œuvre</p>
-                                                <button class="btn btn-primary btn-sm magic-btn" style="width: 100%; margin-top: 1rem;">Créer une œuvre</button>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <a href="/oeuvre" class="btn btn-secondary magic-btn" style="margin-top: 1rem;">
-                                    Voir toutes mes œuvres ({{ oeuvresCount|default(oeuvres|length)|default(0) }})
-                                </a>
-                            </div>
-
-                            <!-- MES ARTEFACTS -->
-                            <div class="content-section">
-                                <h2>Mes Artefacts</h2>
-                                <div class="items-grid">
-                                    {% if artefacts is defined and artefacts|length > 0 %}
-                                        {% for a in artefacts %}
-                                            <div class="card" onclick="openArtefactModal({{ a.id|default(loop.index0) }})">
-                                                <div class="card-image">
-                                                    {% if a.imageUrl is defined and a.imageUrl %}
-                                                        <img src="{{ asset(a.imageUrl) }}" alt="{{ a.name|default('Artefact') }}">
+                                                    {% if artefact.imageUrl %}
+                                                        <img src="{{ asset(artefact.imageUrl) }}" alt="{{ artefact.name }}">
                                                     {% else %}
                                                         <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
                                                             ⚔️
@@ -919,26 +854,54 @@
                                                     {% endif %}
                                                 </div>
                                                 <div class="card-body">
-                                                    <h3 class="card-title">{{ a.name|default('Sans nom') }}</h3>
-                                                    <p class="card-text">{{ a.origins|default('Aucune description')|slice(0, 100) ~ (a.origins|default('')|length > 100 ? '...' : '') }}</p>
-                                                    <small style="color: var(--text-secondary);">
-                                                        {% if a.createdAt is defined and a.createdAt %}
-                                                            {{ a.createdAt|date('d/m/Y') }}
-                                                        {% endif %}
-                                                    </small>
+                                                    <h3>{{ artefact.name }}</h3>
+                                                    <p>{{ artefact.origins|slice(0, 80) ~ '...' }}</p>
+                                                    <small class="text-secondary">{{ artefact.createdAt|date('d/m/Y') }}</small>
                                                 </div>
                                             </div>
                                         {% endfor %}
                                     {% else %}
-                                        <div class="card" onclick="openArtefactModal('empty')">
-                                            <div class="card-image" style="display: flex; align-items: center; justify-content: center; font-size: 3rem;">
-                                                🏺
+                                        <div class="empty-state">
+                                            <span class="empty-icon">⚔️</span>
+                                            <p>Aucun artefact créé</p>
+                                            {% if isOwner %}
+                                                <a href="/artefact/create" class="btn btn-primary btn-sm mt-3">Créer un artefact</a>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- ŒUVRES -->
+                            <div class="content-section">
+                                <h2><i class="fas fa-pen-fancy me-2"></i> Œuvres</h2>
+                                <div class="items-grid">
+                                    {% if oeuvres|length > 0 %}
+                                        {% for oeuvre in oeuvres %}
+                                            <div class="card">
+                                                <div class="card-image">
+                                                    {% if oeuvre.imageUrl %}
+                                                        <img src="{{ asset(oeuvre.imageUrl) }}" alt="{{ oeuvre.title }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            📚
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3>{{ oeuvre.title }}</h3>
+                                                    <p>{{ oeuvre.description|slice(0, 80) ~ '...' }}</p>
+                                                    <small class="text-secondary">{{ oeuvre.createdAt|date('d/m/Y') }}</small>
+                                                </div>
                                             </div>
-                                            <div class="card-body">
-                                                <h3 class="card-title">Aucun artefact</h3>
-                                                <p class="card-text">Vous n'avez pas encore créé d'artefact</p>
-                                                <button class="btn btn-primary btn-sm magic-btn" style="width: 100%; margin-top: 1rem;">Créer un artefact</button>
-                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="empty-state">
+                                            <span class="empty-icon">📚</span>
+                                            <p>Aucune œuvre créée</p>
+                                            {% if isOwner %}
+                                                <a href="/oeuvre/create" class="btn btn-primary btn-sm mt-3">Créer une œuvre</a>
+                                            {% endif %}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -947,24 +910,10 @@
                     </div>
                 </div>
             </section>
-
-            {% else %}
-                <section class="section">
-                    <div class="container" style="text-align: center; padding: 4rem 2rem;">
-                        <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">Accès non autorisé</h2>
-                        <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
-                            Vous devez être connecté pour accéder à votre profil.
-                        </p>
-                        <div style="display: flex; gap: 1rem; justify-content: center;">
-                            <a href="{{ path('app_login') }}" class="btn btn-primary magic-btn">Se connecter</a>
-                            <a href="{{ path('app_register') }}" class="btn btn-secondary magic-btn">S'inscrire</a>
-                        </div>
-                    </div>
-                </section>
-            {% endif %}
         </main>
 
-        <!-- MODAL ÉDITER PROFIL -->
+        <!-- MODAL ÉDITER PROFIL (uniquement pour le propriétaire) -->
+        {% if isOwner and profileForm %}
         <div id="editProfileModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeModal('editProfileModal')">&times;</span>
@@ -986,19 +935,21 @@
                 {{ form_end(profileForm) }}
             </div>
         </div>
+        {% endif %}
 
-        <!-- MODAL PARAMÈTRES -->
+        <!-- MODAL PARAMÈTRES (uniquement pour le propriétaire) -->
+        {% if isOwner and passwordForm %}
         <div id="settingsModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeModal('settingsModal')">&times;</span>
                 <h2>Paramètres</h2>
 
-                <button class="btn btn-primary" onclick="document.getElementById('passwordForm').style.display='block'" style="width: 100%; margin-bottom: 1.5rem;">
+                <button class="btn btn-primary w-100 mb-3" onclick="document.getElementById('passwordForm').style.display='block'">
                     Changer le mot de passe
                 </button>
 
                 <div id="passwordForm" style="display:none; margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                    <h3 style="color: #18E3A4; margin-bottom: 1rem;">Changement de mot de passe</h3>
+                    <h3 class="text-primary mb-3">Changement de mot de passe</h3>
                     {{ form_start(passwordForm, {'attr': {'class': 'password-form'}}) }}
                         <div class="form-group">
                             <label class="form-label">Mot de passe actuel</label>
@@ -1009,159 +960,47 @@
                             {{ form_widget(passwordForm.newPassword, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Confirmer le nouveau mot de passe</label>
+                            <label class="form-label">Confirmer</label>
                             {{ form_widget(passwordForm.confirmPassword, {'attr': {'class': 'form-control'}}) }}
                         </div>
-                        <button class="btn btn-success" type="submit" style="width: 100%;">Modifier le mot de passe</button>
+                        <button class="btn btn-success w-100" type="submit">Modifier</button>
                     {{ form_end(passwordForm) }}
                 </div>
 
-                <button class="btn btn-danger" onclick="document.getElementById('deleteForm').style.display='block'" style="width: 100%;">
+                <button class="btn btn-danger w-100" onclick="document.getElementById('deleteForm').style.display='block'">
                     Supprimer mon compte
                 </button>
 
-                <div id="deleteForm" style="display:none; margin-top: 1.5rem; padding: 1.5rem; background: rgba(220,53,69,0.1); border-radius: 8px; border: 1px solid rgba(220,53,69,0.3);">
-                    <h3 style="color: #dc3545; margin-bottom: 1rem;">Suppression du compte</h3>
-                    <p style="color: #B0B9B6; margin-bottom: 1rem;">Cette action est irréversible. Toutes vos données seront définitivement supprimées.</p>
-                    <form action="{{ path('profile_delete') }}" method="POST" onsubmit="return confirm('Êtes-vous certain de vouloir supprimer votre compte ? Cette action est irréversible.');">
+                <div id="deleteForm" style="display:none; margin-top: 1.5rem; padding: 1.5rem; background: rgba(220,53,69,0.1); border-radius: 8px;">
+                    <h3 class="text-danger mb-2">Suppression du compte</h3>
+                    <p class="text-secondary small mb-3">Cette action est irréversible.</p>
+                    <form action="{{ path('profile_delete') }}" method="POST" onsubmit="return confirm('Confirmer la suppression ?');">
                         <div class="form-group">
-                            <label class="form-label">Confirmez avec votre mot de passe :</label>
-                            <input type="password" name="password" required class="form-control">
+                            <input type="password" name="password" placeholder="Votre mot de passe" required class="form-control">
                         </div>
-                        <button class="btn btn-danger" type="submit" style="width: 100%;">Supprimer définitivement mon compte</button>
+                        <button class="btn btn-danger w-100" type="submit">Supprimer définitivement</button>
                     </form>
                 </div>
             </div>
         </div>
+        {% endif %}
 
-        <!-- MODALE POUR ŒUVRES -->
-        <div id="oeuvreModal" class="modal">
-            <div class="modal-content modal-detail">
-                <span class="close" onclick="closeModal('oeuvreModal')">&times;</span>
-                <div class="modal-header">
-                    <h2 id="oeuvreTitle">Titre de l'Œuvre</h2>
-                    <div class="modal-subtitle" id="oeuvreAuthor">Par Auteur</div>
+        <!-- MODALE RECHERCHE UTILISATEURS (pour tout le monde) -->
+        <div id="searchUserModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('searchUserModal')">&times;</span>
+                <h2><i class="fas fa-search me-2"></i> Rechercher un membre</h2>
+                
+                <div class="form-group">
+                    <input type="text" 
+                           id="userSearchInput" 
+                           class="form-control" 
+                           placeholder="Nom d'utilisateur, prénom ou nom..."
+                           autocomplete="off">
                 </div>
-                <div class="modal-body">
-                    <div class="modal-image">
-                        <img id="oeuvreImage" src="" alt="Image de l'œuvre">
-                    </div>
-                    <div class="modal-info">
-                        <div class="info-group">
-                            <span class="info-label">Type</span>
-                            <div class="info-value" id="oeuvreType">Roman</div>
-                        </div>
-                        <div class="info-group">
-                            <span class="info-label">Date de création</span>
-                            <div class="info-value" id="oeuvreDate">01/01/2024</div>
-                        </div>
-                        <div class="info-group">
-                            <span class="info-label">Statut</span>
-                            <div class="info-value" id="oeuvreStatus">Publié</div>
-                        </div>
-                        <div class="info-group">
-                            <span class="info-label">Tags</span>
-                            <div class="card-tags" id="oeuvreTags">
-                                <span class="tag">Fantasy</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-description">
-                        <h3>Description</h3>
-                        <p id="oeuvreDescription">Description détaillée de l'œuvre...</p>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn btn-secondary magic-btn" onclick="closeModal('oeuvreModal')">Fermer</button>
-                    <button id="oeuvreDeleteBtn" class="btn btn-danger magic-btn" onclick="deleteOeuvre()">Supprimer</button>
-                    <a id="oeuvreEditBtn" href="#" class="btn btn-primary magic-btn">Éditer</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODALE POUR ARTEFACTS -->
-        <div id="artefactModal" class="modal">
-            <div class="modal-content modal-detail">
-                <span class="close" onclick="closeModal('artefactModal')">&times;</span>
-                <div class="modal-header">
-                    <h2 id="artefactName">Nom de l'Artefact</h2>
-                    <div class="modal-subtitle" id="artefactType">Type d'artefact</div>
-                </div>
-                <div class="modal-body">
-                    <div class="modal-image">
-                        <img id="artefactImage" src="" alt="Image de l'artefact">
-                    </div>
-                    <div class="modal-info">
-                        <div class="info-group">
-                            <span class="info-label">Rareté</span>
-                            <div class="info-value" id="artefactRarity">Légendaire</div>
-                        </div>
-                        <div class="info-group">
-                            <span class="info-label">Pouvoirs</span>
-                            <div class="info-value" id="artefactPowers">Magie élémentaire</div>
-                        </div>
-                        <div class="info-group">
-                            <span class="info-label">Date de création</span>
-                            <div class="info-value" id="artefactDate">01/01/2024</div>
-                        </div>
-                        <div class="info-group">
-                            <span class="info-label">Origine</span>
-                            <div class="info-value" id="artefactOrigin">Ancienne civilisation</div>
-                        </div>
-                    </div>
-                    <div class="modal-description">
-                        <h3>Histoire & Description</h3>
-                        <p id="artefactDescription">Description détaillée de l'artefact...</p>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn btn-secondary magic-btn" onclick="closeModal('artefactModal')">Fermer</button>
-                    <button class="btn btn-primary magic-btn">Éditer</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODALE POUR UNIVERS -->
-        <div id="universeModal" class="modal">
-            <div class="modal-content modal-detail">
-                <span class="close" onclick="closeModal('universeModal')">&times;</span>
-                <div class="modal-header">
-                    <h2 id="universeName">Nom de l'Univers</h2>
-                    <div class="modal-subtitle" id="universeCreator">Créé par Utilisateur</div>
-                </div>
-                <div class="modal-body">
-                    <div class="modal-image">
-                        <img id="universeImage" src="" alt="Image de l'univers">
-                    </div>
-                    <div class="modal-info">
-                        <div class="info-group">
-                            <span class="info-label">Thèmes</span>
-                            <div class="card-tags" id="universeThemes">
-                                <span class="tag">Fantasy</span>
-                                <span class="tag">Médiéval</span>
-                            </div>
-                        </div>
-                        <div class="info-group">
-                            <span class="info-label">Favoris</span>
-                            <div class="info-value" id="universeFavorites">1,240</div>
-                        </div>
-                        <div class="info-group">
-                            <span class="info-label">Date de création</span>
-                            <div class="info-value" id="universeDate">01/01/2024</div>
-                        </div>
-                        <div class="info-group">
-                            <span class="info-label">Statut</span>
-                            <div class="info-value" id="universeStatus">Public</div>
-                        </div>
-                    </div>
-                    <div class="modal-description">
-                        <h3>Description</h3>
-                        <p id="universeDescription">Description détaillée de l'univers...</p>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn btn-secondary magic-btn" onclick="closeModal('universeModal')">Fermer</button>
-                    <button class="btn btn-primary magic-btn">Éditer</button>
+                
+                <div id="userSearchResults" class="search-results" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Les résultats apparaîtront ici -->
                 </div>
             </div>
         </div>
@@ -1175,8 +1014,39 @@
     </div>
 
     <script>
-        // Magic Button Particle Effect
-        document.querySelectorAll('.magic-btn').forEach(btn => {
+        // ===== FONCTIONS MODALES =====
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Fermer avec Echap
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal('editProfileModal');
+                closeModal('settingsModal');
+                closeModal('searchUserModal');
+            }
+        });
+
+        // Fermer en cliquant dehors
+        window.onclick = function(event) {
+            const modals = ['editProfileModal', 'settingsModal', 'searchUserModal'];
+            modals.forEach(id => {
+                const modal = document.getElementById(id);
+                if (event.target == modal) {
+                    closeModal(id);
+                }
+            });
+        }
+
+        // ===== MAGIC BUTTON PARTICLE EFFECT =====
+        document.querySelectorAll('.magic-btn, .btn-primary, .btn-secondary').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 for(let i = 0; i < 8; i++) {
                     const particle = document.createElement('span');
@@ -1190,283 +1060,142 @@
                     particle.style.left = (e.clientX - rect.left) + 'px';
                     particle.style.top = (e.clientY - rect.top) + 'px';
                     
-                    const hue = Math.floor(Math.random() * 60) + 140;
-                    particle.style.background = `radial-gradient(circle, hsl(${hue}, 100%, 60%), hsl(${hue}, 100%, 30%))`;
-                    
                     btn.appendChild(particle);
                     setTimeout(() => particle.remove(), 600);
                 }
             });
         });
 
-        // Highlight active nav link
-        const currentPath = window.location.pathname;
-        document.querySelectorAll('nav .magic-btn').forEach(link => {
-            const homePath = '{{ path('home') }}';
-            if (link.getAttribute('href') === currentPath || 
-                (link.getAttribute('href') === homePath && currentPath === '/')) {
-                link.classList.add('active');
-            }
-        });
+        // ===== RECHERCHE UTILISATEURS =====
+        const searchInput = document.getElementById('userSearchInput');
+        const resultsContainer = document.getElementById('userSearchResults');
+        let searchTimeout;
+        let controller;
 
-        // Background initialization
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                
+                if (controller) controller.abort();
+                
+                if (query.length < 2) {
+                    resultsContainer.innerHTML = '';
+                    return;
+                }
+                
+                resultsContainer.innerHTML = '<div style="text-align:center; padding:1rem;"><div class="loading-spinner"></div><p>Recherche...</p></div>';
+                
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchUsers(query);
+                }, 500);
+            });
+        }
+
+        async function searchUsers(query) {
+            controller = new AbortController();
+            
+            try {
+                const response = await fetch(`/api/search/users?q=${encodeURIComponent(query)}`, {
+                    signal: controller.signal
+                });
+                
+                const users = await response.json();
+                displayResults(users);
+                
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                resultsContainer.innerHTML = '<p class="text-danger">Erreur</p>';
+            }
+        }
+
+        function displayResults(users) {
+            if (users.length === 0) {
+                resultsContainer.innerHTML = '<p class="text-secondary text-center">Aucun utilisateur trouvé</p>';
+                return;
+            }
+
+            let html = '';
+            users.forEach(user => {
+                const avatarUrl = user.avatar ? `/uploads/avatars/${user.avatar}` : '/images/default-avatar.png';
+                html += `
+                    <div class="search-result-item" onclick="window.location.href='/profile/${user.id}'">
+                        <img src="${avatarUrl}" class="search-result-avatar">
+                        <div>
+                            <strong>@${user.username}</strong>
+                            <p>${user.prenom} ${user.nom}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+        }
+
+        // ===== BACKGROUND VIDEO =====
         document.addEventListener('DOMContentLoaded', function() {
             const bgVideo = document.getElementById('bg-video');
             const gradientBg = document.getElementById('gradient-bg');
             
             if (bgVideo) {
                 bgVideo.addEventListener('error', function() {
-                    console.log('Background video failed to load, using gradient fallback');
-                    if (gradientBg) {
-                        gradientBg.style.display = 'block';
-                    }
+                    if (gradientBg) gradientBg.style.display = 'block';
                 });
                 
-                bgVideo.play().catch(function(error) {
-                    console.log('Video autoplay prevented:', error);
-                    if (gradientBg) {
-                        gradientBg.style.display = 'block';
-                    }
-                });
-            }
-            
-            document.addEventListener('visibilitychange', function() {
-                if (bgVideo) {
-                    if (document.hidden) {
-                        bgVideo.pause();
-                    } else {
-                        bgVideo.play().catch(e => console.log('Video play error:', e));
-                    }
-                }
-            });
-        });
-
-        // Fonctions modales
-        function openModal(id) {
-            document.getElementById(id).style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        // Fermer si clic en dehors de la modal
-        window.onclick = function(event) {
-            const modals = ['editProfileModal', 'settingsModal', 'oeuvreModal', 'artefactModal', 'universeModal'];
-            modals.forEach(id => {
-                const modal = document.getElementById(id);
-                if (event.target == modal) {
-                    closeModal(id);
-                }
-            });
-        }
-
-        // Fermer modales avec Escape
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal('editProfileModal');
-                closeModal('settingsModal');
-                closeModal('oeuvreModal');
-                closeModal('artefactModal');
-                closeModal('universeModal');
-            }
-        });
-
-        // Fonction pour ouvrir la modale d'œuvre
-        function openOeuvreModal(id) {
-            window.currentOeuvreId = id;
-            const editBtn = document.getElementById('oeuvreEditBtn');
-            editBtn.href = '/oeuvre/' + id + '/edit';
-            {% if oeuvres is defined and oeuvres|length > 0 %}
-                {% set oeuvre = oeuvres[0] %}
-                const oeuvreData = {
-                    title: "{{ oeuvre.title|default('Titre de l\'œuvre')|e('js') }}",
-                    author: "{{ app.user.username|e('js') }}",
-                    image: "{{ oeuvre.imageUrl|default('')|e('js') }}",
-                    type: "{{ oeuvre.type|default('Roman')|e('js') }}",
-                    date: "{{ oeuvre.createdAt ? oeuvre.createdAt|date('d/m/Y') : '01/01/2024' }}",
-                    status: "{{ oeuvre.status|default('Publié')|e('js') }}",
-                    tags: {{ oeuvre.tags|default(['Fantasy', 'Aventure'])|json_encode|raw }},
-                    description: "{{ oeuvre.description|default('Description de l\'œuvre...')|e('js') }}"
-                };
-            {% else %}
-                const oeuvreData = {
-                    title: "Aucune œuvre",
-                    author: "{{ app.user.username|e('js') }}",
-                    image: "",
-                    type: "-",
-                    date: "-",
-                    status: "-",
-                    tags: [],
-                    description: "Vous n'avez pas encore créé d'œuvre. Commencez dès maintenant !"
-                };
-            {% endif %}
-            
-            document.getElementById('oeuvreTitle').textContent = oeuvreData.title;
-            document.getElementById('oeuvreAuthor').textContent = "Par " + oeuvreData.author;
-            document.getElementById('oeuvreImage').src = oeuvreData.image;
-            document.getElementById('oeuvreType').textContent = oeuvreData.type;
-            document.getElementById('oeuvreDate').textContent = oeuvreData.date;
-            document.getElementById('oeuvreStatus').textContent = oeuvreData.status;
-            document.getElementById('oeuvreDescription').textContent = oeuvreData.description;
-            
-            const tagsContainer = document.getElementById('oeuvreTags');
-            tagsContainer.innerHTML = '';
-            if (oeuvreData.tags && oeuvreData.tags.length > 0) {
-                oeuvreData.tags.forEach(tag => {
-                    const tagElement = document.createElement('span');
-                    tagElement.className = 'tag';
-                    tagElement.textContent = tag;
-                    tagsContainer.appendChild(tagElement);
-                });
-            } else {
-                const tagElement = document.createElement('span');
-                tagElement.className = 'tag';
-                tagElement.textContent = 'Non catégorisé';
-                tagsContainer.appendChild(tagElement);
-            }
-            
-            openModal('oeuvreModal');
-        }
-
-        // Fonction pour supprimer une œuvre
-        function deleteOeuvre() {
-            if (!window.currentOeuvreId) return;
-            
-            if (confirm('Êtes-vous sûr de vouloir supprimer cette œuvre ? Cette action est irréversible.')) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/oeuvre/' + window.currentOeuvreId + '/delete';
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-
-        // Fonction pour ouvrir la modale d'artefact
-        function openArtefactModal(id) {
-            {% if artefacts is defined and artefacts|length > 0 %}
-                {% set artefact = artefacts[0] %}
-                const artefactData = {
-                    name: "{{ artefact.name|default('Nom de l\'artefact')|e('js') }}",
-                    type: "{{ artefact.type|default('Artefact mystérieux')|e('js') }}",
-                    image: "{{ artefact.imageUrl|default('')|e('js') }}",
-                    rarity: "{{ artefact.rarity|default('Légendaire')|e('js') }}",
-                    powers: "{{ artefact.powers|default('Pouvoirs inconnus')|e('js') }}",
-                    date: "{{ artefact.createdAt ? artefact.createdAt|date('d/m/Y') : '01/01/2024' }}",
-                    origin: "{{ artefact.origins|default('Origine inconnue')|e('js') }}",
-                    description: "{{ artefact.description|default(artefact.origins)|default('Description de l\'artefact...')|e('js') }}"
-                };
-            {% else %}
-                const artefactData = {
-                    name: "Aucun artefact",
-                    type: "-",
-                    image: "",
-                    rarity: "-",
-                    powers: "-",
-                    date: "-",
-                    origin: "-",
-                    description: "Vous n'avez pas encore créé d'artefact. Commencez dès maintenant !"
-                };
-            {% endif %}
-            
-            document.getElementById('artefactName').textContent = artefactData.name;
-            document.getElementById('artefactType').textContent = artefactData.type;
-            document.getElementById('artefactImage').src = artefactData.image;
-            document.getElementById('artefactRarity').textContent = artefactData.rarity;
-            document.getElementById('artefactPowers').textContent = artefactData.powers;
-            document.getElementById('artefactDate').textContent = artefactData.date;
-            document.getElementById('artefactOrigin').textContent = artefactData.origin;
-            document.getElementById('artefactDescription').textContent = artefactData.description;
-            
-            openModal('artefactModal');
-        }
-
-        // Fonction pour ouvrir la modale d'univers
-        function openUniverseModal(universeId) {
-            let universeData;
-            
-            if (universeId === 'universe-1') {
-                universeData = {
-                    name: 'Nuit Éternelle',
-                    creator: "{{ app.user.username|e('js') }}",
-                    image: "",
-                    themes: ['Sombre', 'Mystère'],
-                    favorites: '1,240',
-                    date: '01/01/2024',
-                    status: 'Public',
-                    description: 'Un monde plongé dans une nuit perpétuelle, où la lune ne se couche jamais et les créatures nocturnes règnent en maître.'
-                };
-            } else if (universeId === 'universe-2') {
-                universeData = {
-                    name: 'Châteaux Flottants',
-                    creator: "{{ app.user.username|e('js') }}",
-                    image: "",
-                    themes: ['Épic', 'Magie'],
-                    favorites: '892',
-                    date: '01/01/2024',
-                    status: 'Public',
-                    description: 'Des forteresses majestueuses flottant dans les nuages, où la magie est omniprésente et les chevaliers combattent à dos de griffons.'
-                };
-            } else {
-                universeData = {
-                    name: 'Univers inconnu',
-                    creator: "{{ app.user.username|e('js') }}",
-                    image: "",
-                    themes: [],
-                    favorites: '0',
-                    date: '01/01/2024',
-                    status: 'Privé',
-                    description: 'Description non disponible.'
-                };
-            }
-            
-            document.getElementById('universeName').textContent = universeData.name;
-            document.getElementById('universeCreator').textContent = "Créé par " + universeData.creator;
-            document.getElementById('universeImage').src = universeData.image;
-            document.getElementById('universeFavorites').textContent = universeData.favorites;
-            document.getElementById('universeDate').textContent = universeData.date;
-            document.getElementById('universeStatus').textContent = universeData.status;
-            document.getElementById('universeDescription').textContent = universeData.description;
-            
-            const themesContainer = document.getElementById('universeThemes');
-            themesContainer.innerHTML = '';
-            if (universeData.themes && universeData.themes.length > 0) {
-                universeData.themes.forEach(theme => {
-                    const themeElement = document.createElement('span');
-                    themeElement.className = 'tag';
-                    themeElement.textContent = theme;
-                    themesContainer.appendChild(themeElement);
-                });
-            } else {
-                const themeElement = document.createElement('span');
-                themeElement.className = 'tag';
-                themeElement.textContent = 'Non catégorisé';
-                themesContainer.appendChild(themeElement);
-            }
-            
-            openModal('universeModal');
-        }
-
-        // Form submission feedback
-        document.querySelectorAll('.profile-form, .password-form').forEach(form => {
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    if (submitBtn) {
-                        const originalText = submitBtn.textContent;
-                        submitBtn.textContent = 'Enregistrement...';
-                        submitBtn.disabled = true;
-                        
-                        setTimeout(() => {
-                            submitBtn.textContent = originalText;
-                            submitBtn.disabled = false;
-                        }, 1500);
-                    }
+                bgVideo.play().catch(() => {
+                    if (gradientBg) gradientBg.style.display = 'block';
                 });
             }
         });
     </script>
+
+    <style>
+        /* Styles supplémentaires pour la recherche */
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(24, 227, 164, 0.05);
+            border-radius: var(--border-radius);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-result-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        .search-result-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid transparent;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .text-danger { color: #dc3545; }
+        .text-center { text-align: center; }
+        .mb-3 { margin-bottom: 1rem; }
+        .mt-3 { margin-top: 1rem; }
+        .w-100 { width: 100%; }
+    </style>
 </body>
 </html>

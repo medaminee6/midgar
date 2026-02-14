@@ -8,6 +8,8 @@
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
     <link rel="stylesheet" href="/css/midgar-theme.css">
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         /* ===== VARIABLES & RESET ===== */
@@ -21,6 +23,7 @@
             --card-bg: rgba(26, 31, 30, 0.7);
             --glass-bg: rgba(26, 31, 30, 0.5);
             --border-radius: 12px;
+            --danger: #EF5350;
         }
         
         * {
@@ -231,7 +234,10 @@
         }
         
         .auth-buttons {
+            position: relative;
+            min-width: 200px;
             display: flex;
+            justify-content: flex-end;
             align-items: center;
             gap: 0.5rem;
         }
@@ -261,6 +267,158 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+        
+        /* ===== BARRE DE RECHERCHE DANS LE HEADER ===== */
+        .search-bar-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 200;
+        }
+
+        .search-bar-container.active {
+            width: 300px;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .search-bar-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(11, 15, 14, 0.9);
+            border: 1px solid var(--primary-color);
+            border-radius: 30px;
+            padding: 0.3rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(24, 227, 164, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .search-icon {
+            color: var(--primary-color);
+            margin-left: 1rem;
+            font-size: 1rem;
+        }
+
+        .search-bar-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.8rem 0.5rem;
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-bar-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .search-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .search-close-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            transform: rotate(90deg);
+        }
+
+        .search-bar-results {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            background: var(--bg-primary);
+            border: 1px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 0.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .search-bar-results .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem;
+            margin-bottom: 0.3rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar-results .search-result-item:hover {
+            background: rgba(24, 227, 164, 0.1);
+        }
+
+        .search-bar-results .search-result-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+
+        .auth-buttons-normal {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .auth-buttons-normal.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        @keyframes searchPulse {
+            0% { transform: scale(1); }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 0 20px var(--primary-color);
+            }
+            100% { transform: scale(1); }
+        }
+
+        .search-toggle {
+            animation: searchPulse 2s infinite;
+            z-index: 150;
+        }
+
+        .search-toggle:hover {
+            animation: none;
         }
         
         /* ===== HERO SECTION ===== */
@@ -427,7 +585,7 @@
             transform: scale(1.1);
         }
         
-        /* ===== SWIPER AVEC EFFET COVERFLOW ===== */
+        /* ===== SWIPER ===== */
         .swiper-container {
             padding: 3rem 0;
             position: relative;
@@ -609,6 +767,11 @@
             
             .auth-buttons {
                 justify-content: center;
+                min-width: auto;
+            }
+            
+            .search-bar-container.active {
+                width: 250px;
             }
             
             .hero {
@@ -655,6 +818,20 @@
         .pulse {
             animation: pulse 2s infinite;
         }
+
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid transparent;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -694,22 +871,48 @@
                 </ul>
             </nav>
             
-            <div class="auth-buttons">
+            <div class="auth-buttons" id="auth-buttons-container">
                 {% if app.user %}
-                    <a href="{{ path('profile') }}" class="profile-link magic-btn">
-                        <div class="avatar">
-                            {% if app.user.avatar %}
-                                <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}">
-                            {% else %}
-                                <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}">
-                            {% endif %}
+                    <!-- Bouton loupe pour ouvrir la recherche -->
+                    <button class="magic-btn search-toggle" id="searchToggleBtn" onclick="toggleSearchBar()" title="Rechercher un utilisateur">
+                        <i class="fas fa-search"></i>
+                    </button>
+
+                    <!-- Barre de recherche (cachée par défaut) -->
+                    <div class="search-bar-container" id="searchBarContainer">
+                        <div class="search-bar-wrapper">
+                            <i class="fas fa-search search-icon"></i>
+                            <input 
+                                type="text" 
+                                id="searchBarInput" 
+                                class="search-bar-input" 
+                                placeholder="Nom d'utilisateur, prénom ou nom..."
+                                autocomplete="off"
+                            >
+                            <button class="search-close-btn" onclick="toggleSearchBar()">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                        <span>{{ app.user.username }}</span>
-                    </a>
-                    <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-glow ">Déconnexion</a>
+                        <div id="searchBarResults" class="search-bar-results"></div>
+                    </div>
+
+                    <!-- Boutons normaux (visibles par défaut) -->
+                    <div class="auth-buttons-normal" id="normalButtons">
+                        <a href="{{ path('profile') }}" class="profile-link magic-btn">
+                            <div class="avatar">
+                                {% if app.user.avatar %}
+                                    <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}">
+                                {% else %}
+                                    <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}">
+                                {% endif %}
+                            </div>
+                            <span>{{ app.user.username }}</span>
+                        </a>
+                        <a href="{{ path('app_logout') }}" class="btn btn-secondary ">Déconnexion</a>
+                    </div>
                 {% else %}
-                    <a href="{{ path('app_login') }}" class="btn btn-secondary  btn-glow">Connexion</a>
-                    <a href="{{ path('app_register') }}" class="btn btn-primary  btn-glow">S'inscrire</a>
+                    <a href="{{ path('app_login') }}" class="btn btn-secondary btn-glow">Connexion</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-glow">S'inscrire</a>
                 {% endif %}
             </div>
         </header>
@@ -846,10 +1049,138 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     
     <script>
-        // Magic Button Particle Effect (sans son)
+        // ===== FONCTIONS MODALES =====
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // ===== BARRE DE RECHERCHE DANS LE HEADER =====
+        function toggleSearchBar() {
+            const searchBar = document.getElementById('searchBarContainer');
+            const normalButtons = document.getElementById('normalButtons');
+            const searchToggle = document.getElementById('searchToggleBtn');
+            
+            searchBar.classList.toggle('active');
+            
+            if (searchBar.classList.contains('active')) {
+                normalButtons.classList.add('hidden');
+                searchToggle.innerHTML = '<i class="fas fa-times"></i>';
+                setTimeout(() => {
+                    document.getElementById('searchBarInput').focus();
+                }, 300);
+            } else {
+                normalButtons.classList.remove('hidden');
+                searchToggle.innerHTML = '<i class="fas fa-search"></i>';
+                document.getElementById('searchBarResults').innerHTML = '';
+                document.getElementById('searchBarInput').value = '';
+            }
+        }
+
+        // ===== RECHERCHE EN TEMPS RÉEL DANS LA BARRE =====
+        const searchBarInput = document.getElementById('searchBarInput');
+        const searchBarResults = document.getElementById('searchBarResults');
+        let searchBarTimeout;
+        let searchBarController;
+
+        if (searchBarInput) {
+            searchBarInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                
+                if (searchBarController) searchBarController.abort();
+                
+                if (query.length < 2) {
+                    searchBarResults.innerHTML = '';
+                    return;
+                }
+                
+                searchBarResults.innerHTML = `
+                    <div style="text-align:center; padding:1rem;">
+                        <div class="loading-spinner" style="width:30px; height:30px;"></div>
+                        <p style="color: var(--text-secondary); font-size:0.9rem; margin-top:0.5rem;">Recherche...</p>
+                    </div>
+                `;
+                
+                clearTimeout(searchBarTimeout);
+                searchBarTimeout = setTimeout(() => {
+                    searchUsersInBar(query);
+                }, 500);
+            });
+        }
+
+        async function searchUsersInBar(query) {
+            searchBarController = new AbortController();
+            
+            try {
+                const response = await fetch(`/api/search/users?q=${encodeURIComponent(query)}`, {
+                    signal: searchBarController.signal
+                });
+                
+                if (!response.ok) throw new Error('Erreur réseau');
+                
+                const users = await response.json();
+                displayBarResults(users);
+                
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                console.error('Erreur:', error);
+                searchBarResults.innerHTML = `
+                    <div style="text-align:center; padding:1rem; color: var(--danger);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p style="font-size:0.9rem;">Erreur</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayBarResults(users) {
+            if (users.length === 0) {
+                searchBarResults.innerHTML = `
+                    <div style="text-align:center; padding:1rem;">
+                        <p style="color: var(--text-secondary); font-size:0.9rem;">Aucun utilisateur trouvé</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            users.forEach(user => {
+                const avatarUrl = user.avatar ? `/uploads/avatars/${user.avatar}` : '/images/default-avatar.png';
+                
+                html += `
+                    <div class="search-result-item" onclick="window.location.href='/profile/${user.id}'">
+                        <img src="${avatarUrl}" class="search-result-avatar">
+                        <div>
+                            <strong style="color: var(--primary-color);">@${user.username}</strong>
+                            <p style="color: var(--text-secondary); font-size:0.9rem;">${user.prenom} ${user.nom}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            searchBarResults.innerHTML = html;
+        }
+
+        // Fermer la barre de recherche si on clique ailleurs
+        document.addEventListener('click', function(event) {
+            const searchBar = document.getElementById('searchBarContainer');
+            const searchToggle = document.getElementById('searchToggleBtn');
+            
+            if (searchBar && searchBar.classList.contains('active')) {
+                if (!searchBar.contains(event.target) && !searchToggle.contains(event.target)) {
+                    toggleSearchBar();
+                }
+            }
+        });
+
+        // ===== MAGIC BUTTON PARTICLE EFFECT =====
         document.querySelectorAll('.magic-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
-                // Effet de particules
                 for(let i = 0; i < 12; i++) {
                     const particle = document.createElement('span');
                     particle.classList.add('particle');
@@ -858,58 +1189,31 @@
                     particle.style.setProperty('--x', x);
                     particle.style.setProperty('--y', y);
                     
-                    // Position relative au bouton
                     const rect = btn.getBoundingClientRect();
                     particle.style.left = (e.clientX - rect.left) + 'px';
                     particle.style.top = (e.clientY - rect.top) + 'px';
                     
-                    // Couleur aléatoire pour effet magique
-                    const hue = Math.floor(Math.random() * 60) + 140; // Teintes vert/cyan
+                    const hue = Math.floor(Math.random() * 60) + 140;
                     particle.style.background = `radial-gradient(circle, hsl(${hue}, 100%, 60%), hsl(${hue}, 100%, 30%))`;
                     
                     btn.appendChild(particle);
                     setTimeout(() => particle.remove(), 600);
                 }
-                
-                // Effet visuel : onde concentrique
-                const wave = document.createElement('div');
-                wave.style.position = 'absolute';
-                wave.style.width = '0';
-                wave.style.height = '0';
-                wave.style.border = '2px solid var(--primary-color)';
-                wave.style.borderRadius = '50%';
-                wave.style.top = '50%';
-                wave.style.left = '50%';
-                wave.style.transform = 'translate(-50%, -50%)';
-                wave.style.opacity = '0.7';
-                wave.style.pointerEvents = 'none';
-                wave.style.zIndex = '1';
-                
-                btn.style.position = 'relative';
-                btn.appendChild(wave);
-                
-                // Animation de l'onde
-                let size = 0;
-                const waveInterval = setInterval(() => {
-                    size += 5;
-                    wave.style.width = size + 'px';
-                    wave.style.height = size + 'px';
-                    wave.style.opacity = (0.7 - (size / 100));
-                    
-                    if (size > 100) {
-                        clearInterval(waveInterval);
-                        wave.remove();
-                    }
-                }, 10);
-            });
-            
-            // Effet au survol
-            btn.addEventListener('mouseenter', function() {
-                this.style.transition = 'all 0.3s ease';
             });
         });
 
-        // Highlight active nav link
+        // ===== FERMETURE DES MODALES AVEC ECHAP =====
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const searchBar = document.getElementById('searchBarContainer');
+                if (searchBar && searchBar.classList.contains('active')) {
+                    toggleSearchBar();
+                }
+                closeModal('defi-modal');
+            }
+        });
+
+        // ===== HIGHLIGHT ACTIVE NAV LINK =====
         const currentPath = window.location.pathname;
         document.querySelectorAll('nav .magic-btn').forEach(link => {
             if (link.getAttribute('href') === currentPath) {
@@ -917,10 +1221,10 @@
             }
         });
 
-        // Swiper Initialization avec effet Coverflow
+        // ===== SWIPER INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', function() {
-            // Univers Slider avec effet Coverflow
-            const universSwiper = new Swiper('.univers-slider', {
+            // Univers Slider
+            new Swiper('.univers-slider', {
                 loop: true,
                 slidesPerView: 3,
                 spaceBetween: 30,
@@ -943,32 +1247,14 @@
                     clickable: true,
                 },
                 breakpoints: {
-                    320: {
-                        slidesPerView: 1,
-                        coverflowEffect: {
-                            rotate: 30,
-                            depth: 50,
-                        }
-                    },
-                    640: {
-                        slidesPerView: 2,
-                        coverflowEffect: {
-                            rotate: 40,
-                            depth: 80,
-                        }
-                    },
-                    1024: {
-                        slidesPerView: 3,
-                        coverflowEffect: {
-                            rotate: 50,
-                            depth: 100,
-                        }
-                    }
+                    320: { slidesPerView: 1 },
+                    640: { slidesPerView: 2 },
+                    1024: { slidesPerView: 3 }
                 }
             });
 
-            // Créations Slider avec effet Coverflow
-            const creationsSwiper = new Swiper('.creations-slider', {
+            // Créations Slider
+            new Swiper('.creations-slider', {
                 loop: true,
                 slidesPerView: 3,
                 spaceBetween: 30,
@@ -991,83 +1277,38 @@
                     clickable: true,
                 },
                 breakpoints: {
-                    320: {
-                        slidesPerView: 1,
-                        coverflowEffect: {
-                            rotate: 30,
-                            depth: 50,
-                        }
-                    },
-                    640: {
-                        slidesPerView: 2,
-                        coverflowEffect: {
-                            rotate: 40,
-                            depth: 80,
-                        }
-                    },
-                    1024: {
-                        slidesPerView: 3,
-                        coverflowEffect: {
-                            rotate: 50,
-                            depth: 100,
-                        }
-                    }
+                    320: { slidesPerView: 1 },
+                    640: { slidesPerView: 2 },
+                    1024: { slidesPerView: 3 }
                 }
             });
 
-            // Modal Functionality
+            // Modal Functionality for defis
             const defiModal = document.getElementById('defi-modal');
-            const modalClose = defiModal.querySelector('.modal-close');
-            const modalParticipate = document.getElementById('modal-participate');
-
-            // Fetch défi details
-            async function fetchDefiDetails(defiId) {
-                try {
-                    // Remplacez ceci par votre appel API réel
-                    // const response = await fetch(`/api/defis/${defiId}`);
-                    // const data = await response.json();
-                    
-                    // Simulation de données
-                    return {
-                        titre: `Défi ${defiId}`,
-                        theme: 'Fantasy Épique',
-                        description: 'Description complète du défi... Créez un univers fantasy unique avec des personnages mémorables et une histoire captivante.',
-                        dateDebut: '01/01/2026',
-                        dateFin: '31/12/2026',
-                        statut: 'Ouvert'
-                    };
-                } catch (error) {
-                    console.error('Erreur:', error);
-                    return null;
-                }
-            }
-
-            // Modal handling
+            
             document.querySelectorAll('.view-defi').forEach(btn => {
                 btn.addEventListener('click', async function(e) {
                     e.stopPropagation();
                     const card = this.closest('.defi-card');
                     const defiId = card.dataset.defiId;
                     
-                    // Show loading state
                     defiModal.querySelector('.modal-content').innerHTML = `
                         <div style="text-align: center; padding: 2rem;">
-                            <div style="
-                                width: 40px;
-                                height: 40px;
-                                border: 3px solid transparent;
-                                border-top-color: var(--primary-color);
-                                border-radius: 50%;
-                                animation: spin 1s linear infinite;
-                                margin: 0 auto 1rem;
-                            "></div>
-                            <p>Chargement du défi...</p>
+                            <div class="loading-spinner"></div>
+                            <p style="color: var(--text-secondary); margin-top: 1rem;">Chargement du défi...</p>
                         </div>
                     `;
                     defiModal.style.display = 'flex';
                     
                     setTimeout(async () => {
-                        const defiDetails = await fetchDefiDetails(defiId);
+                        const defiDetails = {
+                            titre: `Défi ${defiId}`,
+                            theme: 'Fantasy Épique',
+                            description: 'Description complète du défi... Créez un univers fantasy unique avec des personnages mémorables et une histoire captivante.',
+                            dateDebut: '01/01/2026',
+                            dateFin: '31/12/2026',
+                            statut: 'Ouvert'
+                        };
                         
                         if (defiDetails) {
                             defiModal.querySelector('.modal-content').innerHTML = `
@@ -1081,7 +1322,6 @@
                                 <button class="btn btn-primary magic-btn" id="modal-participate" style="margin-top: 1rem;">Participer</button>
                             `;
                             
-                            // Re-attach event listeners
                             defiModal.querySelector('.modal-close').addEventListener('click', () => {
                                 defiModal.style.display = 'none';
                             });
@@ -1094,71 +1334,12 @@
                     }, 500);
                 });
             });
-
-            // Close modal
-            modalClose.addEventListener('click', () => {
-                defiModal.style.display = 'none';
-            });
-
-            // Close modal on outside click
-            window.addEventListener('click', (e) => {
-                if (e.target === defiModal) {
-                    defiModal.style.display = 'none';
-                }
-            });
-
-            // Participate button
-            modalParticipate.addEventListener('click', () => {
-                alert('Participation enregistrée !');
-                defiModal.style.display = 'none';
-            });
-
-            // Card hover effects
-            document.querySelectorAll('.defi-card').forEach(card => {
-                card.addEventListener('mouseenter', () => {
-                    card.style.transform = 'scale(1.02)';
-                    card.style.boxShadow = '0 10px 25px rgba(24, 227, 164, 0.3)';
-                });
-                
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = 'scale(1)';
-                    card.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
-                });
-            });
-
-            // Spin animation for CSS
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Smooth scrolling for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    if (targetId === '#') return;
-                    
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
         });
 
-        // Video background fallback
+        // ===== VIDEO BACKGROUND FALLBACK =====
         const bgVideo = document.getElementById('bg-video');
         if (bgVideo) {
             bgVideo.addEventListener('error', function() {
-                console.log('Video failed to load, using fallback background');
                 document.body.style.background = 'linear-gradient(135deg, #1A1F1E 0%, #0D0F0F 100%)';
             });
         }

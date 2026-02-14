@@ -7,12 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
-#[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
-#[UniqueEntity(fields: ['googleId'], message: 'This Google account is already linked')]
+#[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé')]
+#[UniqueEntity(fields: ['username'], message: 'Ce nom d\'utilisateur est déjà pris')]
+#[UniqueEntity(fields: ['googleId'], message: 'Ce compte Google est déjà lié')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const ROLE_USER = 'ROLE_USER';
@@ -29,6 +30,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Assert\NotBlank(message: 'L\'email est requis')]
+    #[Assert\Email(message: 'Le format de l\'email est invalide')]
+    #[Assert\Length(max: 180, maxMessage: 'L\'email ne peut pas dépasser {{ limit }} caractères')]
     private ?string $email = null;
 
     #[ORM\Column(nullable: true)]
@@ -38,29 +42,68 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $role = 'user';
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le nom est requis')]
+    #[Assert\Length(
+        min: 2, 
+        max: 50, 
+        minMessage: 'Le nom doit contenir au moins {{ limit }} caractères',
+        maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères'
+    )]
+    #[Assert\Regex(
+        pattern: '/^[a-zA-ZÀ-ÿ\s-]+$/',
+        message: 'Le nom ne peut contenir que des lettres, espaces et tirets'
+    )]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le prénom est requis')]
+    #[Assert\Length(
+        min: 2, 
+        max: 50, 
+        minMessage: 'Le prénom doit contenir au moins {{ limit }} caractères',
+        maxMessage: 'Le prénom ne peut pas dépasser {{ limit }} caractères'
+    )]
+    #[Assert\Regex(
+        pattern: '/^[a-zA-ZÀ-ÿ\s-]+$/',
+        message: 'Le prénom ne peut contenir que des lettres, espaces et tirets'
+    )]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank(message: 'Le nom d\'utilisateur est requis')]
+    #[Assert\Length(
+        min: 3, 
+        max: 20, 
+        minMessage: 'Le nom d\'utilisateur doit contenir au moins {{ limit }} caractères',
+        maxMessage: 'Le nom d\'utilisateur ne peut pas dépasser {{ limit }} caractères'
+    )]
+    #[Assert\Regex(
+        pattern: '/^[a-zA-Z0-9]+$/',
+        message: 'Le nom d\'utilisateur ne peut contenir que des lettres et des chiffres (sans espaces)'
+    )]
     private ?string $username = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Assert\Length(max: 500, maxMessage: 'La bio ne peut pas dépasser {{ limit }} caractères')]
     private ?string $bio = null;
 
     #[ORM\Column(options: ['default' => false])]
-    private bool $isBlocked = false;
+        private bool $isBlocked = false;
+    #[ORM\Column(options: ['default' => true])]
+    private bool $isVerified = true;
 
-    #[ORM\Column(options: ['default' => false])]
-    private bool $isVerified = false;
 
     #[ORM\Column(type: 'datetime')]
     private ?\DateTime $createdAt = null;
+    
     #[ORM\Column(length: 20, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/^[0-9+\-\s]+$/',
+        message: 'Le numéro de téléphone n\'est pas valide'
+    )]
     private ?string $phoneNumber = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -68,7 +111,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTime $resetTokenExpiresAt = null;
-
 
     // ================= GOOGLE OAUTH =================
     #[ORM\Column(type: 'string', length: 255, nullable: true, unique: true)]
@@ -274,37 +316,43 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->createdAt = $createdAt;
         return $this;
     }
+    
     public function getPhoneNumber(): ?string
-{
-    return $this->phoneNumber;
-}
+    {
+        return $this->phoneNumber;
+    }
 
-public function setPhoneNumber(?string $phoneNumber): self
-{
-    $this->phoneNumber = $phoneNumber;
-    return $this;
-}
+    public function setPhoneNumber(?string $phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
+        return $this;
+    }
 
-public function getResetToken(): ?string
-{
-    return $this->resetToken;
-}
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
 
-public function setResetToken(?string $resetToken): self
-{
-    $this->resetToken = $resetToken;
-    return $this;
-}
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+        return $this;
+    }
 
-public function getResetTokenExpiresAt(): ?\DateTime
-{
-    return $this->resetTokenExpiresAt;
-}
+    public function getResetTokenExpiresAt(): ?\DateTime
+    {
+        return $this->resetTokenExpiresAt;
+    }
 
-public function setResetTokenExpiresAt(?\DateTime $date): self
-{
-    $this->resetTokenExpiresAt = $date;
-    return $this;
-}
+    public function setResetTokenExpiresAt(?\DateTime $date): self
+    {
+        $this->resetTokenExpiresAt = $date;
+        return $this;
+    }
 
+    // ================== MÉTHODE UTILE ==================
+    public function getFullName(): string
+    {
+        return trim($this->prenom . ' ' . $this->nom);
+    }
 }

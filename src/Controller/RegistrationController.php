@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class RegistrationController extends AbstractController
 {
@@ -75,5 +77,47 @@ class RegistrationController extends AbstractController
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
         ]);
+    }
+
+    // ===== AJAX Endpoint pour vérifier username & email =====
+    #[Route('/check-field', name: 'check_field', methods: ['GET'])]
+    public function checkField(Request $request, UserRepository $userRepository): JsonResponse
+    {
+        $field = $request->query->get('field');
+        $value = trim($request->query->get('value', ''));
+
+        if (!$field || !$value) {
+            return new JsonResponse(['valid' => false]);
+        }
+
+        if ($field === 'username') {
+            $user = $userRepository->findOneBy(['username' => $value]);
+            if ($user) {
+                $suggestions = [];
+                for ($i = 1; $i <= 5; $i++) {
+                    $suggestion = $value . rand(10, 99);
+                    if (!$userRepository->findOneBy(['username' => $suggestion])) {
+                        $suggestions[] = $suggestion;
+                    }
+                }
+                return new JsonResponse([
+                    'valid' => false,
+                    'message' => 'Ce nom d\'utilisateur est déjà pris.',
+                    'suggestions' => $suggestions
+                ]);
+            }
+        }
+
+        if ($field === 'email') {
+            $user = $userRepository->findOneBy(['email' => $value]);
+            if ($user) {
+                return new JsonResponse([
+                    'valid' => false,
+                    'message' => 'Cette adresse email est déjà utilisée.'
+                ]);
+            }
+        }
+
+        return new JsonResponse(['valid' => true]);
     }
 }

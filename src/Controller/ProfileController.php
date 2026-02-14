@@ -106,11 +106,15 @@ class ProfileController extends AbstractController
         }
 
         return $this->render('profile/profile.html.twig', [
+            'user' => $user,
             'profileForm' => $profileForm->createView(),
             'passwordForm' => $passwordForm->createView(),
             'artefacts' => $artefacts,
             'oeuvres' => $oeuvres,
-        ]);
+            'isOwner' => true,
+            ]);
+
+        
     }
 
     #[Route('/profile/delete', name: 'profile_delete', methods: ['POST'])]
@@ -138,4 +142,42 @@ class ProfileController extends AbstractController
         $this->addFlash('success', 'Votre compte a été supprimé.');
         return $this->redirectToRoute('home');
     }
+    #[Route('/profile/{id}', name: 'profile_public', requirements: ['id' => '\d+'])]
+public function publicProfile(
+    User $user,
+    EntityManagerInterface $em
+): Response {
+    // sécurité minimale
+    if (!$user->isVerified()) {
+        throw $this->createNotFoundException();
+    }
+
+    // charger ses artefacts
+    $artefacts = $em->getRepository(Artefact::class)
+        ->createQueryBuilder('a')
+        ->where('a.createdBy = :user')
+        ->setParameter('user', $user)
+        ->orderBy('a.createdAt', 'DESC')
+        ->getQuery()
+        ->getResult();
+
+    // charger ses œuvres
+    $oeuvres = $em->getRepository(Oeuvre::class)
+        ->createQueryBuilder('o')
+        ->where('o.createdBy = :user')
+        ->setParameter('user', $user)
+        ->orderBy('o.createdAt', 'DESC')
+        ->getQuery()
+        ->getResult();
+
+    return $this->render('profile/profile.html.twig', [
+        'user' => $user,
+        'artefacts' => $artefacts,
+        'oeuvres' => $oeuvres,
+        'profileForm' => null,
+        'passwordForm' => null,
+        'isOwner' => false,
+    ]);
+}
+
 }

@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\OeuvreRepository;
-use App\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -38,6 +37,12 @@ class Oeuvre
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?User $createdBy = null;
+
+    // ===== NOUVELLE RELATION AVEC UNIVERSE =====
+    #[ORM\ManyToOne(targetEntity: Universe::class, inversedBy: 'oeuvres')]
+    #[ORM\JoinColumn(name: 'universe_id', referencedColumnName: 'id', nullable: true)]
+    private ?Universe $universe = null;
+    // ===========================================
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -116,6 +121,30 @@ class Oeuvre
         return $this;
     }
 
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    // ===== GETTERS ET SETTERS POUR UNIVERSE =====
+    public function getUniverse(): ?Universe
+    {
+        return $this->universe;
+    }
+
+    public function setUniverse(?Universe $universe): static
+    {
+        $this->universe = $universe;
+        return $this;
+    }
+    // ===========================================
+
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -135,17 +164,6 @@ class Oeuvre
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    public function getCreatedBy(): ?User
-    {
-        return $this->createdBy;
-    }
-
-    public function setCreatedBy(?User $createdBy): static
-    {
-        $this->createdBy = $createdBy;
         return $this;
     }
 

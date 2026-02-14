@@ -37,4 +37,43 @@ class UserRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function searchPublicUsers(string $q): array
+{
+    return $this->createQueryBuilder('u')
+        ->andWhere('u.username LIKE :q OR u.username LIKE :q')
+        ->setParameter('q', '%' . $q . '%')
+        ->setMaxResults(10)
+        ->getQuery()
+        ->getResult();
+        
+}
+public function searchUsersApi(string $query): array
+{
+    $users = $this->createQueryBuilder('u')
+        ->where('u.username LIKE :query')
+        ->orWhere('u.prenom LIKE :query')
+        ->orWhere('u.nom LIKE :query')
+        ->andWhere('u.isBlocked = :blocked')
+        ->setParameter('query', '%' . $query . '%')
+        ->setParameter('blocked', false)
+        ->orderBy('u.username', 'ASC')
+        ->setMaxResults(10)
+        ->getQuery()
+        ->getResult();
+    
+    $data = [];
+    foreach ($users as $user) {
+        $data[] = [
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+            'prenom' => $user->getPrenom(),
+            'nom' => $user->getNom(),
+            'avatar' => $user->getAvatar(),
+            'createdAt' => $user->getCreatedAt()->format('d/m/Y')
+        ];
+    }
+    
+    return $data;
+}
+
 }

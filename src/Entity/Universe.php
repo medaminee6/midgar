@@ -1,7 +1,10 @@
 <?php
+
 namespace App\Entity;
 
 use App\Repository\UniverseRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -49,17 +52,18 @@ class Universe
     private \DateTimeImmutable $updatedAt;
 
     #[ORM\OneToMany(mappedBy: 'universe', targetEntity: Personnage::class, cascade: ['remove'], orphanRemoval: true)]
-    private $personnages;
+    private Collection $personnages;
 
     #[ORM\OneToMany(mappedBy: 'universe', targetEntity: Oeuvre::class, cascade: ['remove'], orphanRemoval: true)]
-    private $oeuvres;
+    private Collection $oeuvres;
 
     public function __construct()
     {
         $this->themes = [];
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
-        $this->personnages = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->personnages = new ArrayCollection();
+        $this->oeuvres = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -162,10 +166,64 @@ class Universe
         return $this->updatedAt;
     }
 
-    /** @return \Doctrine\Common\Collections\Collection|Personnage[] */
-    public function getPersonnages()
+    /**
+     * @return Collection<int, Personnage>
+     */
+    public function getPersonnages(): Collection
     {
         return $this->personnages;
+    }
+
+    public function addPersonnage(Personnage $personnage): self
+    {
+        if (!$this->personnages->contains($personnage)) {
+            $this->personnages->add($personnage);
+            $personnage->setUniverse($this);
+        }
+
+        return $this;
+    }
+
+    public function removePersonnage(Personnage $personnage): self
+    {
+        if ($this->personnages->removeElement($personnage)) {
+            // set the owning side to null (unless already changed)
+            if ($personnage->getUniverse() === $this) {
+                $personnage->setUniverse(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Oeuvre>
+     */
+    public function getOeuvres(): Collection
+    {
+        return $this->oeuvres;
+    }
+
+    public function addOeuvre(Oeuvre $oeuvre): self
+    {
+        if (!$this->oeuvres->contains($oeuvre)) {
+            $this->oeuvres->add($oeuvre);
+            $oeuvre->setUniverse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOeuvre(Oeuvre $oeuvre): self
+    {
+        if ($this->oeuvres->removeElement($oeuvre)) {
+            // set the owning side to null (unless already changed)
+            if ($oeuvre->getUniverse() === $this) {
+                $oeuvre->setUniverse(null);
+            }
+        }
+
+        return $this;
     }
 
     public function getBannerBase64(): ?string
@@ -197,11 +255,5 @@ class Universe
         }
         
         return 'data:image/jpeg;base64,' . base64_encode($data);
-    }
-
-    /** @return \Doctrine\Common\Collections\Collection|Oeuvre[] */
-    public function getOeuvres()
-    {
-        return $this->oeuvres;
     }
 }
