@@ -16,3 +16,9 @@ app_logout:
 app_register:
     path: /register
     controller: App\Controller\RegistrationController::register
+connect_google_start:
+    path: /connect/google
+    controller: App\Controller\GoogleController::connect
+
+connect_google_check:
+    path: /connect/google/check

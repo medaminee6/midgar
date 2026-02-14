@@ -1073,7 +1073,8 @@
                 </div>
                 <div class="modal-actions">
                     <button class="btn btn-secondary magic-btn" onclick="closeModal('oeuvreModal')">Fermer</button>
-                    <button class="btn btn-primary magic-btn">Éditer</button>
+                    <button id="oeuvreDeleteBtn" class="btn btn-danger magic-btn" onclick="deleteOeuvre()">Supprimer</button>
+                    <a id="oeuvreEditBtn" href="#" class="btn btn-primary magic-btn">Éditer</a>
                 </div>
             </div>
         </div>
@@ -1275,6 +1276,9 @@
 
         // Fonction pour ouvrir la modale d'œuvre
         function openOeuvreModal(id) {
+            window.currentOeuvreId = id;
+            const editBtn = document.getElementById('oeuvreEditBtn');
+            editBtn.href = '/oeuvre/' + id + '/edit';
             {% if oeuvres is defined and oeuvres|length > 0 %}
                 {% set oeuvre = oeuvres[0] %}
                 const oeuvreData = {
@@ -1325,6 +1329,19 @@
             }
             
             openModal('oeuvreModal');
+        }
+
+        // Fonction pour supprimer une œuvre
+        function deleteOeuvre() {
+            if (!window.currentOeuvreId) return;
+            
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette œuvre ? Cette action est irréversible.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/oeuvre/' + window.currentOeuvreId + '/delete';
+                document.body.appendChild(form);
+                form.submit();
+            }
         }
 
         // Fonction pour ouvrir la modale d'artefact
