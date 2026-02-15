@@ -3,15 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\ArtefactRepository;
-<<<<<<< HEAD
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
-=======
 use App\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
->>>>>>> validation-final-2
 
 #[ORM\Entity(repositoryClass: ArtefactRepository::class)]
 #[ORM\Table(name: 'artefacts')]
@@ -24,23 +19,6 @@ class Artefact
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-<<<<<<< HEAD
-    private ?string $name = null;
-
-    #[ORM\Column(length: 50)]
-    private ?string $type = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $universe = null;
-
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $origins = null;
-
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $powers = null;
-
-    #[ORM\Column(length: 50)]
-=======
     #[Assert\NotBlank(message: "Le nom est requis")]
     #[Assert\Length(min: 3, minMessage: "Le nom doit contenir au moins 3 caractères")]
     #[Assert\Regex(pattern: '/^[\p{L}][\p{L}\s\'\-\x{2019}]*$/u', message: "Le nom ne doit contenir que des lettres (espaces, tirets et apostrophes autorisés)")]
@@ -69,20 +47,14 @@ class Artefact
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: "La rareté est requise")]
->>>>>>> validation-final-2
     private ?string $rarity = null;
 
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $imageUrl = null;
 
-<<<<<<< HEAD
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $createdBy = null;
-=======
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?User $createdBy = null;
->>>>>>> validation-final-2
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -194,20 +166,12 @@ class Artefact
         return $this;
     }
 
-<<<<<<< HEAD
-    public function getCreatedBy(): ?string
-=======
     public function getCreatedBy(): ?User
->>>>>>> validation-final-2
     {
         return $this->createdBy;
     }
 
-<<<<<<< HEAD
-    public function setCreatedBy(?string $createdBy): static
-=======
     public function setCreatedBy(?User $createdBy): static
->>>>>>> validation-final-2
     {
         $this->createdBy = $createdBy;
         return $this;

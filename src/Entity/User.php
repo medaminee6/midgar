@@ -118,6 +118,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 50)]
     private string $authProvider = 'local'; // 'local' ou 'google'
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $faceDescriptor = null;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $faceEnabled = false;
+
     // =================================================
 
     public function __construct()
@@ -355,4 +361,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return trim($this->prenom . ' ' . $this->nom);
     }
+    public function getFaceDescriptor(): ?string
+{
+    return $this->faceDescriptor;
+}
+
+public function setFaceDescriptor(?string $faceDescriptor): self
+{
+    $this->faceDescriptor = $faceDescriptor;
+    return $this;
+}
+
+public function isFaceEnabled(): bool
+{
+    return $this->faceEnabled;
+}
+
+public function setFaceEnabled(bool $faceEnabled): self
+{
+    $this->faceEnabled = $faceEnabled;
+    return $this;
+}
+
 }

@@ -1,0 +1,19 @@
+<style>
+    video {
+        max-width: 100%;
+        pointer-events: none;
+    }
+</style>
+
+<video id="video" autoplay muted></video>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+<button id="startCamera">Activer ma caméra</button>
+<button id="captureFace" style="display:none;">Enregistrer mon visage</button>
+
+<img id="preview" style="margin-top:10px; max-width:300px;" />
+
+<script src="{{ asset('js/face-setup.js') }}"></script>
+<script src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script src="{{ asset('js/face-setup.js') }}"></script>

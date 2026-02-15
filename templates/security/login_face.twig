@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion par visage{% endblock %}
+
+{% block body %}
+<h1>Connexion par reconnaissance faciale</h1>
+<video id="video" width="320" height="240" autoplay muted></video>
+<button id="btnLoginFace">Se connecter avec le visage</button>
+<canvas id="snapshot" style="display:none;"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+<script src="{{ asset('js/face_login.js') }}"></script>
+{% endblock %}

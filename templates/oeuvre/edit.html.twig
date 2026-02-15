@@ -1,74 +1,3 @@
-<<<<<<< HEAD
-{% extends 'base.html.twig' %}
-
-{% block title %}Modifier une Œuvre - Midgar{% endblock %}
-
-{% block body %}
-<main>
-    <section class="section">
-        <div class="container">
-            <div style="max-width: 700px; margin: 0 auto;">
-                <h1 style="margin-bottom: 0.5rem;">Modifier une Œuvre</h1>
-                <p style="color: #B0B9B6; margin-bottom: 2rem;">{{ oeuvre.title }}</p>
-
-                <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 2.5rem;">
-                    <form method="POST" enctype="multipart/form-data">
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem;">Titre de l'Œuvre *</label>
-                            <input type="text" name="title" value="{{ oeuvre.title }}" class="form-input" required style="width: 100%; padding: 0.875rem; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: inherit; font-size: 0.95rem;">
-                        </div>
-
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem;">Type d'Œuvre *</label>
-                            <select name="type" class="form-select" required style="width: 100%; padding: 0.875rem; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: inherit; font-size: 0.95rem;">
-                                <option value="">Sélectionner un type</option>
-                                <option value="roman" {% if oeuvre.type == 'roman' %}selected{% endif %}>Roman</option>
-                                <option value="nouvelle" {% if oeuvre.type == 'nouvelle' %}selected{% endif %}>Nouvelle</option>
-                                <option value="poesie" {% if oeuvre.type == 'poesie' %}selected{% endif %}>Poésie</option>
-                                <option value="artwork" {% if oeuvre.type == 'artwork' %}selected{% endif %}>Illustration</option>
-                                <option value="musique" {% if oeuvre.type == 'musique' %}selected{% endif %}>Musique</option>
-                                <option value="autre" {% if oeuvre.type == 'autre' %}selected{% endif %}>Autre</option>
-                            </select>
-                        </div>
-
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem;">Description *</label>
-                            <textarea name="description" class="form-textarea" required style="width: 100%; padding: 0.875rem; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: inherit; font-size: 0.95rem; resize: vertical; min-height: 120px;">{{ oeuvre.description }}</textarea>
-                        </div>
-
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem;">Date de Publication *</label>
-                            <input type="date" name="datePublication" value="{{ oeuvre.datePublication ? oeuvre.datePublication|date('Y-m-d') : '' }}" class="form-input" required style="width: 100%; padding: 0.875rem; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: inherit; font-size: 0.95rem;">
-                        </div>
-
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem;">Image</label>
-                            {% if oeuvre.imageUrl %}
-                                <p style="margin-bottom: 1rem;">
-                                    <img src="{{ oeuvre.imageUrl }}" alt="{{ oeuvre.title }}" style="max-width: 200px; border-radius: 4px;">
-                                </p>
-                                <p style="color: #B0B9B6; font-size: 0.9rem;">Laissez vide pour conserver l'image actuelle</p>
-                            {% endif %}
-                            <input type="file" name="image" class="form-input" accept="image/*" style="width: 100%; padding: 0.875rem; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: inherit; font-size: 0.95rem;">
-                        </div>
-
-                        <div style="margin-bottom: 2rem;">
-                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem;">Auteur/Artiste</label>
-                            <input type="text" name="author" value="{{ oeuvre.author }}" class="form-input" style="width: 100%; padding: 0.875rem; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: inherit; font-size: 0.95rem;">
-                        </div>
-
-                        <div style="display: flex; gap: 1rem;">
-                            <a href="{{ path('oeuvre_show', {id: oeuvre.id}) }}" class="btn btn-secondary" style="padding: 0.875rem 2rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s; font-size: 0.9rem; background-color: var(--border-color); color: var(--text-primary); text-decoration: none; display: inline-block;">Annuler</a>
-                            <button type="submit" class="btn btn-primary" style="padding: 0.875rem 2rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s; font-size: 0.9rem; background-color: var(--accent-primary); color: var(--bg-primary);">Mettre à jour</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-</main>
-{% endblock %}
-=======
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -342,4 +271,3 @@ video.play().catch(() => gradient.style.display = 'block');
 
 </body>
 </html>
->>>>>>> validation-final-2

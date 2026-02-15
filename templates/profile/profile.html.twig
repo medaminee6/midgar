@@ -580,6 +580,98 @@
             padding-right: 2rem;
         }
         
+        /* ===== MODALES DÉTAILLÉES ===== */
+        .modal-detail {
+            max-width: 800px;
+            width: 95%;
+        }
+        
+        .modal-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(24, 227, 164, 0.2);
+        }
+        
+        .modal-header h2 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .modal-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .modal-image {
+            width: 100%;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-image img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .modal-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .info-group {
+            margin-bottom: 1rem;
+        }
+        
+        .info-label {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+        
+        .info-value {
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .modal-description {
+            grid-column: 1 / -1;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .modal-description h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .modal-description p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(24, 227, 164, 0.2);
+        }
+        
         /* ===== FORM STYLES ===== */
         .form-group {
             margin-bottom: 1.5rem;
@@ -667,6 +759,15 @@
                 margin: 20% auto;
                 padding: 1.5rem;
             }
+            
+            .modal-body {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .modal-image img {
+                height: 200px;
+            }
         }
         
         /* ===== SCROLLBAR ===== */
@@ -686,6 +787,53 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary-color);
         }
+
+        /* Styles supplémentaires pour la recherche */
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(24, 227, 164, 0.05);
+            border-radius: var(--border-radius);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-result-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        .search-result-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid transparent;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .text-danger { color: #dc3545; }
+        .text-center { text-align: center; }
+        .mb-3 { margin-bottom: 1rem; }
+        .mt-3 { margin-top: 1rem; }
+        .w-100 { width: 100%; }
     </style>
 </head>
 <body>
@@ -837,13 +985,13 @@
 
                         <!-- MAIN CONTENT - CRÉATIONS -->
                         <div class="content-grid">
-                                            <!-- ARTEFACTS -->
+                            <!-- ARTEFACTS -->
                             <div class="content-section">
                                 <h2><i class="fas fa-gem me-2"></i> Artefacts</h2>
                                 <div class="items-grid">
                                     {% if artefacts|length > 0 %}
                                         {% for artefact in artefacts %}
-                                            <div class="card">
+                                            <div class="card" onclick="openArtefactModal({{ artefact.id }})">
                                                 <div class="card-image">
                                                     {% if artefact.imageUrl %}
                                                         <img src="{{ asset(artefact.imageUrl) }}" alt="{{ artefact.name }}">
@@ -878,7 +1026,7 @@
                                 <div class="items-grid">
                                     {% if oeuvres|length > 0 %}
                                         {% for oeuvre in oeuvres %}
-                                            <div class="card">
+                                            <div class="card" onclick="openOeuvreModal({{ oeuvre.id }})">
                                                 <div class="card-image">
                                                     {% if oeuvre.imageUrl %}
                                                         <img src="{{ asset(oeuvre.imageUrl) }}" alt="{{ oeuvre.title }}">
@@ -906,14 +1054,220 @@
                                     {% endif %}
                                 </div>
                             </div>
+
+                            <!-- MES FAVORIS - ŒUVRES (ajouté depuis le code 1) -->
+                            <div class="content-section">
+                                <h2><i class="fas fa-heart me-2"></i> Favoris - Œuvres</h2>
+                                <div class="items-grid">
+                                    {% if favoriOeuvres is defined and favoriOeuvres|length > 0 %}
+                                        {% for o in favoriOeuvres %}
+                                            <div class="card">
+                                                <div class="card-image">
+                                                    {% if o.imageUrl is defined and o.imageUrl %}
+                                                        <img src="{{ asset(o.imageUrl) }}" alt="{{ o.title|default('Œuvre') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            🎨
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3>{{ o.title|default('Sans titre') }}</h3>
+                                                    <p>{{ o.description|default('Aucune description')|slice(0, 80) ~ '...' }}</p>
+                                                    <button class="btn btn-sm magic-btn remove-favorite-btn" 
+                                                            style="width: 100%; margin-top: 0.5rem; border-color: #dc3545; color: #dc3545;"
+                                                            onclick="event.stopPropagation(); removeFavorite('oeuvre', {{ o.id }}, this)">
+                                                        <i class="fas fa-trash-alt me-2"></i> Retirer
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="empty-state">
+                                            <span class="empty-icon">❤️</span>
+                                            <p>Aucune œuvre favorite</p>
+                                            <a href="/oeuvre" class="btn btn-primary btn-sm mt-3">Découvrir des œuvres</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- MES FAVORIS - ARTEFACTS (ajouté depuis le code 1) -->
+                            <div class="content-section">
+                                <h2><i class="fas fa-heart me-2"></i> Favoris - Artefacts</h2>
+                                <div class="items-grid">
+                                    {% if favoriArtefacts is defined and favoriArtefacts|length > 0 %}
+                                        {% for a in favoriArtefacts %}
+                                            <div class="card">
+                                                <div class="card-image">
+                                                    {% if a.imageUrl is defined and a.imageUrl %}
+                                                        <img src="{{ asset(a.imageUrl) }}" alt="{{ a.name|default('Artefact') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            ⚔️
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3>{{ a.name|default('Sans nom') }}</h3>
+                                                    <p>{{ a.origins|default('Aucune description')|slice(0, 80) ~ '...' }}</p>
+                                                    <button class="btn btn-sm magic-btn remove-favorite-btn" 
+                                                            style="width: 100%; margin-top: 0.5rem; border-color: #dc3545; color: #dc3545;"
+                                                            onclick="event.stopPropagation(); removeFavorite('artefact', {{ a.id }}, this)">
+                                                        <i class="fas fa-trash-alt me-2"></i> Retirer
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="empty-state">
+                                            <span class="empty-icon">❤️</span>
+                                            <p>Aucun artefact favori</p>
+                                            <a href="/artefact" class="btn btn-primary btn-sm mt-3">Découvrir des artefacts</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
 
-        <!-- MODAL ÉDITER PROFIL (uniquement pour le propriétaire) -->
-        {% if isOwner and profileForm %}
+        <!-- MODALE POUR ŒUVRES (depuis code 1) -->
+        <div id="oeuvreModal" class="modal">
+            <div class="modal-content modal-detail">
+                <span class="close" onclick="closeModal('oeuvreModal')">&times;</span>
+                <div class="modal-header">
+                    <h2 id="oeuvreTitle">Titre de l'Œuvre</h2>
+                    <div class="modal-subtitle" id="oeuvreAuthor">Par Auteur</div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-image">
+                        <img id="oeuvreImage" src="" alt="Image de l'œuvre">
+                    </div>
+                    <div class="modal-info">
+                        <div class="info-group">
+                            <span class="info-label">Type</span>
+                            <div class="info-value" id="oeuvreType">Roman</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Date de création</span>
+                            <div class="info-value" id="oeuvreDate">01/01/2024</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Statut</span>
+                            <div class="info-value" id="oeuvreStatus">Publié</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Tags</span>
+                            <div class="card-tags" id="oeuvreTags">
+                                <span class="tag">Fantasy</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-description">
+                        <h3>Description</h3>
+                        <p id="oeuvreDescription">Description détaillée de l'œuvre...</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary magic-btn" onclick="closeModal('oeuvreModal')">Fermer</button>
+                    <button id="oeuvreDeleteBtn" class="btn btn-danger magic-btn" onclick="deleteOeuvre()">Supprimer</button>
+                    <a id="oeuvreEditBtn" href="#" class="btn btn-primary magic-btn">Éditer</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALE POUR ARTEFACTS (depuis code 1) -->
+        <div id="artefactModal" class="modal">
+            <div class="modal-content modal-detail">
+                <span class="close" onclick="closeModal('artefactModal')">&times;</span>
+                <div class="modal-header">
+                    <h2 id="artefactName">Nom de l'Artefact</h2>
+                    <div class="modal-subtitle" id="artefactType">Type d'artefact</div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-image">
+                        <img id="artefactImage" src="" alt="Image de l'artefact">
+                    </div>
+                    <div class="modal-info">
+                        <div class="info-group">
+                            <span class="info-label">Rareté</span>
+                            <div class="info-value" id="artefactRarity">Légendaire</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Pouvoirs</span>
+                            <div class="info-value" id="artefactPowers">Magie élémentaire</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Date de création</span>
+                            <div class="info-value" id="artefactDate">01/01/2024</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Origine</span>
+                            <div class="info-value" id="artefactOrigin">Ancienne civilisation</div>
+                        </div>
+                    </div>
+                    <div class="modal-description">
+                        <h3>Histoire & Description</h3>
+                        <p id="artefactDescription">Description détaillée de l'artefact...</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary magic-btn" onclick="closeModal('artefactModal')">Fermer</button>
+                    <button id="artefactDeleteBtn" class="btn btn-danger magic-btn" onclick="deleteArtefact()">Supprimer</button>
+                    <a id="artefactEditBtn" href="#" class="btn btn-primary magic-btn">Éditer</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALE POUR UNIVERS (depuis code 1) -->
+        <div id="universeModal" class="modal">
+            <div class="modal-content modal-detail">
+                <span class="close" onclick="closeModal('universeModal')">&times;</span>
+                <div class="modal-header">
+                    <h2 id="universeName">Nom de l'Univers</h2>
+                    <div class="modal-subtitle" id="universeCreator">Créé par Utilisateur</div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-image">
+                        <img id="universeImage" src="" alt="Image de l'univers">
+                    </div>
+                    <div class="modal-info">
+                        <div class="info-group">
+                            <span class="info-label">Thèmes</span>
+                            <div class="card-tags" id="universeThemes">
+                                <span class="tag">Fantasy</span>
+                                <span class="tag">Médiéval</span>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Favoris</span>
+                            <div class="info-value" id="universeFavorites">1,240</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Date de création</span>
+                            <div class="info-value" id="universeDate">01/01/2024</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Statut</span>
+                            <div class="info-value" id="universeStatus">Public</div>
+                        </div>
+                    </div>
+                    <div class="modal-description">
+                        <h3>Description</h3>
+                        <p id="universeDescription">Description détaillée de l'univers...</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary magic-btn" onclick="closeModal('universeModal')">Fermer</button>
+                    <button class="btn btn-primary magic-btn">Éditer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL ÉDITER PROFIL (depuis code 1) -->
         <div id="editProfileModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeModal('editProfileModal')">&times;</span>
@@ -935,17 +1289,15 @@
                 {{ form_end(profileForm) }}
             </div>
         </div>
-        {% endif %}
 
-        <!-- MODAL PARAMÈTRES (uniquement pour le propriétaire) -->
-        {% if isOwner and passwordForm %}
+        <!-- MODAL PARAMÈTRES (depuis code 1) -->
         <div id="settingsModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeModal('settingsModal')">&times;</span>
                 <h2>Paramètres</h2>
 
                 <button class="btn btn-primary w-100 mb-3" onclick="document.getElementById('passwordForm').style.display='block'">
-                    Changer le mot de passe
+                    <i class="fas fa-key me-2"></i> Changer le mot de passe
                 </button>
 
                 <div id="passwordForm" style="display:none; margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
@@ -968,7 +1320,7 @@
                 </div>
 
                 <button class="btn btn-danger w-100" onclick="document.getElementById('deleteForm').style.display='block'">
-                    Supprimer mon compte
+                    <i class="fas fa-trash-alt me-2"></i> Supprimer mon compte
                 </button>
 
                 <div id="deleteForm" style="display:none; margin-top: 1.5rem; padding: 1.5rem; background: rgba(220,53,69,0.1); border-radius: 8px;">
@@ -983,9 +1335,8 @@
                 </div>
             </div>
         </div>
-        {% endif %}
 
-        <!-- MODALE RECHERCHE UTILISATEURS (pour tout le monde) -->
+        <!-- MODALE RECHERCHE UTILISATEURS -->
         <div id="searchUserModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeModal('searchUserModal')">&times;</span>
@@ -1014,6 +1365,81 @@
     </div>
 
     <script>
+    // ===== VARIABLES GLOBALES =====
+// Utiliser 0 comme placeholder (qui respecte \d+)
+const PUBLIC_PROFILE_URL_TEMPLATE = "{{ path('profile_public', {'id': 0})|escape('js') }}";
+
+// Fonction pour générer l'URL avec l'ID correct
+function getProfileUrl(userId) {
+    return PUBLIC_PROFILE_URL_TEMPLATE.replace('0', userId);
+}
+
+// ===== RECHERCHE UTILISATEURS =====
+const searchInput = document.getElementById('userSearchInput');
+const resultsContainer = document.getElementById('userSearchResults');
+let searchTimeout;
+let controller;
+
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        if (controller) controller.abort();
+        
+        if (query.length < 2) {
+            resultsContainer.innerHTML = '';
+            return;
+        }
+        
+        resultsContainer.innerHTML = '<div style="text-align:center; padding:1rem;"><div class="loading-spinner"></div><p>Recherche...</p></div>';
+        
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchUsers(query);
+        }, 500);
+    });
+}
+
+async function searchUsers(query) {
+    controller = new AbortController();
+    
+    try {
+        const response = await fetch(`/api/search/users?q=${encodeURIComponent(query)}`, {
+            signal: controller.signal
+        });
+        
+        const users = await response.json();
+        displayResults(users);
+        
+    } catch (error) {
+        if (error.name === 'AbortError') return;
+        resultsContainer.innerHTML = '<p class="text-danger">Erreur de recherche</p>';
+    }
+}
+
+function displayResults(users) {
+    if (users.length === 0) {
+        resultsContainer.innerHTML = '<p class="text-secondary text-center">Aucun utilisateur trouvé</p>';
+        return;
+    }
+
+    let html = '';
+    users.forEach(user => {
+        const avatarUrl = user.avatar ? `/uploads/avatars/${user.avatar}` : '/images/default-avatar.png';
+        // Utiliser la fonction getProfileUrl avec l'ID de l'utilisateur
+        html += `
+            <div class="search-result-item" onclick="window.location.href='${getProfileUrl(user.id)}'">
+                <img src="${avatarUrl}" class="search-result-avatar">
+                <div>
+                    <strong>@${user.username}</strong>
+                    <p>${user.prenom || ''} ${user.nom || ''}</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    resultsContainer.innerHTML = html;
+}
         // ===== FONCTIONS MODALES =====
         function openModal(id) {
             document.getElementById(id).style.display = 'block';
@@ -1031,12 +1457,15 @@
                 closeModal('editProfileModal');
                 closeModal('settingsModal');
                 closeModal('searchUserModal');
+                closeModal('oeuvreModal');
+                closeModal('artefactModal');
+                closeModal('universeModal');
             }
         });
 
         // Fermer en cliquant dehors
         window.onclick = function(event) {
-            const modals = ['editProfileModal', 'settingsModal', 'searchUserModal'];
+            const modals = ['editProfileModal', 'settingsModal', 'searchUserModal', 'oeuvreModal', 'artefactModal', 'universeModal'];
             modals.forEach(id => {
                 const modal = document.getElementById(id);
                 if (event.target == modal) {
@@ -1046,7 +1475,7 @@
         }
 
         // ===== MAGIC BUTTON PARTICLE EFFECT =====
-        document.querySelectorAll('.magic-btn, .btn-primary, .btn-secondary').forEach(btn => {
+        document.querySelectorAll('.magic-btn, .btn-primary, .btn-secondary, .btn-danger, .btn-warning').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 for(let i = 0; i < 8; i++) {
                     const particle = document.createElement('span');
@@ -1060,11 +1489,172 @@
                     particle.style.left = (e.clientX - rect.left) + 'px';
                     particle.style.top = (e.clientY - rect.top) + 'px';
                     
+                    const hue = Math.floor(Math.random() * 60) + 140;
+                    particle.style.background = `radial-gradient(circle, hsl(${hue}, 100%, 60%), hsl(${hue}, 100%, 30%))`;
+                    
                     btn.appendChild(particle);
                     setTimeout(() => particle.remove(), 600);
                 }
             });
         });
+
+        // ===== FONCTIONS POUR LES MODALES DÉTAILLÉES =====
+        function openOeuvreModal(id) {
+            currentOeuvreId = id;
+            const editBtn = document.getElementById('oeuvreEditBtn');
+            editBtn.href = '/oeuvre/' + id + '/edit';
+            
+            // Données simulées pour l'exemple
+            {% if oeuvres is defined and oeuvres|length > 0 %}
+                {% set oeuvre = oeuvres|first %}
+                const oeuvreData = {
+                    title: "{{ oeuvre.title|default('Titre de l\'œuvre')|e('js') }}",
+                    author: "{{ user.username|e('js') }}",
+                    image: "{{ oeuvre.imageUrl|default('')|e('js') }}",
+                    type: "{{ oeuvre.type|default('Roman')|e('js') }}",
+                    date: "{{ oeuvre.createdAt ? oeuvre.createdAt|date('d/m/Y') : '01/01/2024' }}",
+                    status: "{{ oeuvre.status|default('Publié')|e('js') }}",
+                    tags: {{ oeuvre.tags|default(['Fantasy', 'Aventure'])|json_encode|raw }},
+                    description: "{{ oeuvre.description|default('Description de l\'œuvre...')|e('js') }}"
+                };
+            {% else %}
+                const oeuvreData = {
+                    title: "Aucune œuvre",
+                    author: "{{ user.username|e('js') }}",
+                    image: "",
+                    type: "-",
+                    date: "-",
+                    status: "-",
+                    tags: [],
+                    description: "Aucune description disponible."
+                };
+            {% endif %}
+            
+            document.getElementById('oeuvreTitle').textContent = oeuvreData.title;
+            document.getElementById('oeuvreAuthor').textContent = "Par " + oeuvreData.author;
+            document.getElementById('oeuvreImage').src = oeuvreData.image;
+            document.getElementById('oeuvreType').textContent = oeuvreData.type;
+            document.getElementById('oeuvreDate').textContent = oeuvreData.date;
+            document.getElementById('oeuvreStatus').textContent = oeuvreData.status;
+            document.getElementById('oeuvreDescription').textContent = oeuvreData.description;
+            
+            const tagsContainer = document.getElementById('oeuvreTags');
+            tagsContainer.innerHTML = '';
+            if (oeuvreData.tags && oeuvreData.tags.length > 0) {
+                oeuvreData.tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = tag;
+                    tagsContainer.appendChild(tagElement);
+                });
+            } else {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'tag';
+                tagElement.textContent = 'Non catégorisé';
+                tagsContainer.appendChild(tagElement);
+            }
+            
+            openModal('oeuvreModal');
+        }
+
+        function deleteOeuvre() {
+            if (!currentOeuvreId) return;
+            
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette œuvre ? Cette action est irréversible.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/oeuvre/' + currentOeuvreId + '/delete';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function openArtefactModal(id) {
+            currentArtefactId = id;
+            const editBtn = document.getElementById('artefactEditBtn');
+            editBtn.href = '/artefact/' + id + '/edit';
+            
+            {% if artefacts is defined and artefacts|length > 0 %}
+                {% set artefact = artefacts|first %}
+                const artefactData = {
+                    name: "{{ artefact.name|default('Nom de l\'artefact')|e('js') }}",
+                    type: "{{ artefact.type|default('Artefact mystérieux')|e('js') }}",
+                    image: "{{ artefact.imageUrl|default('')|e('js') }}",
+                    rarity: "{{ artefact.rarity|default('Légendaire')|e('js') }}",
+                    powers: "{{ artefact.powers|default('Pouvoirs inconnus')|e('js') }}",
+                    date: "{{ artefact.createdAt ? artefact.createdAt|date('d/m/Y') : '01/01/2024' }}",
+                    origin: "{{ artefact.origins|default('Origine inconnue')|e('js') }}",
+                    description: "{{ artefact.description|default(artefact.origins)|default('Description de l\'artefact...')|e('js') }}"
+                };
+            {% else %}
+                const artefactData = {
+                    name: "Aucun artefact",
+                    type: "-",
+                    image: "",
+                    rarity: "-",
+                    powers: "-",
+                    date: "-",
+                    origin: "-",
+                    description: "Aucune description disponible."
+                };
+            {% endif %}
+            
+            document.getElementById('artefactName').textContent = artefactData.name;
+            document.getElementById('artefactType').textContent = artefactData.type;
+            document.getElementById('artefactImage').src = artefactData.image;
+            document.getElementById('artefactRarity').textContent = artefactData.rarity;
+            document.getElementById('artefactPowers').textContent = artefactData.powers;
+            document.getElementById('artefactDate').textContent = artefactData.date;
+            document.getElementById('artefactOrigin').textContent = artefactData.origin;
+            document.getElementById('artefactDescription').textContent = artefactData.description;
+            
+            openModal('artefactModal');
+        }
+
+        function deleteArtefact() {
+            if (!currentArtefactId) return;
+            
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet artefact ? Cette action est irréversible.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/artefact/' + currentArtefactId + '/delete';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function openUniverseModal(universeId) {
+            // Données simulées pour l'exemple
+            const universeData = {
+                name: 'Nuit Éternelle',
+                creator: "{{ user.username|e('js') }}",
+                image: "",
+                themes: ['Sombre', 'Mystère', 'Fantasy'],
+                favorites: '1,240',
+                date: '15/01/2024',
+                status: 'Public',
+                description: 'Un monde plongé dans une nuit perpétuelle où les créatures de l\'ombre règnent en maîtres.'
+            };
+            
+            document.getElementById('universeName').textContent = universeData.name;
+            document.getElementById('universeCreator').textContent = "Créé par " + universeData.creator;
+            document.getElementById('universeImage').src = universeData.image;
+            document.getElementById('universeFavorites').textContent = universeData.favorites;
+            document.getElementById('universeDate').textContent = universeData.date;
+            document.getElementById('universeStatus').textContent = universeData.status;
+            document.getElementById('universeDescription').textContent = universeData.description;
+            
+            const themesContainer = document.getElementById('universeThemes');
+            themesContainer.innerHTML = '';
+            universeData.themes.forEach(theme => {
+                const themeElement = document.createElement('span');
+                themeElement.className = 'tag';
+                themeElement.textContent = theme;
+                themesContainer.appendChild(themeElement);
+            });
+            
+            openModal('universeModal');
+        }
 
         // ===== RECHERCHE UTILISATEURS =====
         const searchInput = document.getElementById('userSearchInput');
@@ -1105,7 +1695,7 @@
                 
             } catch (error) {
                 if (error.name === 'AbortError') return;
-                resultsContainer.innerHTML = '<p class="text-danger">Erreur</p>';
+                resultsContainer.innerHTML = '<p class="text-danger">Erreur de recherche</p>';
             }
         }
 
@@ -1119,17 +1709,65 @@
             users.forEach(user => {
                 const avatarUrl = user.avatar ? `/uploads/avatars/${user.avatar}` : '/images/default-avatar.png';
                 html += `
-                    <div class="search-result-item" onclick="window.location.href='/profile/${user.id}'">
+                    <div class="search-result-item" onclick="window.location.href='${PUBLIC_PROFILE_URL.replace('PLACEHOLDER', user.id)}'">
                         <img src="${avatarUrl}" class="search-result-avatar">
                         <div>
                             <strong>@${user.username}</strong>
-                            <p>${user.prenom} ${user.nom}</p>
+                            <p>${user.prenom || ''} ${user.nom || ''}</p>
                         </div>
                     </div>
                 `;
             });
             
             resultsContainer.innerHTML = html;
+        }
+
+        // ===== FONCTIONS FAVORIS (depuis code 1) =====
+        async function removeFavorite(type, id, button) {
+            if (!confirm('Voulez-vous vraiment retirer cet élément de vos favoris ?')) {
+                return;
+            }
+            
+            try {
+                const url = `/favoris/${type}/${id}/toggle`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Animation de suppression
+                    const card = button.closest('.card');
+                    card.style.transition = 'opacity 0.3s, transform 0.3s';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8)';
+                    
+                    setTimeout(() => {
+                        card.remove();
+                        
+                        // Vérifier si la grille est vide
+                        const grid = card.parentElement;
+                        if (grid.querySelectorAll('.card').length === 0) {
+                            grid.innerHTML = `
+                                <div class="empty-state">
+                                    <span class="empty-icon">❤️</span>
+                                    <p>Aucun ${type === 'oeuvre' ? 'œuvre favorite' : 'artefact favori'}</p>
+                                    <a href="/${type}" class="btn btn-primary btn-sm mt-3">Découvrir des ${type === 'oeuvre' ? 'œuvres' : 'artefacts'}</a>
+                                </div>
+                            `;
+                        }
+                    }, 300);
+                } else {
+                    alert('Erreur lors de la suppression des favoris');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue');
+            }
         }
 
         // ===== BACKGROUND VIDEO =====
@@ -1146,56 +1784,36 @@
                     if (gradientBg) gradientBg.style.display = 'block';
                 });
             }
+
+            // Highlight active nav link
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('nav .magic-btn').forEach(link => {
+                const homePath = '{{ path('home') }}';
+                if (link.getAttribute('href') === currentPath || 
+                    (link.getAttribute('href') === homePath && currentPath === '/')) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Form submission feedback
+        document.querySelectorAll('.profile-form, .password-form').forEach(form => {
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        const originalText = submitBtn.textContent;
+                        submitBtn.textContent = 'Enregistrement...';
+                        submitBtn.disabled = true;
+                        
+                        setTimeout(() => {
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        }, 1500);
+                    }
+                });
+            }
         });
     </script>
-
-    <style>
-        /* Styles supplémentaires pour la recherche */
-        .search-result-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            background: rgba(24, 227, 164, 0.05);
-            border-radius: var(--border-radius);
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .search-result-item:hover {
-            border-color: var(--primary-color);
-            background: rgba(24, 227, 164, 0.1);
-        }
-        
-        .search-result-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary-color);
-        }
-        
-        .loading-spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid transparent;
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .text-danger { color: #dc3545; }
-        .text-center { text-align: center; }
-        .mb-3 { margin-bottom: 1rem; }
-        .mt-3 { margin-top: 1rem; }
-        .w-100 { width: 100%; }
-    </style>
 </body>
 </html>
