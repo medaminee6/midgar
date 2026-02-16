@@ -312,8 +312,9 @@ main {
                         </span>
                     </div>
                     <p style="color: var(--text-secondary); line-height: 1.6;">{{ commentaire.contenu }}</p>
-                    {% if is_granted('ROLE_ADMIN') or (app.user and commentaire.userId == app.user.id) %}
+                    {% if is_granted('ROLE_ADMIN') or (app.user and commentaire.userId == app.user.id) or (app.user and oeuvre.createdBy and app.user.id == oeuvre.createdBy.id) %}
                         <form method="post" action="{{ path('commentaire_supprimer', {id: commentaire.id}) }}" style="margin-top: 1rem;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire?')">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('delete_comment_' ~ commentaire.id) }}">
                             <button type="submit" style="background: transparent; border: none; color: #c62828; cursor: pointer; font-size: 0.85rem;">
                                 <i class="fas fa-trash"></i> Supprimer
                             </button>

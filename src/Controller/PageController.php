@@ -8,18 +8,34 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\DefiRepository;
+use Symfony\Component\HttpFoundation\Request;
+
 
 class PageController extends AbstractController
 {
 
 
+
 #[Route('/', name: 'home', methods: ['GET'])]
 public function index(
+    Request $request,
     UniverseRepository $universRepo,
     OeuvreRepository $oeuvreRepo,
     DefiRepository $defiRepo
 ): Response
 {
+    // ==============================
+    // LOGIQUE MODALE FACE (AJOUT)
+    // ==============================
+    $user = $this->getUser();
+    $session = $request->getSession();
+
+    $showFaceModal =
+        $user &&
+        method_exists($user, 'isFaceEnabled') &&
+        !$user->isFaceEnabled() &&
+        !$session->get('face_modal_skipped', false);
+
     // ------------------------------
     // Univers aléatoires
     // ------------------------------
@@ -27,6 +43,7 @@ public function index(
         ->select('u.id')
         ->getQuery()
         ->getArrayResult();
+
     shuffle($allUniversIds);
     $randomIdsUnivers = array_slice(array_column($allUniversIds, 'id'), 0, 10);
     $universPopulaires = $universRepo->findBy(['id' => $randomIdsUnivers]);
@@ -38,6 +55,7 @@ public function index(
         ->select('o.id')
         ->getQuery()
         ->getArrayResult();
+
     shuffle($allOeuvresIds);
     $randomIdsOeuvres = array_slice(array_column($allOeuvresIds, 'id'), 0, 10);
     $creationsRecentes = $oeuvreRepo->findBy(['id' => $randomIdsOeuvres]);
@@ -51,8 +69,10 @@ public function index(
         'universPopulaires' => $universPopulaires,
         'creationsRecentes' => $creationsRecentes,
         'defis' => $defis,
+        'showFaceModal' => $showFaceModal, // 👈 IMPORTANT
     ]);
 }
+
 
 
 

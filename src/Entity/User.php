@@ -91,10 +91,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $bio = null;
 
     #[ORM\Column(options: ['default' => false])]
-        private bool $isBlocked = false;
+    private bool $isBlocked = false;
+
     #[ORM\Column(options: ['default' => true])]
     private bool $isVerified = true;
-
 
     #[ORM\Column(type: 'datetime')]
     private ?\DateTime $createdAt = null;
@@ -118,6 +118,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 50)]
     private string $authProvider = 'local'; // 'local' ou 'google'
+
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $faceDescriptor = null;
 
@@ -170,9 +171,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // nothing to clear
     }
 
+    /**
+     * Vérifie si l'utilisateur a un mot de passe local
+     * Utilisé pour le reset de mot de passe
+     */
     public function hasLocalPassword(): bool
     {
-        return $this->authProvider === 'local' && !empty($this->password);
+        // Un utilisateur peut réinitialiser son mot de passe s'il a un hash en base
+        // Peu importe le provider (local ou google)
+        return !empty($this->password);
     }
 
     // ================== ROLES ==================
@@ -361,26 +368,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return trim($this->prenom . ' ' . $this->nom);
     }
+
     public function getFaceDescriptor(): ?string
-{
-    return $this->faceDescriptor;
-}
+    {
+        return $this->faceDescriptor;
+    }
 
-public function setFaceDescriptor(?string $faceDescriptor): self
-{
-    $this->faceDescriptor = $faceDescriptor;
-    return $this;
-}
+    public function setFaceDescriptor(?string $faceDescriptor): self
+    {
+        $this->faceDescriptor = $faceDescriptor;
+        return $this;
+    }
 
-public function isFaceEnabled(): bool
-{
-    return $this->faceEnabled;
-}
+    public function isFaceEnabled(): bool
+    {
+        return $this->faceEnabled;
+    }
 
-public function setFaceEnabled(bool $faceEnabled): self
-{
-    $this->faceEnabled = $faceEnabled;
-    return $this;
-}
-
+    public function setFaceEnabled(bool $faceEnabled): self
+    {
+        $this->faceEnabled = $faceEnabled;
+        return $this;
+    }
 }

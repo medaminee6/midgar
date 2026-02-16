@@ -49,13 +49,12 @@ class ForgotPasswordController extends AbstractController
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
 
-               // Dans ton ForgotPasswordController, remplace la partie Email par ceci :
-$emailMessage = (new Email())
-    ->from(new Address('zeinebsgh466@gmail.com', 'Midgar Fantasy'))
-
-    ->to($user->getEmail())
-    ->subject('🔮 Réinitialisation de votre mot de passe')
-    ->html("
+                // Email stylisé avec le thème Midgar
+                $emailMessage = (new Email())
+                    ->from(new Address('zeinebsgh466@gmail.com', 'Midgar Fantasy'))
+                    ->to($user->getEmail())
+                    ->subject('🔮 Réinitialisation de votre mot de passe')
+                    ->html("
 <!DOCTYPE html>
 <html lang='fr'>
 <head>
@@ -131,8 +130,7 @@ $emailMessage = (new Email())
 </div>
 </body>
 </html>
-    ");
-
+");
 
                 $mailer->send($emailMessage);
             }

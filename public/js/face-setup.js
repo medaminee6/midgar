@@ -1,64 +1,59 @@
-const video = document.getElementById('video');
-const button = document.getElementById('captureFace'); // id corrigé
+const realVideo = document.getElementById('realVideo');
+const canvas = document.getElementById('canvas');
+const startCameraBtn = document.getElementById('startCamera');
+const captureFaceBtn = document.getElementById('captureFace');
 const status = document.getElementById('status');
 
-async function startCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-    } catch (e) {
-        status.textContent = "❌ Accès caméra refusé";
-    }
-}
+// Charger les modèles face-api
+Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+    faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+]).then(() => {
+    status.innerText = 'Modèles chargés';
+});
 
-async function loadModels() {
-    const MODEL_URL = '/models';
-    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-}
+startCameraBtn.addEventListener('click', async () => {
+    startCameraBtn.style.display = 'none';
+    captureFaceBtn.style.display = 'inline';
 
-button.addEventListener('click', async () => {
-    button.disabled = true;
-    status.textContent = "⏳ Analyse du visage...";
+    // Démarrer la caméra réelle en arrière-plan
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    realVideo.srcObject = stream;
 
-    const detections = await faceapi
-        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceDescriptors();
+    status.innerText = 'Caméra activée. Veuillez regarder la vidéo...';
+});
 
-    if (detections.length === 0) {
-        status.textContent = "❌ Aucun visage détecté";
-        button.disabled = false;
+// Fonction pour capturer et envoyer le visage
+captureFaceBtn.addEventListener('click', async () => {
+    status.innerText = 'Analyse du visage en cours...';
+
+    // Détection faciale sur la caméra réelle (cachée)
+    const detections = await faceapi.detectSingleFace(realVideo, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+
+    if (!detections) {
+        status.innerText = 'Aucun visage détecté, essayez à nouveau.';
         return;
     }
 
-    if (detections.length > 1) {
-        status.textContent = "❌ Plusieurs visages détectés";
-        button.disabled = false;
-        return;
-    }
+    const descriptor = Array.from(detections.descriptor);
 
-    const descriptor = Array.from(detections[0].descriptor);
-
-    const response = await fetch('/profil/securite/visage/save', {
+    // Envoi au backend
+    fetch('/profil/securite/visage/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ descriptor })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            status.innerText = 'Visage enregistré avec succès !';
+        } else {
+            status.innerText = 'Erreur lors de l\'enregistrement : ' + data.message;
+        }
+    })
+    .catch(err => {
+        status.innerText = 'Erreur serveur';
+        console.error(err);
     });
-
-    const result = await response.json();
-
-    if (result.success) {
-        status.textContent = "✅ Visage enregistré avec succès";
-    } else {
-        status.textContent = "❌ " + result.message;
-    }
-
-    button.disabled = false;
 });
-
-(async () => {
-    await loadModels();
-    await startCamera();
-})();

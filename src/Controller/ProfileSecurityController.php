@@ -51,4 +51,22 @@ class ProfileSecurityController extends AbstractController
 
         return new JsonResponse(['success' => true]);
     }
+     #[Route('/profil/securite/visage/skip', name: 'face_modal_skip', methods: ['POST'])]
+    public function skipFace(EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Non connecté'
+            ], 401);
+        }
+
+        // Exemple : désactiver temporairement la vérification faciale
+        $user->setFaceEnabled(false);
+        $em->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
+
 }

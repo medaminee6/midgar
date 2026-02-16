@@ -74,9 +74,7 @@
         .btn-primary:hover {
             background-color: var(--primary-dark);
             transform: scale(1.05);
-            box-shadow: 0 0 15px var(--primary-color), 
-                        0 0 30px var(--primary-color), 
-                        0 0 50px var(--primary-dark);
+            box-shadow: 0 0 15px var(--primary-color), 0 0 30px var(--primary-color);
         }
         
         .btn-secondary {
@@ -89,8 +87,7 @@
             background-color: var(--primary-color);
             color: #000;
             transform: scale(1.05);
-            box-shadow: 0 0 15px var(--primary-color), 
-                        0 0 30px var(--primary-color);
+            box-shadow: 0 0 15px var(--primary-color);
         }
         
         .btn-sm {
@@ -155,14 +152,8 @@
         }
         
         @keyframes fly {
-            0% { 
-                transform: translate(0, 0) scale(1); 
-                opacity: 1; 
-            }
-            100% { 
-                transform: translate(var(--x), var(--y)) scale(0); 
-                opacity: 0; 
-            }
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
         }
         
         /* ===== VIDEO BACKGROUND ===== */
@@ -332,6 +323,7 @@
             height: 100%;
             position: relative;
             border: 1px solid transparent;
+            cursor: pointer;
         }
         
         .card:hover {
@@ -788,7 +780,7 @@
             background: var(--primary-color);
         }
 
-        /* Styles supplémentaires pour la recherche */
+        /* ===== STYLES RECHERCHE ===== */
         .search-result-item {
             display: flex;
             align-items: center;
@@ -831,9 +823,19 @@
         
         .text-danger { color: #dc3545; }
         .text-center { text-align: center; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
         .mb-3 { margin-bottom: 1rem; }
+        .mb-4 { margin-bottom: 1.5rem; }
+        .mt-2 { margin-top: 0.5rem; }
         .mt-3 { margin-top: 1rem; }
+        .mt-4 { margin-top: 1.5rem; }
+        .me-2 { margin-right: 0.5rem; }
         .w-100 { width: 100%; }
+        .small { font-size: 0.875rem; }
+        .d-flex { display: flex; }
+        .justify-content-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; }
     </style>
 </head>
 <body>
@@ -849,7 +851,7 @@
     <div class="site-content">
         <!-- HEADER -->
         <header>
-            <div class="logo">
+            <div class="logo" onclick="window.location.href='{{ path('home') }}'">
                 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
                     <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
@@ -905,6 +907,7 @@
 
         <!-- MAIN CONTENT -->
         <main>
+            {% if user is defined %}
             <section class="section">
                 <div class="container">
                     <h1 class="section-title">
@@ -932,19 +935,19 @@
                                     {% endif %}
                                     
                                     <!-- Infos de base -->
-                                    <h2 class="text-primary mb-1">{{ user.username }}</h2>
-                                    <p class="text-secondary mb-2">{{ user.prenom }} {{ user.nom }}</p>
-                                    <p class="text-secondary small mb-3">
+                                    <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">{{ user.username }}</h2>
+                                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">{{ user.prenom }} {{ user.nom }}</p>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
                                         <i class="fas fa-envelope"></i> {{ user.email }}
                                     </p>
                                     
                                     {% if user.phoneNumber %}
-                                        <p class="text-secondary small mb-3">
+                                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
                                             <i class="fas fa-phone"></i> {{ user.phoneNumber }}
                                         </p>
                                     {% endif %}
                                     
-                                    <div class="d-flex justify-content-center gap-2 mb-3">
+                                    <div style="display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
                                         <span class="badge bg-primary">
                                             {% if isOwner %}Mon compte{% else %}Membre{% endif %}
                                         </span>
@@ -957,14 +960,14 @@
                                     <!-- Bio -->
                                     {% if user.bio %}
                                         <div class="bio-container">
-                                            <h4 class="text-primary mb-2">À propos</h4>
-                                            <p class="text-secondary mb-0">{{ user.bio|nl2br }}</p>
+                                            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">À propos</h4>
+                                            <p style="color: var(--text-secondary); margin-bottom: 0;">{{ user.bio|nl2br }}</p>
                                         </div>
                                     {% endif %}
                                     
                                     <!-- Boutons d'action (uniquement si c'est le propriétaire) -->
                                     {% if isOwner %}
-                                        <div class="mt-4">
+                                        <div style="margin-top: 2rem;">
                                             <button class="btn btn-primary w-100 mb-2" onclick="openModal('editProfileModal')">
                                                 <i class="fas fa-edit me-2"></i> Éditer le profil
                                             </button>
@@ -973,28 +976,29 @@
                                             </button>
                                         </div>
                                     {% else %}
-                                        <div class="mt-4">
-                                            <a href="{{ path('profile') }}" class="btn btn-secondary w-100">
-                                                <i class="fas fa-arrow-left me-2"></i> Retour à mon profil
-                                            </a>
+                                        <!-- Message indiquant que c'est un profil public -->
+                                        <div style="margin-top: 2rem; padding: 1rem; background: rgba(24, 227, 164, 0.05); border-radius: 8px; text-align: center;">
+                                            <p style="color: var(--text-secondary); margin-bottom: 0;">
+                                                <i class="fas fa-eye me-2"></i> Profil public - Consultation seule
+                                            </p>
                                         </div>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
 
-                        <!-- MAIN CONTENT - CRÉATIONS -->
+                        <!-- MAIN CONTENT - CRÉATIONS ET FAVORIS -->
                         <div class="content-grid">
                             <!-- ARTEFACTS -->
                             <div class="content-section">
                                 <h2><i class="fas fa-gem me-2"></i> Artefacts</h2>
                                 <div class="items-grid">
-                                    {% if artefacts|length > 0 %}
+                                    {% if artefacts is defined and artefacts|length > 0 %}
                                         {% for artefact in artefacts %}
                                             <div class="card" onclick="openArtefactModal({{ artefact.id }})">
                                                 <div class="card-image">
-                                                    {% if artefact.imageUrl %}
-                                                        <img src="{{ asset(artefact.imageUrl) }}" alt="{{ artefact.name }}">
+                                                    {% if artefact.imageUrl is defined and artefact.imageUrl %}
+                                                        <img src="{{ asset(artefact.imageUrl) }}" alt="{{ artefact.name|default('Artefact') }}">
                                                     {% else %}
                                                         <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
                                                             ⚔️
@@ -1002,9 +1006,13 @@
                                                     {% endif %}
                                                 </div>
                                                 <div class="card-body">
-                                                    <h3>{{ artefact.name }}</h3>
-                                                    <p>{{ artefact.origins|slice(0, 80) ~ '...' }}</p>
-                                                    <small class="text-secondary">{{ artefact.createdAt|date('d/m/Y') }}</small>
+                                                    <h3>{{ artefact.name|default('Sans nom') }}</h3>
+                                                    <p>{{ artefact.origins|default('Aucune description')|slice(0, 80) ~ '...' }}</p>
+                                                    <small style="color: var(--text-secondary);">
+                                                        {% if artefact.createdAt is defined and artefact.createdAt %}
+                                                            {{ artefact.createdAt|date('d/m/Y') }}
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                             </div>
                                         {% endfor %}
@@ -1024,12 +1032,12 @@
                             <div class="content-section">
                                 <h2><i class="fas fa-pen-fancy me-2"></i> Œuvres</h2>
                                 <div class="items-grid">
-                                    {% if oeuvres|length > 0 %}
+                                    {% if oeuvres is defined and oeuvres|length > 0 %}
                                         {% for oeuvre in oeuvres %}
                                             <div class="card" onclick="openOeuvreModal({{ oeuvre.id }})">
                                                 <div class="card-image">
-                                                    {% if oeuvre.imageUrl %}
-                                                        <img src="{{ asset(oeuvre.imageUrl) }}" alt="{{ oeuvre.title }}">
+                                                    {% if oeuvre.imageUrl is defined and oeuvre.imageUrl %}
+                                                        <img src="{{ asset(oeuvre.imageUrl) }}" alt="{{ oeuvre.title|default('Œuvre') }}">
                                                     {% else %}
                                                         <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
                                                             📚
@@ -1037,9 +1045,13 @@
                                                     {% endif %}
                                                 </div>
                                                 <div class="card-body">
-                                                    <h3>{{ oeuvre.title }}</h3>
-                                                    <p>{{ oeuvre.description|slice(0, 80) ~ '...' }}</p>
-                                                    <small class="text-secondary">{{ oeuvre.createdAt|date('d/m/Y') }}</small>
+                                                    <h3>{{ oeuvre.title|default('Sans titre') }}</h3>
+                                                    <p>{{ oeuvre.description|default('Aucune description')|slice(0, 80) ~ '...' }}</p>
+                                                    <small style="color: var(--text-secondary);">
+                                                        {% if oeuvre.createdAt is defined and oeuvre.createdAt %}
+                                                            {{ oeuvre.createdAt|date('d/m/Y') }}
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                             </div>
                                         {% endfor %}
@@ -1055,13 +1067,14 @@
                                 </div>
                             </div>
 
-                            <!-- MES FAVORIS - ŒUVRES (ajouté depuis le code 1) -->
+                            <!-- FAVORIS - ŒUVRES (uniquement pour le propriétaire) -->
+                            {% if isOwner and favoriOeuvres is defined %}
                             <div class="content-section">
                                 <h2><i class="fas fa-heart me-2"></i> Favoris - Œuvres</h2>
                                 <div class="items-grid">
-                                    {% if favoriOeuvres is defined and favoriOeuvres|length > 0 %}
+                                    {% if favoriOeuvres|length > 0 %}
                                         {% for o in favoriOeuvres %}
-                                            <div class="card">
+                                            <div class="card" onclick="openOeuvreModal({{ o.id }})">
                                                 <div class="card-image">
                                                     {% if o.imageUrl is defined and o.imageUrl %}
                                                         <img src="{{ asset(o.imageUrl) }}" alt="{{ o.title|default('Œuvre') }}">
@@ -1091,14 +1104,16 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            {% endif %}
 
-                            <!-- MES FAVORIS - ARTEFACTS (ajouté depuis le code 1) -->
+                            <!-- FAVORIS - ARTEFACTS (uniquement pour le propriétaire) -->
+                            {% if isOwner and favoriArtefacts is defined %}
                             <div class="content-section">
                                 <h2><i class="fas fa-heart me-2"></i> Favoris - Artefacts</h2>
                                 <div class="items-grid">
-                                    {% if favoriArtefacts is defined and favoriArtefacts|length > 0 %}
+                                    {% if favoriArtefacts|length > 0 %}
                                         {% for a in favoriArtefacts %}
-                                            <div class="card">
+                                            <div class="card" onclick="openArtefactModal({{ a.id }})">
                                                 <div class="card-image">
                                                     {% if a.imageUrl is defined and a.imageUrl %}
                                                         <img src="{{ asset(a.imageUrl) }}" alt="{{ a.name|default('Artefact') }}">
@@ -1128,13 +1143,25 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </section>
+            {% else %}
+                <section class="section">
+                    <div class="container" style="text-align: center; padding: 4rem 2rem;">
+                        <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">Utilisateur non trouvé</h2>
+                        <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
+                            Le profil que vous recherchez n'existe pas.
+                        </p>
+                        <a href="{{ path('home') }}" class="btn btn-primary magic-btn">Retour à l'accueil</a>
+                    </div>
+                </section>
+            {% endif %}
         </main>
 
-        <!-- MODALE POUR ŒUVRES (depuis code 1) -->
+        <!-- MODALE POUR ŒUVRES -->
         <div id="oeuvreModal" class="modal">
             <div class="modal-content modal-detail">
                 <span class="close" onclick="closeModal('oeuvreModal')">&times;</span>
@@ -1171,15 +1198,14 @@
                         <p id="oeuvreDescription">Description détaillée de l'œuvre...</p>
                     </div>
                 </div>
-                <div class="modal-actions">
+                <div class="modal-actions" id="oeuvreModalActions">
                     <button class="btn btn-secondary magic-btn" onclick="closeModal('oeuvreModal')">Fermer</button>
-                    <button id="oeuvreDeleteBtn" class="btn btn-danger magic-btn" onclick="deleteOeuvre()">Supprimer</button>
-                    <a id="oeuvreEditBtn" href="#" class="btn btn-primary magic-btn">Éditer</a>
+                    <!-- Les boutons d'édition/suppression seront ajoutés dynamiquement si c'est le propriétaire -->
                 </div>
             </div>
         </div>
 
-        <!-- MODALE POUR ARTEFACTS (depuis code 1) -->
+        <!-- MODALE POUR ARTEFACTS -->
         <div id="artefactModal" class="modal">
             <div class="modal-content modal-detail">
                 <span class="close" onclick="closeModal('artefactModal')">&times;</span>
@@ -1214,15 +1240,14 @@
                         <p id="artefactDescription">Description détaillée de l'artefact...</p>
                     </div>
                 </div>
-                <div class="modal-actions">
+                <div class="modal-actions" id="artefactModalActions">
                     <button class="btn btn-secondary magic-btn" onclick="closeModal('artefactModal')">Fermer</button>
-                    <button id="artefactDeleteBtn" class="btn btn-danger magic-btn" onclick="deleteArtefact()">Supprimer</button>
-                    <a id="artefactEditBtn" href="#" class="btn btn-primary magic-btn">Éditer</a>
+                    <!-- Les boutons d'édition/suppression seront ajoutés dynamiquement si c'est le propriétaire -->
                 </div>
             </div>
         </div>
 
-        <!-- MODALE POUR UNIVERS (depuis code 1) -->
+        <!-- MODALE POUR UNIVERS -->
         <div id="universeModal" class="modal">
             <div class="modal-content modal-detail">
                 <span class="close" onclick="closeModal('universeModal')">&times;</span>
@@ -1262,12 +1287,12 @@
                 </div>
                 <div class="modal-actions">
                     <button class="btn btn-secondary magic-btn" onclick="closeModal('universeModal')">Fermer</button>
-                    <button class="btn btn-primary magic-btn">Éditer</button>
                 </div>
             </div>
         </div>
 
-        <!-- MODAL ÉDITER PROFIL (depuis code 1) -->
+        <!-- MODAL ÉDITER PROFIL (uniquement pour le propriétaire) -->
+        {% if isOwner %}
         <div id="editProfileModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeModal('editProfileModal')">&times;</span>
@@ -1290,7 +1315,7 @@
             </div>
         </div>
 
-        <!-- MODAL PARAMÈTRES (depuis code 1) -->
+        <!-- MODAL PARAMÈTRES (uniquement pour le propriétaire) -->
         <div id="settingsModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeModal('settingsModal')">&times;</span>
@@ -1301,7 +1326,7 @@
                 </button>
 
                 <div id="passwordForm" style="display:none; margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                    <h3 class="text-primary mb-3">Changement de mot de passe</h3>
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Changement de mot de passe</h3>
                     {{ form_start(passwordForm, {'attr': {'class': 'password-form'}}) }}
                         <div class="form-group">
                             <label class="form-label">Mot de passe actuel</label>
@@ -1324,8 +1349,8 @@
                 </button>
 
                 <div id="deleteForm" style="display:none; margin-top: 1.5rem; padding: 1.5rem; background: rgba(220,53,69,0.1); border-radius: 8px;">
-                    <h3 class="text-danger mb-2">Suppression du compte</h3>
-                    <p class="text-secondary small mb-3">Cette action est irréversible.</p>
+                    <h3 style="color: #dc3545; margin-bottom: 0.5rem;">Suppression du compte</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Cette action est irréversible.</p>
                     <form action="{{ path('profile_delete') }}" method="POST" onsubmit="return confirm('Confirmer la suppression ?');">
                         <div class="form-group">
                             <input type="password" name="password" placeholder="Votre mot de passe" required class="form-control">
@@ -1335,6 +1360,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
 
         <!-- MODALE RECHERCHE UTILISATEURS -->
         <div id="searchUserModal" class="modal">
@@ -1365,81 +1391,14 @@
     </div>
 
     <script>
-    // ===== VARIABLES GLOBALES =====
-// Utiliser 0 comme placeholder (qui respecte \d+)
-const PUBLIC_PROFILE_URL_TEMPLATE = "{{ path('profile_public', {'id': 0})|escape('js') }}";
-
-// Fonction pour générer l'URL avec l'ID correct
-function getProfileUrl(userId) {
-    return PUBLIC_PROFILE_URL_TEMPLATE.replace('0', userId);
-}
-
-// ===== RECHERCHE UTILISATEURS =====
-const searchInput = document.getElementById('userSearchInput');
-const resultsContainer = document.getElementById('userSearchResults');
-let searchTimeout;
-let controller;
-
-if (searchInput) {
-    searchInput.addEventListener('input', function() {
-        const query = this.value.trim();
+        // ===== VARIABLES GLOBALES =====
+        const isOwner = {{ isOwner ? 'true' : 'false' }};
+        const PUBLIC_PROFILE_URL_TEMPLATE = "{{ path('profile_public', {'id': 0}) }}".replace('0', 'PLACEHOLDER');
         
-        if (controller) controller.abort();
-        
-        if (query.length < 2) {
-            resultsContainer.innerHTML = '';
-            return;
-        }
-        
-        resultsContainer.innerHTML = '<div style="text-align:center; padding:1rem;"><div class="loading-spinner"></div><p>Recherche...</p></div>';
-        
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            searchUsers(query);
-        }, 500);
-    });
-}
+        // Variables pour stocker les IDs en cours
+        let currentOeuvreId = null;
+        let currentArtefactId = null;
 
-async function searchUsers(query) {
-    controller = new AbortController();
-    
-    try {
-        const response = await fetch(`/api/search/users?q=${encodeURIComponent(query)}`, {
-            signal: controller.signal
-        });
-        
-        const users = await response.json();
-        displayResults(users);
-        
-    } catch (error) {
-        if (error.name === 'AbortError') return;
-        resultsContainer.innerHTML = '<p class="text-danger">Erreur de recherche</p>';
-    }
-}
-
-function displayResults(users) {
-    if (users.length === 0) {
-        resultsContainer.innerHTML = '<p class="text-secondary text-center">Aucun utilisateur trouvé</p>';
-        return;
-    }
-
-    let html = '';
-    users.forEach(user => {
-        const avatarUrl = user.avatar ? `/uploads/avatars/${user.avatar}` : '/images/default-avatar.png';
-        // Utiliser la fonction getProfileUrl avec l'ID de l'utilisateur
-        html += `
-            <div class="search-result-item" onclick="window.location.href='${getProfileUrl(user.id)}'">
-                <img src="${avatarUrl}" class="search-result-avatar">
-                <div>
-                    <strong>@${user.username}</strong>
-                    <p>${user.prenom || ''} ${user.nom || ''}</p>
-                </div>
-            </div>
-        `;
-    });
-    
-    resultsContainer.innerHTML = html;
-}
         // ===== FONCTIONS MODALES =====
         function openModal(id) {
             document.getElementById(id).style.display = 'block';
@@ -1474,52 +1433,31 @@ function displayResults(users) {
             });
         }
 
-        // ===== MAGIC BUTTON PARTICLE EFFECT =====
-        document.querySelectorAll('.magic-btn, .btn-primary, .btn-secondary, .btn-danger, .btn-warning').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                for(let i = 0; i < 8; i++) {
-                    const particle = document.createElement('span');
-                    particle.classList.add('particle');
-                    const x = (Math.random() - 0.5) * 80 + 'px';
-                    const y = (Math.random() - 0.5) * 80 + 'px';
-                    particle.style.setProperty('--x', x);
-                    particle.style.setProperty('--y', y);
-                    
-                    const rect = btn.getBoundingClientRect();
-                    particle.style.left = (e.clientX - rect.left) + 'px';
-                    particle.style.top = (e.clientY - rect.top) + 'px';
-                    
-                    const hue = Math.floor(Math.random() * 60) + 140;
-                    particle.style.background = `radial-gradient(circle, hsl(${hue}, 100%, 60%), hsl(${hue}, 100%, 30%))`;
-                    
-                    btn.appendChild(particle);
-                    setTimeout(() => particle.remove(), 600);
-                }
-            });
-        });
-
         // ===== FONCTIONS POUR LES MODALES DÉTAILLÉES =====
         function openOeuvreModal(id) {
             currentOeuvreId = id;
-            const editBtn = document.getElementById('oeuvreEditBtn');
-            editBtn.href = '/oeuvre/' + id + '/edit';
             
-            // Données simulées pour l'exemple
             {% if oeuvres is defined and oeuvres|length > 0 %}
-                {% set oeuvre = oeuvres|first %}
-                const oeuvreData = {
-                    title: "{{ oeuvre.title|default('Titre de l\'œuvre')|e('js') }}",
-                    author: "{{ user.username|e('js') }}",
-                    image: "{{ oeuvre.imageUrl|default('')|e('js') }}",
-                    type: "{{ oeuvre.type|default('Roman')|e('js') }}",
-                    date: "{{ oeuvre.createdAt ? oeuvre.createdAt|date('d/m/Y') : '01/01/2024' }}",
-                    status: "{{ oeuvre.status|default('Publié')|e('js') }}",
-                    tags: {{ oeuvre.tags|default(['Fantasy', 'Aventure'])|json_encode|raw }},
-                    description: "{{ oeuvre.description|default('Description de l\'œuvre...')|e('js') }}"
-                };
+                // Récupérer les données de l'œuvre spécifique
+                {% for oeuvre in oeuvres %}
+                    {% if loop.first %}
+                        const oeuvreData = {
+                            id: {{ oeuvre.id|default(0) }},
+                            title: "{{ oeuvre.title|default('Titre de l\'œuvre')|e('js') }}",
+                            author: "{{ user.username|e('js') }}",
+                            image: "{{ oeuvre.imageUrl|default('')|e('js') }}",
+                            type: "{{ oeuvre.type|default('Roman')|e('js') }}",
+                            date: "{{ oeuvre.createdAt ? oeuvre.createdAt|date('d/m/Y') : '01/01/2024' }}",
+                            status: "{{ oeuvre.status|default('Publié')|e('js') }}",
+                            tags: {{ oeuvre.tags|default(['Fantasy', 'Aventure'])|json_encode|raw }},
+                            description: "{{ oeuvre.description|default('Description de l\'œuvre...')|e('js') }}"
+                        };
+                    {% endif %}
+                {% endfor %}
             {% else %}
                 const oeuvreData = {
-                    title: "Aucune œuvre",
+                    id: 0,
+                    title: "Œuvre",
                     author: "{{ user.username|e('js') }}",
                     image: "",
                     type: "-",
@@ -1554,16 +1492,37 @@ function displayResults(users) {
                 tagsContainer.appendChild(tagElement);
             }
             
+            // Ajouter les boutons d'action uniquement si c'est le propriétaire
+            const actionsContainer = document.getElementById('oeuvreModalActions');
+            // Garder seulement le bouton Fermer
+            actionsContainer.innerHTML = '<button class="btn btn-secondary magic-btn" onclick="closeModal(\'oeuvreModal\')">Fermer</button>';
+            
+            if (isOwner && oeuvreData.id) {
+                // Ajouter les boutons d'édition et suppression
+                const editBtn = document.createElement('a');
+                editBtn.href = '/oeuvre/' + oeuvreData.id + '/edit';
+                editBtn.className = 'btn btn-primary magic-btn';
+                editBtn.innerHTML = 'Éditer';
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-danger magic-btn';
+                deleteBtn.innerHTML = 'Supprimer';
+                deleteBtn.onclick = function() { deleteOeuvre(oeuvreData.id); };
+                
+                actionsContainer.appendChild(editBtn);
+                actionsContainer.appendChild(deleteBtn);
+            }
+            
             openModal('oeuvreModal');
         }
 
-        function deleteOeuvre() {
-            if (!currentOeuvreId) return;
+        function deleteOeuvre(id) {
+            if (!id) return;
             
             if (confirm('Êtes-vous sûr de vouloir supprimer cette œuvre ? Cette action est irréversible.')) {
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '/oeuvre/' + currentOeuvreId + '/delete';
+                form.action = '/oeuvre/' + id + '/delete';
                 document.body.appendChild(form);
                 form.submit();
             }
@@ -1571,24 +1530,27 @@ function displayResults(users) {
 
         function openArtefactModal(id) {
             currentArtefactId = id;
-            const editBtn = document.getElementById('artefactEditBtn');
-            editBtn.href = '/artefact/' + id + '/edit';
             
             {% if artefacts is defined and artefacts|length > 0 %}
-                {% set artefact = artefacts|first %}
-                const artefactData = {
-                    name: "{{ artefact.name|default('Nom de l\'artefact')|e('js') }}",
-                    type: "{{ artefact.type|default('Artefact mystérieux')|e('js') }}",
-                    image: "{{ artefact.imageUrl|default('')|e('js') }}",
-                    rarity: "{{ artefact.rarity|default('Légendaire')|e('js') }}",
-                    powers: "{{ artefact.powers|default('Pouvoirs inconnus')|e('js') }}",
-                    date: "{{ artefact.createdAt ? artefact.createdAt|date('d/m/Y') : '01/01/2024' }}",
-                    origin: "{{ artefact.origins|default('Origine inconnue')|e('js') }}",
-                    description: "{{ artefact.description|default(artefact.origins)|default('Description de l\'artefact...')|e('js') }}"
-                };
+                {% for artefact in artefacts %}
+                    {% if loop.first %}
+                        const artefactData = {
+                            id: {{ artefact.id|default(0) }},
+                            name: "{{ artefact.name|default('Nom de l\'artefact')|e('js') }}",
+                            type: "{{ artefact.type|default('Artefact mystérieux')|e('js') }}",
+                            image: "{{ artefact.imageUrl|default('')|e('js') }}",
+                            rarity: "{{ artefact.rarity|default('Légendaire')|e('js') }}",
+                            powers: "{{ artefact.powers|default('Pouvoirs inconnus')|e('js') }}",
+                            date: "{{ artefact.createdAt ? artefact.createdAt|date('d/m/Y') : '01/01/2024' }}",
+                            origin: "{{ artefact.origins|default('Origine inconnue')|e('js') }}",
+                            description: "{{ artefact.description|default(artefact.origins)|default('Description de l\'artefact...')|e('js') }}"
+                        };
+                    {% endif %}
+                {% endfor %}
             {% else %}
                 const artefactData = {
-                    name: "Aucun artefact",
+                    id: 0,
+                    name: "Artefact",
                     type: "-",
                     image: "",
                     rarity: "-",
@@ -1608,16 +1570,37 @@ function displayResults(users) {
             document.getElementById('artefactOrigin').textContent = artefactData.origin;
             document.getElementById('artefactDescription').textContent = artefactData.description;
             
+            // Ajouter les boutons d'action uniquement si c'est le propriétaire
+            const actionsContainer = document.getElementById('artefactModalActions');
+            // Garder seulement le bouton Fermer
+            actionsContainer.innerHTML = '<button class="btn btn-secondary magic-btn" onclick="closeModal(\'artefactModal\')">Fermer</button>';
+            
+            if (isOwner && artefactData.id) {
+                // Ajouter les boutons d'édition et suppression
+                const editBtn = document.createElement('a');
+                editBtn.href = '/artefact/' + artefactData.id + '/edit';
+                editBtn.className = 'btn btn-primary magic-btn';
+                editBtn.innerHTML = 'Éditer';
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-danger magic-btn';
+                deleteBtn.innerHTML = 'Supprimer';
+                deleteBtn.onclick = function() { deleteArtefact(artefactData.id); };
+                
+                actionsContainer.appendChild(editBtn);
+                actionsContainer.appendChild(deleteBtn);
+            }
+            
             openModal('artefactModal');
         }
 
-        function deleteArtefact() {
-            if (!currentArtefactId) return;
+        function deleteArtefact(id) {
+            if (!id) return;
             
             if (confirm('Êtes-vous sûr de vouloir supprimer cet artefact ? Cette action est irréversible.')) {
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '/artefact/' + currentArtefactId + '/delete';
+                form.action = '/artefact/' + id + '/delete';
                 document.body.appendChild(form);
                 form.submit();
             }
@@ -1708,12 +1691,14 @@ function displayResults(users) {
             let html = '';
             users.forEach(user => {
                 const avatarUrl = user.avatar ? `/uploads/avatars/${user.avatar}` : '/images/default-avatar.png';
+                // Remplacer PLACEHOLDER par l'ID réel
+                const profileUrl = PUBLIC_PROFILE_URL_TEMPLATE.replace('PLACEHOLDER', user.id);
                 html += `
-                    <div class="search-result-item" onclick="window.location.href='${PUBLIC_PROFILE_URL.replace('PLACEHOLDER', user.id)}'">
-                        <img src="${avatarUrl}" class="search-result-avatar">
+                    <div class="search-result-item" onclick="window.location.href='${profileUrl}'">
+                        <img src="${avatarUrl}" class="search-result-avatar" alt="${user.username}">
                         <div>
                             <strong>@${user.username}</strong>
-                            <p>${user.prenom || ''} ${user.nom || ''}</p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">${user.prenom || ''} ${user.nom || ''}</p>
                         </div>
                     </div>
                 `;
@@ -1722,7 +1707,7 @@ function displayResults(users) {
             resultsContainer.innerHTML = html;
         }
 
-        // ===== FONCTIONS FAVORIS (depuis code 1) =====
+        // ===== FONCTIONS FAVORIS =====
         async function removeFavorite(type, id, button) {
             if (!confirm('Voulez-vous vraiment retirer cet élément de vos favoris ?')) {
                 return;
@@ -1752,11 +1737,13 @@ function displayResults(users) {
                         // Vérifier si la grille est vide
                         const grid = card.parentElement;
                         if (grid.querySelectorAll('.card').length === 0) {
+                            const emptyType = type === 'oeuvre' ? 'œuvre favorite' : 'artefact favori';
+                            const linkType = type === 'oeuvre' ? 'oeuvre' : 'artefact';
                             grid.innerHTML = `
                                 <div class="empty-state">
                                     <span class="empty-icon">❤️</span>
-                                    <p>Aucun ${type === 'oeuvre' ? 'œuvre favorite' : 'artefact favori'}</p>
-                                    <a href="/${type}" class="btn btn-primary btn-sm mt-3">Découvrir des ${type === 'oeuvre' ? 'œuvres' : 'artefacts'}</a>
+                                    <p>Aucun ${emptyType}</p>
+                                    <a href="/${linkType}" class="btn btn-primary btn-sm mt-3">Découvrir des ${type === 'oeuvre' ? 'œuvres' : 'artefacts'}</a>
                                 </div>
                             `;
                         }
@@ -1770,6 +1757,30 @@ function displayResults(users) {
             }
         }
 
+        // ===== MAGIC BUTTON PARTICLE EFFECT =====
+        document.querySelectorAll('.magic-btn, .btn-primary, .btn-secondary, .btn-danger, .btn-warning').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                for(let i = 0; i < 8; i++) {
+                    const particle = document.createElement('span');
+                    particle.classList.add('particle');
+                    const x = (Math.random() - 0.5) * 80 + 'px';
+                    const y = (Math.random() - 0.5) * 80 + 'px';
+                    particle.style.setProperty('--x', x);
+                    particle.style.setProperty('--y', y);
+                    
+                    const rect = btn.getBoundingClientRect();
+                    particle.style.left = (e.clientX - rect.left) + 'px';
+                    particle.style.top = (e.clientY - rect.top) + 'px';
+                    
+                    const hue = Math.floor(Math.random() * 60) + 140;
+                    particle.style.background = `radial-gradient(circle, hsl(${hue}, 100%, 60%), hsl(${hue}, 100%, 30%))`;
+                    
+                    btn.appendChild(particle);
+                    setTimeout(() => particle.remove(), 600);
+                }
+            });
+        });
+
         // ===== BACKGROUND VIDEO =====
         document.addEventListener('DOMContentLoaded', function() {
             const bgVideo = document.getElementById('bg-video');
@@ -1777,10 +1788,12 @@ function displayResults(users) {
             
             if (bgVideo) {
                 bgVideo.addEventListener('error', function() {
+                    console.log('Background video failed to load, using gradient fallback');
                     if (gradientBg) gradientBg.style.display = 'block';
                 });
                 
-                bgVideo.play().catch(() => {
+                bgVideo.play().catch(function(error) {
+                    console.log('Video autoplay prevented:', error);
                     if (gradientBg) gradientBg.style.display = 'block';
                 });
             }

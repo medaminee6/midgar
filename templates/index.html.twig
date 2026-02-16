@@ -1036,6 +1036,31 @@
                 <button class="btn btn-primary magic-btn" id="modal-participate" style="margin-top: 1rem;">Participer</button>
             </div>
         </div>
+         {% if showFaceModal %}
+            <div id="face-modal" class="modal" style="display: flex;">
+                <div class="modal-content">
+                    <button class="modal-close" id="closeFaceModal">&times;</button>
+
+                    <h3 class="modal-title">🔐 Sécurisez votre compte</h3>
+
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Activez la reconnaissance faciale pour une connexion
+                        plus rapide et plus sécurisée.
+                    </p>
+
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                        <a href="{{ path('face_setup') }}" class="btn btn-primary magic-btn">
+                            📷 Activer maintenant
+                        </a>
+
+                        <button id="skipFaceSetup" class="btn btn-secondary magic-btn">
+                            Plus tard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
 
         <!-- FOOTER -->
         <footer>
@@ -1344,5 +1369,27 @@
             });
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const skipBtn = document.getElementById('skipFaceSetup');
+            const closeBtn = document.getElementById('closeFaceModal');
+            const faceModal = document.getElementById('face-modal');
+
+            function closeFaceModal() {
+                if (faceModal) {
+                    faceModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            }
+
+            skipBtn?.addEventListener('click', () => {
+                fetch('{{ path("face_modal_skip") }}', { method: 'POST' });
+                closeFaceModal();
+            });
+
+            closeBtn?.addEventListener('click', closeFaceModal);
+        });
+</script>
+
 </body>
 </html>
