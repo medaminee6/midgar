@@ -625,6 +625,68 @@
                 font-size: 1.8rem;
             }
         }
+        
+        /* ===== AI DESCRIPTION STYLES ===== */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .ai-description-card {
+            background: rgba(24, 227, 164, 0.1);
+            border: 1px solid rgba(24, 227, 164, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .ai-description-card:hover {
+            background: rgba(24, 227, 164, 0.2);
+            border-color: var(--primary-color);
+            transform: translateX(5px);
+        }
+        
+        .ai-description-card.selected {
+            background: rgba(24, 227, 164, 0.3);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(24, 227, 164, 0.3);
+        }
+        
+        .ai-description-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .ai-description-content {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .ai-description-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+        
+        .ai-manual-btn {
+            background: transparent;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        .ai-manual-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -773,8 +835,34 @@
 
                                     <div class="form-group">
                                         <label class="form-label">Description *</label>
-                                        <textarea name="description" class="form-textarea" placeholder="Décrivez votre œuvre, son contexte, ses inspirations..." required>{{ oldValues.description ?? '' }}</textarea>
+                                        <textarea name="description" class="form-textarea" placeholder="Décrivez votre œuvre, son contexte, ses inspirations..." required id="descriptionField">{{ oldValues.description ?? '' }}</textarea>
                                         {% for error in errors %}{% if error.propertyPath == 'description' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
+                                        
+                                        <!-- AI Description Section -->
+                                        <div class="ai-description-section" style="margin-top: 1rem;">
+                                            <button type="button" class="btn btn-sm magic-btn" id="generateAiBtn" style="display: none;">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 5px;">
+                                                    <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+                                                </svg>
+                                                ✨ Générer une description IA
+                                            </button>
+                                            
+                                            <div id="aiLoading" style="display: none; margin-top: 1rem;">
+                                                <div style="display: flex; align-items: center; gap: 10px; color: var(--primary-color);">
+                                                    <div class="spinner" style="width: 20px; height: 20px; border: 2px solid var(--primary-color); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                                    <span>Analyse de l'image en cours...</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div id="aiDescriptions" style="display: none; margin-top: 1rem;">
+                                                <div style="margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                                    <strong>Descriptions générées par l'IA</strong> - Cliquez pour sélectionner :
+                                                </div>
+                                                <div id="descriptionsList" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+                                            </div>
+                                            
+                                            <div id="aiError" style="display: none; margin-top: 1rem; color: #ff6b6b; font-size: 0.85rem;"></div>
+                                        </div>
                                     </div>
 
                                     <div class="form-group">
@@ -984,6 +1072,159 @@
                 link.classList.add('active');
             }
         });
+        
+        // ===== AI IMAGE ANALYSIS =====
+        const imageInput = document.getElementById('imageInput');
+        const generateAiBtn = document.getElementById('generateAiBtn');
+        const aiLoading = document.getElementById('aiLoading');
+        const aiDescriptions = document.getElementById('aiDescriptions');
+        const descriptionsList = document.getElementById('descriptionsList');
+        const aiError = document.getElementById('aiError');
+        const descriptionField = document.getElementById('descriptionField');
+        let currentImageFile = null;
+        let currentDrawnImage = null;
+        let generatedDescriptions = [];
+        
+        // Show AI button when image is selected (file upload)
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    currentImageFile = e.target.files[0];
+                    currentDrawnImage = null;
+                    generateAiBtn.style.display = 'inline-flex';
+                    // Hide previous results
+                    aiDescriptions.style.display = 'none';
+                    aiError.style.display = 'none';
+                } else {
+                    currentImageFile = null;
+                    if (!currentDrawnImage) {
+                        generateAiBtn.style.display = 'none';
+                    }
+                }
+            });
+        }
+        
+        // Also handle drawn images
+        const drawnImageInput = document.getElementById('drawnImageInput');
+        if (drawnImageInput) {
+            drawnImageInput.addEventListener('change', function() {
+                if (drawnImageInput.value && drawnImageInput.value.length > 10) {
+                    currentDrawnImage = drawnImageInput.value;
+                    currentImageFile = null;
+                    generateAiBtn.style.display = 'inline-flex';
+                    aiDescriptions.style.display = 'none';
+                    aiError.style.display = 'none';
+                } else {
+                    currentDrawnImage = null;
+                    if (!currentImageFile) {
+                        generateAiBtn.style.display = 'none';
+                    }
+                }
+            });
+        }
+        
+        // Handle AI generation button click
+        if (generateAiBtn) {
+            generateAiBtn.addEventListener('click', async function() {
+                // Show loading
+                aiLoading.style.display = 'block';
+                aiDescriptions.style.display = 'none';
+                aiError.style.display = 'none';
+                generateAiBtn.disabled = true;
+                
+                try {
+                    let response, data;
+                    
+                    if (currentImageFile) {
+                        // Use uploaded file
+                        const formData = new FormData();
+                        formData.append('image', currentImageFile);
+                        formData.append('entityType', 'oeuvre');
+                        formData.append('language', 'fr');
+                        
+                        response = await fetch('{{ path("api_ai_analyze_image") }}', {
+                            method: 'POST',
+                            body: formData
+                        });
+                    } else if (currentDrawnImage) {
+                        // Use drawn image
+                        const formData = new FormData();
+                        formData.append('imageData', currentDrawnImage);
+                        formData.append('entityType', 'oeuvre');
+                        formData.append('language', 'fr');
+                        
+                        response = await fetch('{{ path("api_ai_analyze_base64") }}', {
+                            method: 'POST',
+                            body: formData
+                        });
+                    } else {
+                        throw new Error('Aucune image sélectionnée');
+                    }
+                    
+                    // Handle non-JSON responses
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        const text = await response.text();
+                        throw new Error('Réponse invalide du serveur. Type: ' + contentType);
+                    }
+                    
+                    data = await response.json();
+                    
+                    aiLoading.style.display = 'none';
+                    
+                    if (data.success && data.descriptions && data.descriptions.length > 0) {
+                        generatedDescriptions = data.descriptions;
+                        displayDescriptions(data.descriptions);
+                        aiDescriptions.style.display = 'block';
+                    } else {
+                        aiError.textContent = data.error || 'Impossible de générer des descriptions. Veuillez rédiger votre propre description.';
+                        aiError.style.display = 'block';
+                    }
+                } catch (error) {
+                    aiLoading.style.display = 'none';
+                    aiError.textContent = 'Erreur lors de l\'analyse: ' + error.message;
+                    aiError.style.display = 'block';
+                } finally {
+                    generateAiBtn.disabled = false;
+                }
+            });
+        }
+        
+        function displayDescriptions(descriptions) {
+            descriptionsList.innerHTML = '';
+            
+            descriptions.forEach((desc, index) => {
+                const card = document.createElement('div');
+                card.className = 'ai-description-card';
+                card.dataset.index = index;
+                
+                card.innerHTML = `
+                    <div class="ai-description-title">${desc.title || 'Description ' + (index + 1)}</div>
+                    <div class="ai-description-content">${desc.content.substring(0, 200)}${desc.content.length > 200 ? '...' : ''}</div>
+                `;
+                
+                card.addEventListener('click', function() {
+                    // Remove selected class from all cards
+                    document.querySelectorAll('.ai-description-card').forEach(c => c.classList.remove('selected'));
+                    // Add selected class to clicked card
+                    card.classList.add('selected');
+                    // Set the description in the textarea
+                    descriptionField.value = desc.content;
+                });
+                
+                descriptionsList.appendChild(card);
+            });
+            
+            // Add action buttons
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'ai-description-actions';
+            actionsDiv.innerHTML = `
+                <button type="button" class="ai-manual-btn" onclick="document.getElementById('descriptionField').focus();">
+                    ✏️ Rédiger ma propre description
+                </button>
+            `;
+            descriptionsList.appendChild(actionsDiv);
+        }
     </script>
 </body>
 </html>

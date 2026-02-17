@@ -624,6 +624,68 @@
                 font-size: 1.8rem;
             }
         }
+        
+        /* ===== AI DESCRIPTION STYLES ===== */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .ai-description-card {
+            background: rgba(24, 227, 164, 0.1);
+            border: 1px solid rgba(24, 227, 164, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .ai-description-card:hover {
+            background: rgba(24, 227, 164, 0.2);
+            border-color: var(--primary-color);
+            transform: translateX(5px);
+        }
+        
+        .ai-description-card.selected {
+            background: rgba(24, 227, 164, 0.3);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(24, 227, 164, 0.3);
+        }
+        
+        .ai-description-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .ai-description-content {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .ai-description-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+        
+        .ai-manual-btn {
+            background: transparent;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        .ai-manual-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -744,14 +806,66 @@
 
                                     <div class="form-group">
                                         <label class="form-label">Origines & Histoire *</label>
-                                        <textarea name="origins" class="form-textarea" placeholder="Racontez l'histoire et les origines de cet artefact..." required>{{ oldValues.origins ?? '' }}</textarea>
+                                        <textarea name="origins" class="form-textarea" placeholder="Racontez l'histoire et les origines de cet artefact..." required id="originsField">{{ oldValues.origins ?? '' }}</textarea>
                                         {% for error in errors %}{% if error.propertyPath == 'origins' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
+                                        
+                                        <!-- AI Description Section for Origins -->
+                                        <div class="ai-description-section" style="margin-top: 1rem;">
+                                            <button type="button" class="btn btn-sm magic-btn" id="generateAiOriginsBtn" style="display: none;">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 5px;">
+                                                    <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+                                                </svg>
+                                                ✨ Générer les origines IA
+                                            </button>
+                                            
+                                            <div id="aiOriginsLoading" style="display: none; margin-top: 1rem;">
+                                                <div style="display: flex; align-items: center; gap: 10px; color: var(--primary-color);">
+                                                    <div class="spinner" style="width: 20px; height: 20px; border: 2px solid var(--primary-color); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                                    <span>Analyse de l'image en cours...</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div id="aiOriginsDescriptions" style="display: none; margin-top: 1rem;">
+                                                <div style="margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                                    <strong>Origines générées par l'IA</strong> - Cliquez pour sélectionner :
+                                                </div>
+                                                <div id="originsList" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+                                            </div>
+                                            
+                                            <div id="aiOriginsError" style="display: none; margin-top: 1rem; color: #ff6b6b; font-size: 0.85rem;"></div>
+                                        </div>
                                     </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Pouvoirs & Propriétés *</label>
-                                        <textarea name="powers" class="form-textarea" placeholder="Décrivez les pouvoirs et propriétés magiques..." required>{{ oldValues.powers ?? '' }}</textarea>
+                                        <textarea name="powers" class="form-textarea" placeholder="Décrivez les pouvoirs et propriétés magiques..." required id="powersField">{{ oldValues.powers ?? '' }}</textarea>
                                         {% for error in errors %}{% if error.propertyPath == 'powers' %}<div class="form-error" style="color: #ff0000 !important;">{{ error.message }}</div>{% endif %}{% endfor %}
+                                        
+                                        <!-- AI Description Section for Powers -->
+                                        <div class="ai-description-section" style="margin-top: 1rem;">
+                                            <button type="button" class="btn btn-sm magic-btn" id="generateAiPowersBtn" style="display: none;">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 5px;">
+                                                    <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+                                                </svg>
+                                                ✨ Générer les pouvoirs IA
+                                            </button>
+                                            
+                                            <div id="aiPowersLoading" style="display: none; margin-top: 1rem;">
+                                                <div style="display: flex; align-items: center; gap: 10px; color: var(--primary-color);">
+                                                    <div class="spinner" style="width: 20px; height: 20px; border: 2px solid var(--primary-color); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                                    <span>Analyse de l'image en cours...</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div id="aiPowersDescriptions" style="display: none; margin-top: 1rem;">
+                                                <div style="margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                                    <strong>Pouvoirs générés par l'IA</strong> - Cliquez pour sélectionner :
+                                                </div>
+                                                <div id="powersList" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+                                            </div>
+                                            
+                                            <div id="aiPowersError" style="display: none; margin-top: 1rem; color: #ff6b6b; font-size: 0.85rem;"></div>
+                                        </div>
                                     </div>
 
                                     <div class="form-group">
@@ -865,6 +979,165 @@
                 link.classList.add('active');
             }
         });
+        
+        // ===== AI IMAGE ANALYSIS FOR ARTEFACTS =====
+        const artefactImageInput = document.getElementById('imageInput');
+        const generateAiOriginsBtn = document.getElementById('generateAiOriginsBtn');
+        const generateAiPowersBtn = document.getElementById('generateAiPowersBtn');
+        const aiOriginsLoading = document.getElementById('aiOriginsLoading');
+        const aiPowersLoading = document.getElementById('aiPowersLoading');
+        const aiOriginsDescriptions = document.getElementById('aiOriginsDescriptions');
+        const aiPowersDescriptions = document.getElementById('aiPowersDescriptions');
+        const originsList = document.getElementById('originsList');
+        const powersList = document.getElementById('powersList');
+        const aiOriginsError = document.getElementById('aiOriginsError');
+        const aiPowersError = document.getElementById('aiPowersError');
+        const originsField = document.getElementById('originsField');
+        const powersField = document.getElementById('powersField');
+        let currentArtefactImageFile = null;
+        
+        // Show AI buttons when image is selected
+        if (artefactImageInput) {
+            artefactImageInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    currentArtefactImageFile = e.target.files[0];
+                    generateAiOriginsBtn.style.display = 'inline-flex';
+                    generateAiPowersBtn.style.display = 'inline-flex';
+                    aiOriginsDescriptions.style.display = 'none';
+                    aiPowersDescriptions.style.display = 'none';
+                    aiOriginsError.style.display = 'none';
+                    aiPowersError.style.display = 'none';
+                } else {
+                    currentArtefactImageFile = null;
+                    generateAiOriginsBtn.style.display = 'none';
+                    generateAiPowersBtn.style.display = 'none';
+                }
+            });
+        }
+        
+        // Handle AI generation for origins
+        if (generateAiOriginsBtn) {
+            generateAiOriginsBtn.addEventListener('click', async function() {
+                if (!currentArtefactImageFile) {
+                    aiOriginsError.textContent = 'Veuillez d\'abord sélectionner une image';
+                    aiOriginsError.style.display = 'block';
+                    return;
+                }
+                
+                aiOriginsLoading.style.display = 'block';
+                aiOriginsDescriptions.style.display = 'none';
+                aiOriginsError.style.display = 'none';
+                generateAiOriginsBtn.disabled = true;
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('image', currentArtefactImageFile);
+                    formData.append('entityType', 'artefact');
+                    formData.append('language', 'fr');
+                    
+                    const response = await fetch('{{ path("api_ai_analyze_image") }}', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    aiOriginsLoading.style.display = 'none';
+                    
+                    if (data.success && data.descriptions && data.descriptions.length > 0) {
+                        displayAiDescriptions(data.descriptions, originsList, originsField);
+                        aiOriginsDescriptions.style.display = 'block';
+                    } else {
+                        aiOriginsError.textContent = data.error || 'Impossible de générer des descriptions.';
+                        aiOriginsError.style.display = 'block';
+                    }
+                } catch (error) {
+                    aiOriginsLoading.style.display = 'none';
+                    aiOriginsError.textContent = 'Erreur: ' + error.message;
+                    aiOriginsError.style.display = 'block';
+                } finally {
+                    generateAiOriginsBtn.disabled = false;
+                }
+            });
+        }
+        
+        // Handle AI generation for powers
+        if (generateAiPowersBtn) {
+            generateAiPowersBtn.addEventListener('click', async function() {
+                if (!currentArtefactImageFile) {
+                    aiPowersError.textContent = 'Veuillez d\'abord sélectionner une image';
+                    aiPowersError.style.display = 'block';
+                    return;
+                }
+                
+                aiPowersLoading.style.display = 'block';
+                aiPowersDescriptions.style.display = 'none';
+                aiPowersError.style.display = 'none';
+                generateAiPowersBtn.disabled = true;
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('image', currentArtefactImageFile);
+                    formData.append('entityType', 'artefact');
+                    formData.append('language', 'fr');
+                    
+                    const response = await fetch('{{ path("api_ai_analyze_image") }}', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    aiPowersLoading.style.display = 'none';
+                    
+                    if (data.success && data.descriptions && data.descriptions.length > 0) {
+                        displayAiDescriptions(data.descriptions, powersList, powersField);
+                        aiPowersDescriptions.style.display = 'block';
+                    } else {
+                        aiPowersError.textContent = data.error || 'Impossible de générer des descriptions.';
+                        aiPowersError.style.display = 'block';
+                    }
+                } catch (error) {
+                    aiPowersLoading.style.display = 'none';
+                    aiPowersError.textContent = 'Erreur: ' + error.message;
+                    aiPowersError.style.display = 'block';
+                } finally {
+                    generateAiPowersBtn.disabled = false;
+                }
+            });
+        }
+        
+        function displayAiDescriptions(descriptions, listElement, fieldElement) {
+            listElement.innerHTML = '';
+            
+            descriptions.forEach((desc, index) => {
+                const card = document.createElement('div');
+                card.className = 'ai-description-card';
+                card.dataset.index = index;
+                
+                card.innerHTML = `
+                    <div class="ai-description-title">${desc.title || 'Description ' + (index + 1)}</div>
+                    <div class="ai-description-content">${desc.content.substring(0, 200)}${desc.content.length > 200 ? '...' : ''}</div>
+                `;
+                
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.ai-description-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    fieldElement.value = desc.content;
+                });
+                
+                listElement.appendChild(card);
+            });
+            
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'ai-description-actions';
+            actionsDiv.innerHTML = `
+                <button type="button" class="ai-manual-btn" onclick="${fieldElement.id}.focus();">
+                    ✏️ Rédiger moi-même
+                </button>
+            `;
+            listElement.appendChild(actionsDiv);
+        }
     </script>
 </body>
 </html>
