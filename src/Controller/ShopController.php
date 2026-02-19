@@ -12,6 +12,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -55,6 +57,9 @@ class ShopController extends AbstractController
             $produit->setPrix((string)$request->request->get('prix', ''));
             $produit->setTypeProduit((string)$request->request->get('type_produit', ''));
             $produit->setQuantiteDisponible((int)$request->request->get('quantite_disponible', 0));
+            if ($this->getUser() instanceof \App\Entity\User) {
+                $produit->setCreatedBy($this->getUser());
+            }
 
             $errors = $validator->validate($produit);
             if ($errors->count() > 0) {
@@ -261,8 +266,38 @@ class ShopController extends AbstractController
         return $this->redirectToRoute('admin_produits');
     }
 
+    #[Route('/admin/produits/{id}/restock', name: 'admin_produits_restock', methods: ['POST'])]
+    public function adminRestockProduit(Produit $produit, Request $request, EntityManagerInterface $em): Response
+    {
+        $token = (string) $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('restock_produit_' . $produit->getId(), $token)) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_produits');
+        }
+
+        $amount = (int) $request->request->get('restock_amount', 0);
+        $amount = max(1, min(60, $amount));
+
+        $current = (int) ($produit->getQuantiteDisponible() ?? 0);
+        $produit->setQuantiteDisponible($current + $amount);
+        $em->flush();
+
+        $this->addFlash('success', "Stock augmente de {$amount} unites.");
+
+        return $this->redirectToRoute('admin_produits');
+    }
+
     #[Route('/checkout', name: 'shop_checkout', methods: ['GET', 'POST'])]
-    public function checkout(Request $request, CartService $cartService, ProduitRepository $produitRepo, EntityManagerInterface $em, ValidatorInterface $validator): Response
+    public function checkout(
+        Request $request,
+        CartService $cartService,
+        ProduitRepository $produitRepo,
+        EntityManagerInterface $em,
+        ValidatorInterface $validator,
+        MailerInterface $mailer,
+        \App\Service\ShopAutomationService $automationService
+    ): Response
     {
         if ($cartService->isEmpty()) {
             $this->addFlash('warning', 'Votre panier est vide');
@@ -271,6 +306,7 @@ class ShopController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $acheteur = trim((string)$request->request->get('acheteur', ''));
+            $confirmationEmail = trim((string)$request->request->get('confirmation_email', ''));
             $cartItems = $cartService->getCart();
             $productIds = $cartService->getProductIds();
             $produits = $produitRepo->findBy(['id' => $productIds]);
@@ -282,6 +318,12 @@ class ShopController extends AbstractController
             foreach ($produits as $produit) {
                 if (isset($cartItems[$produit->getId()])) {
                     $quantity = $cartItems[$produit->getId()]['quantity'];
+                    $currentStock = (int) ($produit->getQuantiteDisponible() ?? 0);
+                    if ($quantity > $currentStock) {
+                        $this->addFlash('error', "Stock insuffisant pour {$produit->getNomProduit()}.");
+                        $hasValidationError = true;
+                        break;
+                    }
                     $subtotal = bcmul($produit->getPrix(), (string)$quantity, 2);
                     $totalPrice += (float)$subtotal;
 
@@ -291,6 +333,11 @@ class ShopController extends AbstractController
                     $commande->setPrixTotal($subtotal);
                     $commande->setProduit($produit);
                     $commande->setEtat(CommandeEtat::EN_ATTENTE);
+
+                    $produit->setQuantiteDisponible($currentStock - $quantity);
+                    if ($produit->getQuantiteDisponible() === 0) {
+                        $automationService->sendStockZeroEmailForProduct($produit);
+                    }
 
                     $errors = $validator->validate($commande);
                     if ($errors->count() > 0) {
@@ -309,6 +356,63 @@ class ShopController extends AbstractController
             if (!$hasValidationError) {
                 $em->flush();
                 $cartService->clearCart();
+
+                if ($confirmationEmail !== '' && filter_var($confirmationEmail, FILTER_VALIDATE_EMAIL)) {
+                    $references = implode(', ', array_map(fn(Commande $c) => $c->getReferenceCommande(), $commandes));
+                    $totalFormatted = number_format($totalPrice, 2, '.', ' ');
+                    $email = (new Email())
+                        ->from('salahchebil123@gmail.com')
+                        ->to($confirmationEmail)
+                        ->subject('Confirmation de commande - Midgar Shop')
+                        ->text(
+                            "Bonjour {$acheteur},\n\n" .
+                            "Votre commande a bien ete enregistree.\n" .
+                            "References: {$references}\n" .
+                            "Total: {$totalFormatted} EUR\n\n" .
+                            "Merci pour votre achat.\n"
+                        )
+                        ->html(
+                            '<!DOCTYPE html>' .
+                            '<html lang="fr">' .
+                            '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>' .
+                            '<body style="margin:0;padding:0;background:#0B0F0E;color:#E9FFF7;font-family:Arial, sans-serif;">' .
+                            '<div style="max-width:620px;margin:0 auto;padding:32px 20px;">' .
+                            '<div style="background:#121A19;border:1px solid #22302E;border-radius:16px;overflow:hidden;">' .
+                            '<div style="padding:24px 28px;background:linear-gradient(135deg,#0E1514,#14201E);">' .
+                            '<div style="font-size:20px;font-weight:700;color:#20E3B2;">Midgar Shop</div>' .
+                            '<div style="font-size:14px;color:#8EA39E;margin-top:4px;">Confirmation de commande</div>' .
+                            '</div>' .
+                            '<div style="padding:28px;">' .
+                            '<h1 style="margin:0 0 12px 0;font-size:20px;">Merci ' . htmlspecialchars($acheteur, ENT_QUOTES) . ' !</h1>' .
+                            '<p style="margin:0 0 16px 0;color:#B7C8C2;line-height:1.6;">Votre commande a bien ete enregistree. Voici un recapitulatif :</p>' .
+                            '<div style="background:#0F1615;border:1px solid #22302E;border-radius:12px;padding:16px;">' .
+                            '<div style="display:flex;justify-content:space-between;margin-bottom:8px;">' .
+                            '<span style="color:#8EA39E;">References</span>' .
+                            '<span style="font-weight:600;">' . htmlspecialchars($references, ENT_QUOTES) . '</span>' .
+                            '</div>' .
+                            '<div style="display:flex;justify-content:space-between;">' .
+                            '<span style="color:#8EA39E;">Total</span>' .
+                            '<span style="font-weight:700;color:#20E3B2;">' . htmlspecialchars($totalFormatted, ENT_QUOTES) . ' EUR</span>' .
+                            '</div>' .
+                            '</div>' .
+                            '<p style="margin:20px 0 0 0;color:#B7C8C2;">Vous pouvez suivre votre commande depuis votre espace client.</p>' .
+                            '</div>' .
+                            '<div style="padding:18px 28px;border-top:1px solid #22302E;color:#8EA39E;font-size:12px;">' .
+                            'Si vous n\'etes pas a l\'origine de cette commande, ignorez cet email.' .
+                            '</div>' .
+                            '</div>' .
+                            '</div>' .
+                            '</body></html>'
+                        );
+
+                    try {
+                        $mailer->send($email);
+                        $this->addFlash('success', 'Email de confirmation envoye.');
+                    } catch (\Throwable $exception) {
+                        $this->addFlash('warning', "Commande creee, mais email non envoye.");
+                    }
+                }
+
                 $this->addFlash('success', 'Commande créée avec succès! Références: ' . implode(', ', array_map(fn($c) => $c->getReferenceCommande(), $commandes)));
                 return $this->redirectToRoute('shop_commandes');
             }

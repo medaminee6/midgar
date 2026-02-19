@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique Automatisation - Shop Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap">
+    <style>
+        :root {
+            --bg-main: #0A0F0E;
+            --bg-panel: #0F1615;
+            --bg-card: #131B1A;
+            --bg-soft: #182221;
+            --border: #22302E;
+            --accent: #20E3B2;
+            --accent-2: #F6C860;
+            --accent-3: #5CD0FF;
+            --danger: #FF6B6B;
+            --muted: #8EA39E;
+            --text: #E9FFF7;
+            --shadow: 0 18px 45px rgba(0,0,0,0.45);
+            --radius: 16px;
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Space Grotesk", "Segoe UI", sans-serif;
+            background: radial-gradient(1200px 800px at 20% -10%, rgba(32,227,178,0.12), transparent 60%),
+                        radial-gradient(900px 700px at 90% 10%, rgba(92,208,255,0.10), transparent 55%),
+                        linear-gradient(160deg, #070B0A 0%, #0A1110 50%, #0C1412 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            height: 100vh;
+        }
+        .sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon { font-size: 1.8rem; color: var(--accent); }
+        .logo-text { font-size: 1.4rem; font-weight: 800; color: var(--accent); }
+        .admin-sidebar ul { list-style: none; }
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.25s ease;
+        }
+        .admin-sidebar a.active,
+        .admin-sidebar a:hover {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            background: linear-gradient(90deg, rgba(32,227,178,0.10), transparent);
+        }
+
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem 3rem 4rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .panel h1 {
+            font-family: "Fraunces", serif;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .panel-sub { color: var(--muted); margin-bottom: 1.5rem; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 0.75rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.92rem;
+        }
+        th { color: var(--muted); font-weight: 600; }
+        .badge {
+            display: inline-flex;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            background: rgba(92,208,255,0.2);
+            color: var(--accent-3);
+        }
+        .badge.warn { background: rgba(255,107,107,0.2); color: var(--danger); }
+        .badge.ok { background: rgba(32,227,178,0.2); color: var(--accent); }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Midgar Admin</div>
+        </div>
+        <ul>
+            <li><a href="{{ path('admin_users') }}"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+            <li><a href="{{ path('admin_quiz_questions') }}"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+            <li><a href="{{ path('admin_produits') }}"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+            <li><a href="{{ path('admin_commandes') }}"><i class="fas fa-truck"></i><span>Commandes</span></a></li>
+            <li><a href="{{ path('admin_shop_analytics') }}"><i class="fas fa-chart-line"></i><span>Analyse IA</span></a></li>
+            <li><a href="{{ path('admin_shop_automation_history') }}" class="active"><i class="fas fa-clock"></i><span>Historique Auto</span></a></li>
+            <li><a href="{{ path('admin_challenges') }}"><i class="fas fa-trophy"></i><span>Defis</span></a></li>
+        </ul>
+    </aside>
+
+    <main class="admin-content">
+        <section class="panel">
+            <h1>Historique d'automatisation</h1>
+            <p class="panel-sub">Evenements automatiques des 100 dernieres executions.</p>
+
+            {% if events is empty %}
+                <p class="panel-sub">Aucun evenement enregistre.</p>
+            {% else %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Produit</th>
+                            <th>Statut</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                            <tr>
+                                <td>{{ event.createdAt|date('d/m/Y H:i') }}</td>
+                                <td>
+                                    {% if event.type == 'restock' %}
+                                        <span class="badge ok">Reappro</span>
+                                    {% elseif event.type == 'stock_alert' %}
+                                        <span class="badge warn">Alerte stock</span>
+                                    {% elseif event.type == 'stock_zero' %}
+                                        <span class="badge warn">Stock zero</span>
+                                    {% else %}
+                                        <span class="badge">{{ event.type }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ event.product ? event.product.nomProduit : 'N/A' }}</td>
+                                <td>{{ event.status|upper }}</td>
+                                <td>
+                                    {% if event.payload and event.payload.before_stock is defined %}
+                                        {{ event.payload.before_stock }} -> {{ event.payload.after_stock }}
+                                    {% elseif event.payload and event.payload.stock is defined %}
+                                        Stock: {{ event.payload.stock }}
+                                    {% elseif event.payload and event.payload.recipient is defined %}
+                                        Email: {{ event.payload.recipient }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </section>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+    "php.validate.enable": false,
+    "intelephense.environment.includePaths": [
+        "${workspaceFolder}/vendor"
+    ],
+    "intelephense.files.exclude": [
+        "**/var/**"
+    ]
+}

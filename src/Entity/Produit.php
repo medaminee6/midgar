@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProduitRepository;
+use App\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -42,6 +43,13 @@ class Produit
 
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $date_ajout = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?User $createdBy = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $creator_email = null;
 
     #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'produit')]
     private Collection $commandes;
@@ -125,6 +133,30 @@ class Produit
     public function setDateAjout(\DateTimeInterface $date_ajout): self
     {
         $this->date_ajout = $date_ajout;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getCreatorEmail(): ?string
+    {
+        return $this->creator_email;
+    }
+
+    public function setCreatorEmail(?string $creator_email): self
+    {
+        $this->creator_email = $creator_email;
 
         return $this;
     }

@@ -93,6 +93,21 @@
             padding: 0.4rem 0.8rem;
             font-size: 0.9rem;
         }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .qty-slider {
+            width: 90px;
+            accent-color: var(--primary-color);
+        }
+
+        .qty-input {
+            width: 64px;
+        }
         
         .btn-danger {
             background-color: #d32f2f;
@@ -676,10 +691,26 @@
                                                     </td>
                                                     <td>{{ item.produit.prix }}€</td>
                                                     <td>
-                                                        <form action="{{ path('shop_cart_update', {id: item.produit.id}) }}" method="POST" style="display: inline;">
-                                                            <div class="input-group input-group-sm" style="width: 100px;">
-                                                                <input type="number" name="quantity" value="{{ item.quantity }}" class="form-control">
-                                                                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                                        <form action="{{ path('shop_cart_update', {id: item.produit.id}) }}" method="POST" style="display: inline;" class="qty-form" data-qty-form="{{ item.produit.id }}">
+                                                            <div class="qty-control">
+                                                                <input
+                                                                    type="range"
+                                                                    class="qty-slider"
+                                                                    min="1"
+                                                                    max="60"
+                                                                    value="{{ item.quantity }}"
+                                                                    data-qty-range="{{ item.produit.id }}"
+                                                                >
+                                                                <input
+                                                                    type="number"
+                                                                    name="quantity"
+                                                                    min="1"
+                                                                    max="60"
+                                                                    value="{{ item.quantity }}"
+                                                                    class="form-control qty-input"
+                                                                    data-qty-input="{{ item.produit.id }}"
+                                                                >
+                                                                <button type="submit" class="btn btn-outline-secondary btn-sm" title="Mettre a jour">
                                                                     <i class="fas fa-sync"></i>
                                                                 </button>
                                                             </div>
@@ -802,6 +833,49 @@
                     (link.getAttribute('href') === '{{ path('shop_index') }}' && currentPath.includes('/shop'))) {
                     link.classList.add('active');
                 }
+            });
+
+            const submitTimers = new Map();
+
+            function scheduleSubmit(productId) {
+                const form = document.querySelector('.qty-form[data-qty-form="' + productId + '"]');
+                if (!form) {
+                    return;
+                }
+                if (submitTimers.has(productId)) {
+                    clearTimeout(submitTimers.get(productId));
+                }
+                submitTimers.set(productId, setTimeout(() => {
+                    form.submit();
+                    submitTimers.delete(productId);
+                }, 400));
+            }
+
+            document.querySelectorAll('.qty-slider').forEach(slider => {
+                const id = slider.dataset.qtyRange;
+                const input = document.querySelector('.qty-input[data-qty-input="' + id + '"]');
+                if (!input) {
+                    return;
+                }
+
+                slider.addEventListener('input', () => {
+                    input.value = slider.value;
+                });
+
+                slider.addEventListener('change', () => {
+                    scheduleSubmit(id);
+                });
+
+                input.addEventListener('input', () => {
+                    const raw = parseInt(input.value || '1', 10);
+                    const value = Math.max(1, Math.min(60, isNaN(raw) ? 1 : raw));
+                    input.value = value;
+                    slider.value = value;
+                });
+
+                input.addEventListener('change', () => {
+                    scheduleSubmit(id);
+                });
             });
         });
     </script>

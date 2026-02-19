@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Predictif - Shop Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap">
+    <style>
+        :root {
+            --bg-main: #0A0F0E;
+            --bg-panel: #0F1615;
+            --bg-card: #131B1A;
+            --bg-soft: #182221;
+            --border: #22302E;
+            --accent: #20E3B2;
+            --accent-2: #F6C860;
+            --accent-3: #5CD0FF;
+            --danger: #FF6B6B;
+            --muted: #8EA39E;
+            --text: #E9FFF7;
+            --shadow: 0 18px 45px rgba(0,0,0,0.45);
+            --radius: 16px;
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Space Grotesk", "Segoe UI", sans-serif;
+            background: radial-gradient(1200px 800px at 20% -10%, rgba(32,227,178,0.12), transparent 60%),
+                        radial-gradient(900px 700px at 90% 10%, rgba(92,208,255,0.10), transparent 55%),
+                        linear-gradient(160deg, #070B0A 0%, #0A1110 50%, #0C1412 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            height: 100vh;
+        }
+        .sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon { font-size: 1.8rem; color: var(--accent); }
+        .logo-text { font-size: 1.4rem; font-weight: 800; color: var(--accent); }
+        .admin-sidebar ul { list-style: none; }
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.25s ease;
+        }
+        .admin-sidebar a.active,
+        .admin-sidebar a:hover {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            background: linear-gradient(90deg, rgba(32,227,178,0.10), transparent);
+        }
+
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem 3rem 4rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .hero-card {
+            background: linear-gradient(140deg, rgba(24,34,33,0.9), rgba(10,20,18,0.9));
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-card::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(32,227,178,0.35), transparent 70%);
+            right: -80px;
+            top: -80px;
+        }
+        .hero-title {
+            font-family: "Fraunces", serif;
+            font-size: 2.4rem;
+            margin-bottom: 0.5rem;
+        }
+        .hero-sub {
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+        .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .btn {
+            padding: 0.6rem 1rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.25s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(32, 227, 178, 0.2);
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #09110F;
+            border-color: transparent;
+        }
+        .hero-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+        .meta-chip {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 0.8rem 1rem;
+        }
+        .meta-label { color: var(--muted); font-size: 0.8rem; }
+        .meta-value { font-size: 1.1rem; font-weight: 700; }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            transform: translateY(0);
+            transition: transform 0.25s ease;
+        }
+        .kpi-card:hover { transform: translateY(-6px); }
+        .kpi-title { color: var(--muted); font-size: 0.85rem; }
+        .kpi-value { font-size: 1.8rem; font-weight: 700; }
+        .kpi-trend { font-size: 0.9rem; color: var(--accent); }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        .panel h3 {
+            font-family: "Fraunces", serif;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        .panel-sub { color: var(--muted); margin-bottom: 1rem; }
+
+        .matrix {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .matrix th, .matrix td {
+            padding: 0.65rem 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        .heat { border-radius: 10px; padding: 0.25rem 0.6rem; display: inline-block; }
+        .heat.high { background: rgba(32,227,178,0.2); color: var(--accent); }
+        .heat.mid { background: rgba(246,200,96,0.2); color: var(--accent-2); }
+        .heat.low { background: rgba(255,107,107,0.2); color: var(--danger); }
+
+        .alert-list { display: grid; gap: 0.75rem; }
+        .alert-item {
+            background: var(--bg-panel);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 0.9rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .alert-tag { font-size: 0.8rem; padding: 0.25rem 0.6rem; border-radius: 999px; }
+        .alert-tag.risk { background: rgba(255,107,107,0.2); color: var(--danger); }
+        .alert-tag.op { background: rgba(32,227,178,0.2); color: var(--accent); }
+
+        .segment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+        .segment {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1rem;
+        }
+
+        .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+        .scenario {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1rem;
+        }
+        .scenario input[type="range"] { width: 100%; }
+        .scenario-output { margin-top: 0.6rem; color: var(--accent-2); font-weight: 600; }
+
+        .workflow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+        .workflow-card {
+            background: linear-gradient(140deg, rgba(24,34,33,0.95), rgba(10,20,18,0.85));
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1rem;
+        }
+        .workflow-title { font-weight: 700; margin-bottom: 0.5rem; }
+        .badge { display: inline-flex; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; background: rgba(92,208,255,0.2); color: var(--accent-3); }
+
+        @media (max-width: 1100px) {
+            .hero { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Midgar Admin</div>
+        </div>
+        <ul>
+            <li><a href="{{ path('admin_users') }}"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+            <li><a href="{{ path('admin_quiz_questions') }}"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+            <li><a href="{{ path('admin_produits') }}"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+            <li><a href="{{ path('admin_commandes') }}"><i class="fas fa-truck"></i><span>Commandes</span></a></li>
+            <li><a href="{{ path('admin_shop_analytics') }}" class="active"><i class="fas fa-chart-line"></i><span>Analyse IA</span></a></li>
+            <li><a href="{{ path('admin_stock_predictions') }}"><i class="fas fa-brain"></i><span>Predictions Stock</span></a></li>
+            <li><a href="{{ path('admin_shop_automation_history') }}"><i class="fas fa-clock"></i><span>Historique Auto</span></a></li>
+            <li><a href="{{ path('admin_challenges') }}"><i class="fas fa-trophy"></i><span>Defis</span></a></li>
+        </ul>
+    </aside>
+
+    <main class="admin-content">
+        <section class="hero">
+            <div class="hero-card">
+                <h1 class="hero-title">Tableau de Bord d'Analyse Predictive</h1>
+                <p class="hero-sub">Synthese 7/30/90 jours, signaux de demande et alertes automatiques pour piloter Fabatsy Shop.</p>
+                <div class="hero-actions">
+                    <a href="{{ path('admin_stock_predictions') }}" class="btn btn-primary"><i class="fas fa-brain"></i> Predictions Stock</a>
+                    <button class="btn btn-primary"><i class="fas fa-bolt"></i> Lancer scenario</button>
+                    <button class="btn"><i class="fas fa-envelope"></i> Planifier emails</button>
+                    <button class="btn"><i class="fas fa-download"></i> Exporter rapport</button>
+                </div>
+            </div>
+            <div class="hero-card">
+                <div class="hero-meta">
+                    <div class="meta-chip">
+                        <div class="meta-label">Chiffre d'affaires 30j</div>
+                        <div class="meta-value">{{ (kpis.sales_30d / 1000)|round(1) }} K EUR</div>
+                    </div>
+                    <div class="meta-chip">
+                        <div class="meta-label">Prediction 90j</div>
+                        <div class="meta-value">{{ (kpis.growth_percent)|round(1) }}%</div>
+                    </div>
+                    <div class="meta-chip">
+                        <div class="meta-label">Clients actifs</div>
+                        <div class="meta-value">{{ segments.vip + segments.regular }}</div>
+                    </div>
+                    <div class="meta-chip">
+                        <div class="meta-label">Commandes 30j</div>
+                        <div class="meta-value">{{ kpis.orders_30d }}</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Prevision ventes 7 jours</div>
+                <div class="kpi-value">{{ (kpis.sales_7d_prediction / 1000)|round(1) }} K EUR</div>
+                <div class="kpi-trend">+{{ (kpis.sales_7d_prediction - kpis.sales_7d)|round(0) }} EUR vs reel</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Commandes 30 jours</div>
+                <div class="kpi-value">{{ kpis.orders_30d }}</div>
+                <div class="kpi-trend">Panier moyen: {{ (kpis.avg_order_value)|round(2) }} EUR</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Croissance</div>
+                <div class="kpi-value">{{ (kpis.growth_percent)|round(1) }}%</div>
+                <div class="kpi-trend">vs periode precedente</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Ventes actuelles (7j)</div>
+                <div class="kpi-value">{{ (kpis.sales_7d / 1000)|round(1) }} K EUR</div>
+                <div class="kpi-trend">Segment VIP: {{ segments.vip }}</div>
+            </div>
+        </section>
+
+        <section class="grid-2">
+            <div class="panel">
+                <h3>Graphique de Prevision des Ventes</h3>
+                <p class="panel-sub">Historique + predit (ARIMA/Prophet).</p>
+                <canvas id="salesForecast" height="180"></canvas>
+            </div>
+            <div class="panel">
+                <h3>Tendances Produits - 30 jours</h3>
+                <p class="panel-sub">Prediction produits tendance et stocks lents.</p>
+                <canvas id="productTrend" height="180"></canvas>
+            </div>
+        </section>
+
+        <section class="grid-2">
+            <div class="panel">
+                <h3>Matrice de Performance Produits</h3>
+                <table class="matrix">
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Demande</th>
+                            <th>Marge</th>
+                            <th>Risque stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in product_performance %}
+                        <tr>
+                            <td>{{ product.nom }}</td>
+                            <td>
+                                {% if product.demand > 50 %}
+                                    <span class="heat high">Fort</span>
+                                {% elseif product.demand > 10 %}
+                                    <span class="heat mid">Moyen</span>
+                                {% else %}
+                                    <span class="heat low">Faible</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="heat mid">{{ (product.margin_estimate)|round(2) }} EUR</span></td>
+                            <td><span class="heat {{ product.risk }}">{{ product.risk }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel">
+                <h3>Panneau d'Insights Clients</h3>
+                <div class="segment-grid">
+                    <div class="segment">
+                        <div class="meta-label">Segment VIP</div>
+                        <div class="meta-value">{{ segments.vip }} clients</div>
+                        <div class="panel-sub">Meilleur moment email: 20h30</div>
+                    </div>
+                    <div class="segment">
+                        <div class="meta-label">Clients Reguliers</div>
+                        <div class="meta-value">{{ segments.regular }} clients</div>
+                        <div class="panel-sub">Relance: offre 10% + bundle</div>
+                    </div>
+                    <div class="segment">
+                        <div class="meta-label">A risque</div>
+                        <div class="meta-value">{{ segments.at_risk }} clients</div>
+                        <div class="panel-sub">Churn prevu: 14 jours</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid-2">
+            <div class="panel">
+                <h3>Alertes & Recommandations</h3>
+                <div class="alert-list">
+                    <div class="alert-item">
+                        <div>
+                            <div>Risque baisse ventes mobile -17%</div>
+                            <div class="panel-sub">Verifier parcours checkout mobile</div>
+                        </div>
+                        <span class="alert-tag risk">Risque</span>
+                    </div>
+                    <div class="alert-item">
+                        <div>
+                            <div>Reappro imminent: Grimoire Ancestral</div>
+                            <div class="panel-sub">Commander 120 unites (tendance +22%)</div>
+                        </div>
+                        <span class="alert-tag op">Action</span>
+                    </div>
+                    <div class="alert-item">
+                        <div>
+                            <div>Optimiser marge: Pack Artiste</div>
+                            <div class="panel-sub">Augmenter prix +6% (elasticite stable)</div>
+                        </div>
+                        <span class="alert-tag op">Marge</span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <h3>Scenarios "Et Si"</h3>
+                <div class="scenario-grid">
+                    <div class="scenario">
+                        <div class="meta-label">Variation prix (Pack Artiste)</div>
+                        <input id="priceShift" type="range" min="-15" max="15" value="5">
+                        <div class="scenario-output" id="priceShiftOut">+5% -> +3.2% marge</div>
+                    </div>
+                    <div class="scenario">
+                        <div class="meta-label">Stock securite (Bestiaire)</div>
+                        <input id="stockShift" type="range" min="0" max="200" value="80">
+                        <div class="scenario-output" id="stockShiftOut">80 unites -> rupture dans 24j</div>
+                    </div>
+                    <div class="scenario">
+                        <div class="meta-label">Budget retention</div>
+                        <input id="retentionShift" type="range" min="0" max="100" value="35">
+                        <div class="scenario-output" id="retentionShiftOut">35% -> churn -4.1%</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel" style="margin-top: 1.5rem;">
+            <h3>Automatisation Intelligente - Workflows</h3>
+            <div class="workflow">
+                <div class="workflow-card">
+                    <div class="workflow-title">Nouvelle Commande</div>
+                    <div class="panel-sub">Fraude -> Stock -> Email -> Maj inventaire</div>
+                    <span class="badge">Active</span>
+                </div>
+                <div class="workflow-card">
+                    <div class="workflow-title">Stock Bas</div>
+                    <div class="panel-sub">Tendance -> Reappro -> Bon de commande</div>
+                    <span class="badge">Auto</span>
+                </div>
+                <div class="workflow-card">
+                    <div class="workflow-title">Client Inactif</div>
+                    <div class="panel-sub">Score churn -> Offre -> Email personalise</div>
+                    <span class="badge">IA</span>
+                </div>
+                <div class="workflow-card">
+                    <div class="workflow-title">Produit Ajoute</div>
+                    <div class="panel-sub">Description -> Prix -> Publication</div>
+                    <span class="badge">Auto</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel" style="margin-top: 1.5rem;">
+            <h3>Historique d'automatisation</h3>
+            <p class="panel-sub">10 derniers evenements (restock et alertes stock).</p>
+            <div class="alert-list">
+                {% if automation_events is empty %}
+                    <div class="alert-item">
+                        <div>
+                            <div>Aucun evenement enregistre</div>
+                            <div class="panel-sub">Lance l'automatisation pour generer un historique.</div>
+                        </div>
+                        <span class="alert-tag op">Info</span>
+                    </div>
+                {% else %}
+                    {% for event in automation_events %}
+                        <div class="alert-item">
+                            <div>
+                                <div>
+                                    {% if event.type == 'restock' %}
+                                        Reapprovisionnement effectue
+                                    {% elseif event.type == 'stock_alert' %}
+                                        Alerte stock bas
+                                    {% else %}
+                                        Automation: {{ event.type }}
+                                    {% endif %}
+                                </div>
+                                <div class="panel-sub">
+                                    Produit: {{ event.product ? event.product.nomProduit : 'N/A' }}
+                                    | Date: {{ event.createdAt|date('d/m/Y H:i') }}
+                                </div>
+                                {% if event.payload and event.payload.before_stock is defined %}
+                                    <div class="panel-sub">
+                                        Stock: {{ event.payload.before_stock }} -> {{ event.payload.after_stock }}
+                                    </div>
+                                {% elseif event.payload and event.payload.stock is defined %}
+                                    <div class="panel-sub">
+                                        Stock actuel: {{ event.payload.stock }}
+                                        {% if event.payload.threshold is defined %}
+                                            (seuil {{ event.payload.threshold }})
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <span class="alert-tag op">{{ event.status|upper }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const forecastCtx = document.getElementById('salesForecast');
+    new Chart(forecastCtx, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for date, sales in daily_sales %}
+                    '{{ date|date('d/m') }}',
+                {% endfor %}
+            ],
+            datasets: [
+                {
+                    label: 'Ventes reelles (7 jours)',
+                    data: [
+                        {% for date, sales in daily_sales %}
+                            {{ (sales / 1000)|round(1) }},
+                        {% endfor %}
+                    ],
+                    borderColor: '#5CD0FF',
+                    backgroundColor: 'rgba(92,208,255,0.15)',
+                    tension: 0.4
+                },
+                {
+                    label: 'Prediction (schema hausse)',
+                    data: [
+                        {% for date, sales in daily_sales %}
+                            {{ ((sales / 1000) * 1.15)|round(1) }},
+                        {% endfor %}
+                    ],
+                    borderColor: '#20E3B2',
+                    backgroundColor: 'rgba(32,227,178,0.18)',
+                    borderDash: [6,6],
+                    tension: 0.35
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#E9FFF7' } } },
+            scales: {
+                x: { ticks: { color: '#8EA39E' }, grid: { color: 'rgba(34,48,46,0.4)' } },
+                y: { ticks: { color: '#8EA39E' }, grid: { color: 'rgba(34,48,46,0.4)' } }
+            }
+        }
+    });
+
+    const productCtx = document.getElementById('productTrend');
+    new Chart(productCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for product in top_products %}
+                    '{{ product.nom|slice(0, 12) }}',
+                {% endfor %}
+            ],
+            datasets: [
+                {
+                    label: 'Quantite vendues',
+                    data: [
+                        {% for product in top_products %}
+                            {{ product.total_quantite|default(0) }},
+                        {% endfor %}
+                    ],
+                    backgroundColor: ['#20E3B2','#5CD0FF','#F6C860','#FF6B6B','#20E3B2']
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#E9FFF7' } } },
+            scales: {
+                x: { ticks: { color: '#8EA39E' }, grid: { display: false } },
+                y: { ticks: { color: '#8EA39E' }, grid: { color: 'rgba(34,48,46,0.4)' } }
+            }
+        }
+    });
+
+    const priceShift = document.getElementById('priceShift');
+    const priceShiftOut = document.getElementById('priceShiftOut');
+    priceShift.addEventListener('input', () => {
+        const val = priceShift.value;
+        const margin = (val * 0.64).toFixed(1);
+        priceShiftOut.textContent = `${val}% -> ${margin}% marge`;
+    });
+
+    const stockShift = document.getElementById('stockShift');
+    const stockShiftOut = document.getElementById('stockShiftOut');
+    stockShift.addEventListener('input', () => {
+        const val = stockShift.value;
+        const days = Math.max(6, Math.round(30 - val / 10));
+        stockShiftOut.textContent = `${val} unites -> rupture dans ${days}j`;
+    });
+
+    const retentionShift = document.getElementById('retentionShift');
+    const retentionShiftOut = document.getElementById('retentionShiftOut');
+    retentionShift.addEventListener('input', () => {
+        const val = retentionShift.value;
+        const churn = (val * -0.12).toFixed(1);
+        retentionShiftOut.textContent = `${val}% -> churn ${churn}%`;
+    });
+</script>
+</body>
+</html>

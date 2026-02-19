@@ -749,6 +749,8 @@
             <li><a href="{{ path('admin_users') }}"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
             <li><a href="{{ path('admin_quiz_questions') }}"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
             <li><a href="{{ path('admin_produits') }}" class="active"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+            <li><a href="{{ path('admin_commandes') }}"><i class="fas fa-truck"></i><span>Commandes</span></a></li>
+            <li><a href="{{ path('admin_shop_analytics') }}"><i class="fas fa-chart-line"></i><span>Analyse IA</span></a></li>
             <li><a href="{{ path('admin_challenges') }}"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
         </ul>
     </aside>
@@ -894,6 +896,17 @@
                                         <a href="{{ path('admin_produits_edit', {id: produit.id}) }}" class="btn-edit">
                                             <i class="fas fa-edit"></i> Éditer
                                         </a>
+                                        <form method="POST" action="{{ path('admin_produits_restock', {id: produit.id}) }}" style="display:inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('restock_produit_' ~ produit.id) }}">
+                                            <select name="restock_amount" class="form-control" style="width: 72px; display: inline-block;">
+                                                {% for n in 1..60 %}
+                                                    <option value="{{ n }}" {% if n == 10 %}selected{% endif %}>+{{ n }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn-edit" style="margin-left: 6px;">
+                                                <i class="fas fa-plus"></i> Restock
+                                            </button>
+                                        </form>
                                         <form method="POST" action="{{ path('admin_produits_delete', {id: produit.id}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est irréversible.');">
                                             <input type="hidden" name="_token" value="{{ csrf_token('delete_produit_' ~ produit.id) }}">
                                             <button type="submit" class="btn-delete">

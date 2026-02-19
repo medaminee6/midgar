@@ -20,7 +20,6 @@ final class Version20260215000000 extends AbstractMigration
         $this->addSql('CREATE TABLE IF NOT EXISTS `user` (
             id INT AUTO_INCREMENT NOT NULL,
             email VARCHAR(180) NOT NULL,
-            roles JSON NOT NULL,
             password VARCHAR(255) NOT NULL,
             username VARCHAR(255) NOT NULL,
             is_verified TINYINT(1) NOT NULL,
@@ -67,6 +66,14 @@ final class Version20260215000000 extends AbstractMigration
             date_limite DATE DEFAULT NULL,
             PRIMARY KEY (id)
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
+
+        // Add date_limite column if table exists and column doesn't
+        $defiColumnExists = (int) $this->connection->fetchOne(
+            "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'defi' AND COLUMN_NAME = 'date_limite'"
+        );
+        if ($defiColumnExists == 0) {
+            $this->addSql('ALTER TABLE defi ADD COLUMN date_limite DATE DEFAULT NULL');
+        }
 
         // Create participation table
         $this->addSql('CREATE TABLE IF NOT EXISTS participation (
