@@ -759,6 +759,13 @@
                                         {{ form_errors(form.portraitFile, {'attr': {'class': 'form-error'}}) }}
                                     </div>
                                     
+                                    <div class="form-group">
+                                        <label class="form-label">Tags *</label>
+                                        {{ form_widget(form.tags, {'attr': {'class': 'form-input', 'placeholder': 'Ex: #dark,#magie,#guerre'}}) }}
+                                        {{ form_errors(form.tags, {'attr': {'class': 'form-error'}}) }}
+                                        <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">Commencez avec #, séparez par des virgules</small>
+                                    </div>
+                                    
                                     <div class="form-actions">
                                         <a href="{{ path('personnage_index') }}" class="btn btn-secondary magic-btn">Annuler</a>
                                         <button type="submit" class="btn btn-primary magic-btn">Créer le Personnage</button>

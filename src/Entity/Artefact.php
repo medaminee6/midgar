@@ -38,6 +38,9 @@ class Artefact
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $imageUrl = null;
 
+    #[ORM\Column(length: 255)]
+    private string $tags = '';
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?User $createdBy = null;
@@ -127,6 +130,17 @@ class Artefact
     public function setImageUrl(?string $imageUrl): static
     {
         $this->imageUrl = $imageUrl;
+        return $this;
+    }
+
+    public function getTags(): string
+    {
+        return $this->tags;
+    }
+
+    public function setTags(string $tags): static
+    {
+        $this->tags = $tags;
         return $this;
     }
 

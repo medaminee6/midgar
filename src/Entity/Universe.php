@@ -42,6 +42,9 @@ class Universe
     #[ORM\Column(name: 'banner_image', type: 'blob', nullable: true)]
     private $bannerImage = null;
 
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $tags = '';
+
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
@@ -148,6 +151,18 @@ class Universe
     public function setBannerImage($bannerImage): self
     {
         $this->bannerImage = $bannerImage;
+
+        return $this;
+    }
+
+    public function getTags(): string
+    {
+        return $this->tags;
+    }
+
+    public function setTags(string $tags): self
+    {
+        $this->tags = $tags;
 
         return $this;
     }

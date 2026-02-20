@@ -59,6 +59,9 @@ class Personnage
     #[ORM\Column(name: 'updated_at', type: 'datetime_immutable')]
     private \DateTimeImmutable $updatedAt;
 
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $tags = '';
+
     #[ORM\ManyToOne(targetEntity: Universe::class, inversedBy: 'personnages')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotNull]
@@ -193,6 +196,17 @@ class Personnage
     {
         $this->portraitImage = $portraitImage;
 
+        return $this;
+    }
+
+    public function getTags(): string
+    {
+        return $this->tags;
+    }
+
+    public function setTags(string $tags): self
+    {
+        $this->tags = $tags;
         return $this;
     }
 

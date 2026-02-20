@@ -79,6 +79,7 @@ class ArtefactController extends AbstractController
             $origins = $request->request->get('origins');
             $powers = $request->request->get('powers');
             $rarity = $request->request->get('rarity');
+            $tags = $request->request->get('tags');
 
             if (!$name || strlen($name) < 3) {
                 $errors[] = "Le nom doit contenir au moins 3 caractères";
@@ -107,6 +108,14 @@ class ArtefactController extends AbstractController
             if (!$rarity) {
                 $errors[] = "La rareté est requise";
             }
+            
+            // Validate tags
+            if (!$tags || empty(trim($tags))) {
+                $errors[] = "Les tags sont obligatoires.";
+            } elseif (!str_starts_with(trim($tags), '#')) {
+                $errors[] = "Les tags doivent commencer par #. Exemple: #dark,#magie";
+            }
+            
             if (!$request->files->get('image')) {
                 $errors[] = "L image est requise";
             } else {
@@ -131,6 +140,7 @@ class ArtefactController extends AbstractController
             $artefact->setOrigins($origins);
             $artefact->setPowers($powers);
             $artefact->setRarity($rarity);
+            $artefact->setTags(trim($tags));
             $currentUser = $this->getUser();
             if ($currentUser instanceof User) {
                 $artefact->setCreatedBy($currentUser);
@@ -232,6 +242,8 @@ class ArtefactController extends AbstractController
             $artefact->setOrigins($origins);
             $artefact->setPowers($powers);
             $artefact->setRarity($rarity);
+            $tags = $request->request->get('tags');
+            $artefact->setTags(trim($tags) ?? '');
 
             $imageFile = $request->files->get('image');
             if ($imageFile) {

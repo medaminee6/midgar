@@ -56,6 +56,12 @@ class UniverseType extends AbstractType
                 'label' => 'Thèmes (séparés par des virgules)', 
                 'mapped' => false
             ])
+            ->add('tags', TextType::class, [
+                'label' => 'Tags',
+                'constraints' => [
+                    new NotBlank(['message' => 'Les tags sont obligatoires']),
+                ]
+            ])
             ->add('bannerFile', FileType::class, [
                 'mapped' => false,
                 'required' => false,

@@ -86,6 +86,7 @@ class OeuvreController extends AbstractController
             $type = $request->request->get('type');
             $description = $request->request->get('description');
             $author = $request->request->get('author');
+            $tags = $request->request->get('tags');
             $dateStr = $request->request->get('datePublication');
 
             if (!$title || strlen($title) < 2) {
@@ -100,6 +101,14 @@ class OeuvreController extends AbstractController
             if (!$description || strlen($description) < 10) {
                 $errors[] = "La description doit contenir au moins 10 caractères";
             }
+            
+            // Validate tags
+            if (!$tags || empty(trim($tags))) {
+                $errors[] = "Les tags sont obligatoires.";
+            } elseif (!str_starts_with(trim($tags), '#')) {
+                $errors[] = "Les tags doivent commencer par #. Exemple: #dark,#magie";
+            }
+            
             $drawnImage = $request->request->get('drawnImage');
             $uploadedImage = $request->files->get('image');
             if (!$uploadedImage && !$drawnImage) {
@@ -136,6 +145,7 @@ class OeuvreController extends AbstractController
             $oeuvre->setType($type);
             $oeuvre->setDescription($description);
             $oeuvre->setAuthor($author);
+            $oeuvre->setTags(trim($tags));
             $currentUser = $this->getUser();
             if ($currentUser instanceof User) {
                 $oeuvre->setCreatedBy($currentUser);

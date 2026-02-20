@@ -35,6 +35,9 @@ class Oeuvre
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $author = null;
 
+    #[ORM\Column(length: 255)]
+    private string $tags = '';
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?User $createdBy = null;
@@ -113,6 +116,17 @@ class Oeuvre
     public function setAuthor(?string $author): static
     {
         $this->author = $author;
+        return $this;
+    }
+
+    public function getTags(): string
+    {
+        return $this->tags;
+    }
+
+    public function setTags(string $tags): static
+    {
+        $this->tags = $tags;
         return $this;
     }
 

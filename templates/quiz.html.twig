@@ -528,45 +528,47 @@
                         </p>
 
                         <div class="quiz-container">
-                            <div class="quiz-question">
-                                <h3>{{ question.question }}</h3>
+                            <form id="quizForm" method="POST" action="{{ path('quiz', {step: step}) }}">
+                                <div class="quiz-question">
+                                    <h3>{{ question.question }}</h3>
 
-                                <div class="quiz-options">
-                                    {% for reponse in reponses %}
-                                        <input type="radio" id="reponse-{{ reponse.id }}" name="reponse" value="{{ reponse.id }}">
-                                        <label for="reponse-{{ reponse.id }}" class="quiz-option">
-                                            {{ reponse.option }}
-                                        </label>
-                                    {% endfor %}
+                                    <div class="quiz-options">
+                                        {% for reponse in reponses %}
+                                            <input type="radio" id="reponse-{{ reponse.id }}" name="reponse" value="{{ reponse.id }}">
+                                            <label for="reponse-{{ reponse.id }}" class="quiz-option">
+                                                {{ reponse.option }}
+                                            </label>
+                                        {% endfor %}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="progress-bar">
-                                <div class="progress-fill"></div>
-                            </div>
-                            <div class="progress-text">
-                                Question {{ step }} de {{ total }}
-                            </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill"></div>
+                                </div>
+                                <div class="progress-text">
+                                    Question {{ step }} de {{ total }}
+                                </div>
 
-                            <!-- NAVIGATION -->
-                            <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: space-between;">
-                                {% if step > 1 %}
-                                    <a href="{{ path('quiz', {step: step - 1}) }}" class="btn btn-secondary magic-btn">Précédent</a>
-                                {% else %}
-                                    <button class="btn btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">Précédent</button>
-                                {% endif %}
-                                
-                                {% if step < total %}
-                                    <a href="{{ path('quiz', {step: step + 1}) }}" class="btn btn-primary magic-btn">Suivant</a>
-                                {% else %}
-                                    <a href="{{ path('quiz', {step: 1}) }}" class="btn btn-primary magic-btn">Terminer</a>
-                                {% endif %}
-                            </div>
+                                <!-- NAVIGATION -->
+                                <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: space-between;">
+                                    {% if step > 1 %}
+                                        <button type="button" class="btn btn-secondary magic-btn" onclick="submitToPrevious()">Précédent</button>
+                                    {% else %}
+                                        <button class="btn btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">Précédent</button>
+                                    {% endif %}
+                                    
+                                    {% if step < total %}
+                                        <button type="button" class="btn btn-primary magic-btn" onclick="submitToNext()">Suivant</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-primary magic-btn" onclick="completeQuiz()">Terminer</button>
+                                    {% endif %}
+                                </div>
 
-                            <!-- PERSONALIZE FEED -->
-                            <div class="personalize-link">
-                                ou <a href="/preferences/advanced">personnaliser ton feed</a>
-                            </div>
+                                <!-- PERSONALIZE FEED -->
+                                <div class="personalize-link">
+                                    ou <a href="/preferences/advanced">personnaliser ton feed</a>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -584,6 +586,25 @@
     </div>
 
     <script>
+        // ===== QUIZ FORM SUBMISSION FUNCTIONS =====
+        function submitToNext() {
+            const form = document.getElementById('quizForm');
+            form.action = "{{ path('quiz', {step: step + 1}) }}";
+            form.submit();
+        }
+
+        function submitToPrevious() {
+            const form = document.getElementById('quizForm');
+            form.action = "{{ path('quiz', {step: step - 1}) }}";
+            form.submit();
+        }
+
+        function completeQuiz() {
+            const form = document.getElementById('quizForm');
+            form.action = "{{ path('quiz_complete') }}";
+            form.submit();
+        }
+
         // ===== MAGIC BUTTON PARTICLE EFFECT =====
         document.querySelectorAll('.magic-btn, .btn-primary, .btn-secondary').forEach(btn => {
             btn.addEventListener('click', function(e) {

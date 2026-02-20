@@ -16,6 +16,8 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class PersonnageType extends AbstractType
 {
@@ -125,6 +127,12 @@ class PersonnageType extends AbstractType
             ->add('abilitiesPowers', TextareaType::class, [
                 'label' => 'Capacités & Pouvoirs', 
                 'required' => false
+            ])
+            ->add('tags', TextType::class, [
+                'label' => 'Tags',
+                'constraints' => [
+                    new NotBlank(['message' => 'Les tags sont obligatoires']),
+                ]
             ])
             ->add('portraitFile', FileType::class, [
                 'mapped' => false,

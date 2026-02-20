@@ -54,6 +54,13 @@ class PersonnageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Validate tags start with #
+            $tags = $personnage->getTags();
+            if (!str_starts_with(trim($tags), '#')) {
+                $this->addFlash('error', 'Les tags doivent commencer par #. Exemple: #dark,#magie');
+                return $this->render('create-personnage.html.twig', ['form' => $form->createView()]);
+            }
+            
             $file = $form->get('portraitFile')->getData();
             if ($file) {
                 $data = file_get_contents($file->getPathname());

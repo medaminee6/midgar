@@ -70,9 +70,14 @@ class QuestionController extends AbstractController
             $question->setQuestion($questionText);
             $this->entityManager->persist($question);
             $this->entityManager->flush();
+            $this->addFlash('success', 'Question créée avec succès.');
+        } else {
+            foreach ($errors as $error) {
+                $this->addFlash('error', $error);
+            }
         }
 
-        return $this->redirectToRoute('admin_quiz_questions', $errors ? ['errors' => $errors] : []);
+        return $this->redirectToRoute('admin_quiz_questions');
     }
 
     #[Route('/admin/quiz-questions/edit/{id}', name: 'admin_quiz_questions_edit', methods: ['GET'])]
@@ -125,9 +130,14 @@ class QuestionController extends AbstractController
         if (empty($errors)) {
             $question->setQuestion($questionText);
             $this->entityManager->flush();
+            $this->addFlash('success', 'Question mise à jour avec succès.');
+        } else {
+            foreach ($errors as $error) {
+                $this->addFlash('error', $error);
+            }
         }
 
-        return $this->redirectToRoute('admin_quiz_questions', $errors ? ['errors' => $errors] : []);
+        return $this->redirectToRoute('admin_quiz_questions');
     }
 
     #[Route('/admin/quiz-questions/delete/{id}', name: 'admin_quiz_questions_delete', methods: ['POST'])]

@@ -131,6 +131,12 @@
                         <input type="text" class="form-input" placeholder="Votre nom ou pseudonyme">
                     </div>
 
+                    <div class="form-group">
+                        <label class="form-label">Tags *</label>
+                        <input type="text" name="tags" class="form-input" placeholder="Ex: #dark,#magie,#guerre" required>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">Commencez avec #, séparez par des virgules</small>
+                    </div>
+
                     <div class="form-actions">
                         <a href="/discover" class="btn btn-secondary">Annuler</a>
                         <button type="submit" class="btn btn-primary">Publier l'Œuvre</button>
@@ -153,6 +159,23 @@
         });
         document.getElementById('oeuvreForm')?.addEventListener('submit', (e) => {
             e.preventDefault();
+            
+            // Validate tags
+            const tagsInput = document.querySelector('input[name="tags"]');
+            const tags = tagsInput?.value.trim() || '';
+            
+            if (!tags) {
+                alert('Les tags sont obligatoires.');
+                tagsInput?.focus();
+                return;
+            }
+            
+            if (!tags.startsWith('#')) {
+                alert('Les tags doivent commencer par #. Exemple: #dark,#magie');
+                tagsInput?.focus();
+                return;
+            }
+            
             alert('Œuvre créée! (Fonctionnalité de démonstration)');
             // After creating (demo) show only Œuvre and Artefact in the sidebar
             try {

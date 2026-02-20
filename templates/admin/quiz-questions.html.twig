@@ -997,26 +997,14 @@
                 </div>
             </div>
             
-            {% if errors is defined and errors|length > 0 %}
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div>
-                        <strong>Erreurs de validation:</strong>
-                        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
-                        {% for error in errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            {% endif %}
+
             
             <form method="POST" action="{% if editQuestion is defined and editQuestion %}{{ path('admin_quiz_questions_update', {id: editQuestion.id}) }}{% else %}{{ path('admin_quiz_questions_create') }}{% endif %}">
                 <div class="form-group">
                     <label class="form-label">
                         <i class="fas fa-question"></i> Question
                     </label>
-                    <textarea class="form-control" name="question" rows="3" required>{% if editQuestion is defined and editQuestion %}{{ editQuestion.question }}{% endif %}</textarea>
+                    <textarea class="form-control" name="question" rows="3">{% if editQuestion is defined and editQuestion %}{{ editQuestion.question }}{% endif %}</textarea>
                 </div>
                 
                 <div class="btn-group">
@@ -1042,7 +1030,6 @@
                     <input type="text" name="q" value="{{ search | default('') }}" 
                         class="form-input"
                         placeholder="Rechercher une question, option ou tag">
-                        
                 </div>
                 
                 <div class="form-group">
@@ -1143,14 +1130,14 @@
                         <label class="form-label">
                             <i class="fas fa-tag"></i> Option
                         </label>
-                        <input class="form-control" type="text" name="option" value="{% if editReponse is defined and editReponse %}{{ editReponse.option }}{% endif %}" required placeholder="Ex: Épic, Sombre, Magique...">
+                        <input class="form-control" type="text" name="option" value="{% if editReponse is defined and editReponse %}{{ editReponse.option }}{% endif %}" placeholder="Ex: Épic, Sombre, Magique...">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">
                             <i class="fas fa-hashtag"></i> Tag
                         </label>
-                        <input class="form-control" type="text" name="tag" value="{% if editReponse is defined and editReponse %}{{ editReponse.tag }}{% endif %}" required placeholder="Ex: action, aventure, magie...">
+                        <input class="form-control" type="text" name="tag" value="{% if editReponse is defined and editReponse %}{{ editReponse.tag }}{% endif %}" placeholder="Ex: action, aventure, magie...">
                         <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">Séparez les tags par des virgules pour en ajouter plusieurs</small>
                     </div>
 
@@ -1158,7 +1145,7 @@
                         <label class="form-label">
                             <i class="fas fa-question"></i> Question associée
                         </label>
-                        <select class="form-select" name="question_id" required>
+                        <select class="form-select" name="question_id">
                             <option value="">-- Sélectionner une question --</option>
                             {% for question in questions %}
                                 <option value="{{ question.id }}" {% if editReponse is defined and editReponse and editReponse.question.id == question.id %}selected{% endif %}>
@@ -1328,6 +1315,7 @@
             if (this.form && this.form.onsubmit) return;
         });
     });
+
 </script>
 
 </body>

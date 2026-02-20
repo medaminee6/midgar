@@ -20,7 +20,13 @@ final class Version20260209040800 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE defi ADD date_limite DATE DEFAULT NULL');
+        // Check if column already exists to avoid duplicate column error
+        if ($schema->hasTable('defi')) {
+            $table = $schema->getTable('defi');
+            if (!$table->hasColumn('date_limite')) {
+                $this->addSql('ALTER TABLE defi ADD date_limite DATE DEFAULT NULL');
+            }
+        }
     }
 
     public function down(Schema $schema): void

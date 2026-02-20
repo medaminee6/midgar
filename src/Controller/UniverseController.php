@@ -35,6 +35,16 @@ class UniverseController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // validate tags
+            $tags = $universe->getTags();
+            if (!$tags || empty(trim($tags))) {
+                $this->addFlash('error', 'Les tags sont obligatoires.');
+                return $this->render('create-universe.html.twig', ['form' => $form->createView()]);
+            } elseif (!str_starts_with(trim($tags), '#')) {
+                $this->addFlash('error', 'Les tags doivent commencer par #. Exemple: #dark,#magie');
+                return $this->render('create-universe.html.twig', ['form' => $form->createView()]);
+            }
+
             // handle themes string -> array
             $themesRaw = $form->get('themes')->getData();
             $themes = [];
@@ -42,6 +52,7 @@ class UniverseController extends AbstractController
                 $themes = array_map('trim', explode(',', $themesRaw));
             }
             $universe->setThemes($themes);
+            $universe->setTags(trim($tags));
 
             $file = $form->get('bannerFile')->getData();
             if ($file) {
@@ -67,10 +78,21 @@ class UniverseController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // validate tags
+            $tags = $universe->getTags();
+            if (!$tags || empty(trim($tags))) {
+                $this->addFlash('error', 'Les tags sont obligatoires.');
+                return $this->render('create-universe.html.twig', ['form' => $form->createView(), 'universe' => $universe]);
+            } elseif (!str_starts_with(trim($tags), '#')) {
+                $this->addFlash('error', 'Les tags doivent commencer par #. Exemple: #dark,#magie');
+                return $this->render('create-universe.html.twig', ['form' => $form->createView(), 'universe' => $universe]);
+            }
+
             $themesRaw = $form->get('themes')->getData();
             $themes = [];
             if ($themesRaw) $themes = array_map('trim', explode(',', $themesRaw));
             $universe->setThemes($themes);
+            $universe->setTags(trim($tags));
 
             $file = $form->get('bannerFile')->getData();
             if ($file) {

@@ -945,6 +945,61 @@
                             </div>
                         </div>
 
+                        {# DIRECTLY RENDER CONTENT WITHOUT JS #}
+                        {% set hasContent = (universes|length > 0) or (personnages|length > 0) or (oeuvres|length > 0) or (artefacts|length > 0) %}
+                        {% if hasContent %}
+                        <div class="feed-grid">
+                            {# Render Universes #}
+                            {% for item in universes %}
+                            <div class="universe-card" onclick="window.location.href='/universe-detail?id={{ item.id }}'">
+                                <div class="card-banner" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">🌌</div>
+                                <div class="card-content">
+                                    <div class="card-type">Univers</div>
+                                    <h3 class="card-title">{{ item.name }}</h3>
+                                    <div class="card-genre-tags">
+                                        <span class="genre-tag">{{ item.genre }}</span>
+                                    </div>
+                                    <p class="card-description">{{ item.shortDescription|slice(0, 150) }}...</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                            {# Render Personnages #}
+                            {% for item in personnages %}
+                            <div class="universe-card" onclick="window.location.href='/personnage-detail?id={{ item.id }}'">
+                                <div class="card-banner" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">👤</div>
+                                <div class="card-content">
+                                    <div class="card-type">Personnage</div>
+                                    <h3 class="card-title">{{ item.name }}</h3>
+                                    <div class="card-genre-tags">
+                                        <span class="genre-tag">{{ item.classRole }}</span>
+                                    </div>
+                                    <p class="card-description">{{ item.historyContext|slice(0, 150) }}...</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                            {# Render Artefacts #}
+                            {% for item in artefacts %}
+                            <div class="universe-card" onclick="window.location.href='/artefact/{{ item.id }}'">
+                                <div class="card-banner" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">⚔️</div>
+                                <div class="card-content">
+                                    <div class="card-type">Artefact</div>
+                                    <h3 class="card-title">{{ item.name }}</h3>
+                                    <div class="card-genre-tags">
+                                        <span class="genre-tag">{{ item.origin }}</span>
+                                    </div>
+                                    <p class="card-description">{{ item.description|slice(0, 150) }}...</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state" style="display: block;">
+                            <p>😔 Aucun résultat pour vos préférences</p>
+                        </div>
+                        {% endif %}
+
                         <div class="feed-grid" id="feedGrid"></div>
 
                         <div class="load-more" id="loadMoreContainer" style="display: none;">
@@ -961,7 +1016,91 @@
     </main>
 
     <script>
+        // DEBUG: Check if Twig variables are set
+        console.log('=== TEMPLATE DEBUG ===');
+        
+        // Convert Symfony data to mockContent format
+        const realContent = {
+            oeuvres: {{ oeuvres|json_encode|default('[]') }},
+            artefacts: {{ artefacts|json_encode|default('[]') }},
+            personnages: {{ personnages|json_encode|default('[]') }},
+            universes: {{ universes|json_encode|default('[]') }}
+        };
 
+        // Build mockContent array from real data
+        let mockContent = [];
+        
+        // DEBUG: Log real content
+        console.log('Real Content:', realContent);
+        console.log('Universes:', realContent.universes);
+        console.log('Personnages:', realContent.personnages);
+        console.log('Oeuvres:', realContent.oeuvres);
+        console.log('Artefacts:', realContent.artefacts);
+        
+        // Force show alert even if no content
+        if (mockContent.length === 0) {
+            alert('ATTENTION: No items loaded!\n\nReal Content keys: ' + Object.keys(realContent).join(', '));
+        }
+        
+        // Add universes
+        if (Array.isArray(realContent.universes)) {
+            realContent.universes.forEach(item => {
+                mockContent.push({
+                    id: item.id,
+                    type: 'univers',
+                    title: item.name,
+                    description: item.shortDescription,
+                    genre: item.genre,
+                    tags: item.tags || '',
+                    image: item.bannerImage ? 'data:image/jpeg;base64,' + item.bannerImage : null
+                });
+            });
+        }
+
+        // Add personnages
+        if (Array.isArray(realContent.personnages)) {
+            realContent.personnages.forEach(item => {
+                mockContent.push({
+                    id: item.id,
+                    type: 'personnage',
+                    title: item.name,
+                    description: item.historyContext,
+                    genre: item.classRole,
+                    tags: item.tags || '',
+                    image: item.portraitImage ? 'data:image/jpeg;base64,' + item.portraitImage : null
+                });
+            });
+        }
+
+        // Add oeuvres
+        if (Array.isArray(realContent.oeuvres)) {
+            realContent.oeuvres.forEach(item => {
+                mockContent.push({
+                    id: item.id,
+                    type: 'oeuvre',
+                    title: item.title,
+                    description: item.description,
+                    genre: item.genre,
+                    tags: item.tags || '',
+                    image: null
+                });
+            });
+        }
+
+        // Add artefacts
+        if (Array.isArray(realContent.artefacts)) {
+            realContent.artefacts.forEach(item => {
+                mockContent.push({
+                    id: item.id,
+                    type: 'artefact',
+                    title: item.name,
+                    description: item.description,
+                    genre: item.origin,
+                    tags: item.tags || '',
+                    image: null
+                });
+            });
+        }
 
         let filtered = [...mockContent];
         let displayedItems = 12;
@@ -969,6 +1108,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             renderFeed();
             attachListeners();
+            // DEBUG: Show data info
+            setTimeout(() => {
+                alert('DEBUG: ' + mockContent.length + ' items loaded.\nCheck console for details.');
+            }, 500);
         });
 
         function attachListeners(){
@@ -1009,10 +1152,30 @@
             const sort = document.querySelector('.sort-filter:checked').value;
 
             filtered = mockContent.filter(item => {
+                // Handle type filter
                 if(types.length > 0 && !types.includes('all') && !types.includes(item.type)) return false;
-                if(genres.length > 0 && !genres.some(g => item.genre.includes(g))) return false;
-                if(themes.length > 0 && !themes.some(t => item.themes.includes(t))) return false;
-                if(search && !item.name.toLowerCase().includes(search)) return false;
+                
+                // Handle genre filter - genre can be string or array
+                if(genres.length > 0) {
+                    const itemGenre = item.genre;
+                    if (typeof itemGenre === 'string') {
+                        if (!genres.some(g => itemGenre.includes(g))) return false;
+                    } else if (Array.isArray(itemGenre)) {
+                        if (!genres.some(g => itemGenre.includes(g))) return false;
+                    }
+                }
+                
+                // Handle theme filter
+                if(themes.length > 0 && item.themes) {
+                    if (!themes.some(t => item.themes.includes(t))) return false;
+                }
+                
+                // Handle search - check both title and name
+                if(search) {
+                    const searchTarget = (item.title || item.name || '').toLowerCase();
+                    if (!searchTarget.includes(search)) return false;
+                }
+                
                 return true;
             });
 
@@ -1036,22 +1199,58 @@
                 filtered.slice(0, displayedItems).forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'universe-card';
-                    const genreMap = {'high-fantasy':'Haute Fantaisie','dark-fantasy':'Sombre','scifi-fantasy':'Sci-Fi','urban-fantasy':'Urban'};
-                    const genreTags = item.genre.map(g => `<span class="genre-tag">${genreMap[g] || g}</span>`).join('');
+                    
+                    // Map type to French label
+                    const typeLabels = {
+                        'univers': 'Univers',
+                        'personnage': 'Personnage',
+                        'oeuvre': 'Œuvre',
+                        'artefact': 'Artefact'
+                    };
+                    const typeLabel = typeLabels[item.type] || item.type;
+                    
+                    // Handle genre (string or array)
+                    let genreTags = '';
+                    if (item.genre) {
+                        if (typeof item.genre === 'string') {
+                            genreTags = `<span class="genre-tag">${item.genre}</span>`;
+                        } else if (Array.isArray(item.genre)) {
+                            const genreMap = {'high-fantasy':'Haute Fantaisie','dark-fantasy':'Sombre','scifi-fantasy':'Sci-Fi','urban-fantasy':'Urban'};
+                            genreTags = item.genre.map(g => `<span class="genre-tag">${genreMap[g] || g}</span>`).join('');
+                        }
+                    }
+                    
+                    // Use title or name, description or shortDescription
+                    const cardTitle = item.title || item.name || '';
+                    const cardDesc = item.description || item.shortDescription || item.desc || '';
+                    const cardBanner = item.image || item.banner || '';
+                    
+                    // Build card HTML based on type
+                    let cardHtml = '';
+                    if (cardBanner) {
+                        cardHtml = `<div class="card-banner">${cardBanner}</div>`;
+                    } else {
+                        cardHtml = `<div class="card-banner" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">${item.type === 'univers' ? '🌌' : item.type === 'personnage' ? '👤' : item.type === 'oeuvre' ? '📖' : '⚔️'}</div>`;
+                    }
+                    
                     card.innerHTML = `
-                        <div class="card-banner">${item.banner}</div>
+                        ${cardHtml}
                         <div class="card-content">
-                            <div class="card-type">Universe</div>
-                            <h3 class="card-title">${item.name}</h3>
+                            <div class="card-type">${typeLabel}</div>
+                            <h3 class="card-title">${cardTitle}</h3>
                             <div class="card-genre-tags">${genreTags}</div>
-                            <p class="card-description">${item.desc}</p>
-                            <div class="card-footer">
-                                <div class="card-stats"><div class="stat">Characters ${item.personnages}</div><div class="stat">Works ${item.oeuvres}</div><div class="stat">Artifacts ${item.artefacts}</div></div>
-                                <div class="creator-info"><div class="creator-avatar">${item.avatar}</div><span>${item.creator}</span></div>
-                            </div>
+                            <p class="card-description">${cardDesc.substring(0, 150)}${cardDesc.length > 150 ? '...' : ''}</p>
                         </div>
                     `;
-                    card.addEventListener('click', () => window.location.href = `/universe-detail?id=${item.id}`);
+                    
+                    // Add click handler based on type
+                    let url = '#';
+                    if (item.type === 'univers') url = `/universe-detail?id=${item.id}`;
+                    else if (item.type === 'personnage') url = `/personnage-detail?id=${item.id}`;
+                    else if (item.type === 'oeuvre') url = `/oeuvre/${item.id}`;
+                    else if (item.type === 'artefact') url = `/artefact/${item.id}`;
+                    
+                    card.addEventListener('click', () => window.location.href = url);
                     grid.appendChild(card);
                 });
                 more.style.display = filtered.length > displayedItems ? 'flex' : 'none';
@@ -1059,6 +1258,63 @@
             document.getElementById('displayedCount').textContent = Math.min(displayedItems, filtered.length);
             document.getElementById('totalCount').textContent = filtered.length;
         }
+
+        // ===== MAGIC BUTTON PARTICLE EFFECT =====
+        document.querySelectorAll('.magic-btn, .btn-primary, .btn-secondary, .create-cta, .filter-reset').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                for(let i = 0; i < 8; i++) {
+                    const particle = document.createElement('span');
+                    particle.classList.add('particle');
+                    const x = (Math.random() - 0.5) * 80 + 'px';
+                    const y = (Math.random() - 0.5) * 80 + 'px';
+                    particle.style.setProperty('--x', x);
+                    particle.style.setProperty('--y', y);
+                    
+                    const rect = btn.getBoundingClientRect();
+                    particle.style.left = (e.clientX - rect.left) + 'px';
+                    particle.style.top = (e.clientY - rect.top) + 'px';
+                    
+                    btn.appendChild(particle);
+                    setTimeout(() => particle.remove(), 600);
+                }
+            });
+        });
+
+        // ===== BACKGROUND INITIALIZATION =====
+        const bgVideo = document.getElementById('bg-video');
+        const gradientBg = document.getElementById('gradient-bg');
+        
+        if (bgVideo) {
+            bgVideo.addEventListener('error', function() {
+                console.log('Background video failed to load, using gradient fallback');
+                if (gradientBg) gradientBg.style.display = 'block';
+            });
+            
+            bgVideo.play().catch(function(error) {
+                console.log('Video autoplay prevented:', error);
+                if (gradientBg) gradientBg.style.display = 'block';
+            });
+        }
+        
+        document.addEventListener('visibilitychange', function() {
+            if (bgVideo) {
+                if (document.hidden) {
+                    bgVideo.pause();
+                } else {
+                    bgVideo.play().catch(e => console.log('Video play error:', e));
+                }
+            }
+        });
+
+        // ===== HIGHLIGHT ACTIVE NAV LINK =====
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('nav .magic-btn').forEach(link => {
+            if (link.getAttribute('href') === currentPath || 
+                (link.getAttribute('href') === '{{ path('home') }}' && currentPath === '/') ||
+                (link.getAttribute('href') === '/discover' && currentPath.includes('/discover'))) {
+                link.classList.add('active');
+            }
+        });
     </script>
 
         <!-- ===== FOOTER ===== -->
