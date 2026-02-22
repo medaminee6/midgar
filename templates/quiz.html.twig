@@ -4,13 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz de Préférences - Midgar</title>
-<<<<<<< HEAD
-    <link rel="stylesheet" href="/css/midgar.css">
-
-    <!-- QUIZ OPTIONS STYLING -->
-    <style>
-        /* === QUIZ OPTIONS GRID === */
-=======
     
     <style>
         /* ===== VARIABLES & RESET ===== */
@@ -313,7 +306,6 @@
             font-size: 1.3rem;
         }
         
->>>>>>> validation-final-2
         .quiz-options {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -327,21 +319,12 @@
         .quiz-option {
             position: relative;
             padding: 1.25rem 1.5rem;
-<<<<<<< HEAD
-            background-color: #0B0F0E;
-            border: 2px solid #2A3139;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-            color: #E6FFF6;
-=======
             background-color: rgba(0, 0, 0, 0.3);
             border: 2px solid rgba(24, 227, 164, 0.3);
             border-radius: var(--border-radius);
             cursor: pointer;
             transition: all 0.25s ease;
             color: var(--text-color);
->>>>>>> validation-final-2
             min-height: 90px;
             display: flex;
             align-items: center;
@@ -349,21 +332,13 @@
 
         .quiz-option:hover {
             transform: translateY(-3px);
-<<<<<<< HEAD
-            border-color: #18E3A4;
-=======
             border-color: var(--primary-color);
->>>>>>> validation-final-2
             box-shadow: 0 10px 25px rgba(24, 227, 164, 0.15);
         }
 
         .quiz-options input[type="radio"]:checked + .quiz-option {
             background: linear-gradient(135deg, rgba(24,227,164,0.14), rgba(24,227,164,0.05));
-<<<<<<< HEAD
-            border-color: #18E3A4;
-=======
             border-color: var(--primary-color);
->>>>>>> validation-final-2
             box-shadow: 0 0 0 1px rgba(24,227,164,0.6), 0 12px 30px rgba(24,227,164,0.25);
         }
 
@@ -374,25 +349,15 @@
             top: 0;
             height: 100%;
             width: 4px;
-<<<<<<< HEAD
-            background: #18E3A4;
-            opacity: 0;
-            border-radius: 10px 0 0 10px;
-=======
             background: var(--primary-color);
             opacity: 0;
             border-radius: var(--border-radius) 0 0 var(--border-radius);
->>>>>>> validation-final-2
             transition: opacity 0.25s ease;
         }
 
         .quiz-options input[type="radio"]:checked + .quiz-option::before {
             opacity: 1;
         }
-<<<<<<< HEAD
-
-        /* === PERSONALIZE FEED LINK === */
-=======
         
         .progress-bar {
             background: rgba(0, 0, 0, 0.3);
@@ -416,147 +381,10 @@
             margin-top: 0.5rem;
         }
 
->>>>>>> validation-final-2
         .personalize-link {
             text-align: center;
             margin-top: 1.5rem;
             font-size: 0.95rem;
-<<<<<<< HEAD
-            color: #B0B9B6;
-        }
-
-        .personalize-link a {
-            color: #18E3A4;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(24,227,164,0.4);
-            padding-bottom: 2px;
-            transition: color 0.25s ease, border-color 0.25s ease, text-shadow 0.25s ease;
-        }
-
-        .personalize-link a:hover {
-            color: #E6FFF6;
-            border-bottom-color: #18E3A4;
-            text-shadow: 0 0 8px rgba(24,227,164,0.6);
-        }
-
-        @media (max-width: 640px) {
-            .quiz-options {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-
-<body>
-<header>
-    <div class="logo">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
-            <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
-            <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
-            <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
-            <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
-            <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
-        </svg>
-        Midgar
-    </div>
-
-    <nav>
-        <ul>
-            <li><a href="/">Accueil</a></li>
-            <li><a href="/discover">Découvrir</a></li>
-            <li><a href="/universes">Univers</a></li>
-            <li><a href="/oeuvre">Œuvre</a></li>
-            <li><a href="/shop">Boutique</a></li>
-            <li><a href="/challenges">Défis</a></li>
-        </ul>
-    </nav>
-
-    <div class="auth-buttons">
-        <a href="/login" class="btn btn-secondary btn-sm">Connexion</a>
-        <a href="/register" class="btn btn-primary btn-sm">S'inscrire</a>
-    </div>
-</header>
-
-<main>
-<section class="section">
-<div class="container">
-<div style="max-width: 700px; margin: 0 auto;">
-
-    <h1 class="text-center mb-4">Quiz de Préférences</h1>
-    <p class="text-center mb-4" style="color:#B0B9B6;font-size:1.1rem;">
-        Découvrez vos préférences en création fantasy
-    </p>
-
-    <div id="quiz-container" style="background-color:#1A1F1E;padding:2rem;border-radius:8px;border:1px solid #2A3139;">
-
-        <div class="quiz-question">
-            <h3 style="margin-bottom:1.5rem;">
-                Quel type d'univers vous attire le plus ?
-            </h3>
-
-            <div class="quiz-options">
-                <input type="radio" id="q1-epic" name="q1">
-                <label for="q1-epic" class="quiz-option">
-                    Épic et héroïque — Royaumes et légendes
-                </label>
-
-                <input type="radio" id="q1-dark" name="q1">
-                <label for="q1-dark" class="quiz-option">
-                    Sombre et mystérieux — Ombres et intrigues
-                </label>
-
-                <input type="radio" id="q1-magic" name="q1">
-                <label for="q1-magic" class="quiz-option">
-                    Magique et enchanteur — Merveilles et sorts
-                </label>
-
-                <input type="radio" id="q1-scifi" name="q1">
-                <label for="q1-scifi" class="quiz-option">
-                    Sci-Fi fantasy — Technologie & magie
-                </label>
-            </div>
-        </div>
-
-        <div style="margin-top:2rem;">
-            <div style="background:#0B0F0E;height:4px;border-radius:2px;overflow:hidden;">
-                <div style="background:linear-gradient(90deg,#18E3A4,#0DCF92);height:100%;width:25%;"></div>
-            </div>
-            <p style="text-align:center;font-size:0.9rem;color:#B0B9B6;margin-top:0.5rem;">
-                Question 1 de 4
-            </p>
-        </div>
-
-        <!-- NAVIGATION -->
-        <div style="display:flex;gap:1rem;margin-top:2rem;justify-content:space-between;">
-            <button class="btn btn-secondary" disabled>Précédent</button>
-            <button class="btn btn-primary">Suivant</button>
-        </div>
-
-        <!-- PERSONALIZE FEED -->
-        <div class="personalize-link">
-            ou <a href="/preferences/advanced">personnaliser ton feed</a>
-        </div>
-
-    </div>
-
-</div>
-</div>
-</section>
-</main>
-
-<footer>
-    <div class="container">
-        <div class="footer-bottom">
-            <p>&copy; 2026 Midgar Fantasy Platform</p>
-        </div>
-    </div>
-</footer>
-
-<script src="/js/main.js"></script>
-</body>
-</html>
-=======
             color: var(--text-secondary);
         }
 
@@ -816,4 +644,3 @@
     </script>
 </body>
 </html>
->>>>>>> validation-final-2

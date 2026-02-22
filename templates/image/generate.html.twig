@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Génération d’avatar IA</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: #e5e7eb;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #020617;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,.5);
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 16px;
+        }
+
+        input, select {
+            background: #020617;
+            color: #e5e7eb;
+            border: 1px solid #1e293b;
+        }
+
+        button {
+            background: linear-gradient(135deg, #6366f1, #9333ea);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.6);
+        }
+
+        .download {
+            display: inline-block;
+            margin-top: 12px;
+            background: #22c55e;
+            color: #020617;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>🎨 Génération d’avatar IA</h1>
+
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+
+            <label>Photo de base</label>
+            <input type="file" name="image" accept="image/*" required>
+
+            <label>Thème</label>
+            <select name="theme">
+                <option value="fantasy">Fantasy</option>
+                <option value="anime">Anime</option>
+                <option value="cyberpunk">Cyberpunk</option>
+                <option value="steampunk">Steampunk</option>
+                <option value="dark_fantasy">Dark Fantasy</option>
+            </select>
+
+            <button type="submit">✨ Générer l’avatar</button>
+        </form>
+    </div>
+
+    {% if image %}
+        <div class="card" style="margin-top:30px; text-align:center;">
+            <h2>🖼️ Résultat</h2>
+
+            <img src="{{ image }}" alt="Avatar généré">
+
+            <a href="{{ image }}" download class="download">
+                ⬇️ Télécharger l’image
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+</body>
+</html>

@@ -1,11 +1,11 @@
 
-<<<<<<< HEAD
-=======
 # Local env files (may contain secrets)
 .env
 .env.dev
+models/stable-diffusion-v1-5/
+config/midgarapp-a2e246d71083.json
 
->>>>>>> validation-final-2
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -14,4 +14,5 @@
 /public/bundles/
 /var/
 /vendor/
+//
 ###< symfony/framework-bundle ###

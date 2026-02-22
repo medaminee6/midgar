@@ -6,11 +6,7 @@ parameters:
     user_photos_directory: '%kernel.project_dir%/public/uploads/avatars'
     avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
     app_base_url: 'http://127.0.0.1:8000'
-    
-    # AI Configuration - lire depuis les variables d'environnement
-    ai_provider: '%env(AI_PROVIDER)%'
-    ai_model: '%env(AI_MODEL)%'
-
+    hf_token: '%env(HF_TOKEN)%'
 services:
     # Default configuration for services in this file
     _defaults:
@@ -28,26 +24,13 @@ services:
             - '../src/Kernel.php'
 
     # Service AI
-    App\Service\ImageAnalysisService:
+
+    App\Service\ImageGenerator:
         arguments:
-            $apiKey: '%env(AI_API_KEY)%'
-            $apiModel: '%ai_model%'
-            $apiProvider: '%ai_provider%'
-        calls:
-            - method: setGoogleApiKey
-              arguments:
-                  - '%env(GOOGLE_API_KEY)%'
-            - method: setAnthropicApiKey
-              arguments:
-                  - '%env(ANTHROPIC_API_KEY)%'
+            $hfToken: '%hf_token%'
+
 
     # Service GeminiPro
-    App\Service\GeminiProService:
-        arguments:
-             $projectId: '%env(GOOGLE_PROJECT_ID)%'
-             $serviceAccountPath: '%kernel.project_dir%/config/midgarapp-a2e246d71083.json'
-
+    
     # Avatar generator alias → local implementation
-    App\Avatar\AvatarGeneratorInterface:
-        alias: 'App\Avatar\LocalAvatarGenerator'
-        public: true
+
