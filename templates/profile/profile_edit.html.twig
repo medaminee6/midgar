@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Éditer Profil - Midgar{% endblock %}
+
+{% block body %}
+<h1>Éditer votre profil</h1>
+
+{{ form_start(form) }}
+    {{ form_row(form.username) }}
+    {{ form_row(form.email) }}
+    {{ form_row(form.avatar) }}
+    <button class="btn btn-primary">Enregistrer</button>
+{{ form_end(form) }}
+
+<p>
+    <a href="{{ path('profile') }}">Retour au profil</a>
+</p>
+{% endblock %}

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pourquoi je vois ceci ?</title>
+    <style>
+    :root {
+        --primary-color: #18E3A4;
+        --primary-dark: #13c891;
+        --text-color: #E6FFF6;
+        --text-secondary: #B0B9B6;
+        --bg-primary: #1A1F1E;
+        --bg-dark: #0D0F0F;
+        --card-bg: rgba(26, 31, 30, 0.7);
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, var(--bg-primary), var(--bg-dark));
+        color: var(--text-color);
+        font-family: Arial, sans-serif;
+    }
+
+    .why-page-wrap {
+        max-width: 1080px;
+        margin: 2rem auto;
+        padding: 0 1rem 2.25rem;
+    }
+
+    .why-header {
+        margin-bottom: 1.7rem;
+    }
+
+    .why-header h1 {
+        color: var(--primary-color, #18E3A4);
+        margin-bottom: 0.45rem;
+        font-size: clamp(1.85rem, 2.7vw, 2.45rem);
+        letter-spacing: 0.3px;
+        text-shadow: 0 0 18px rgba(24, 227, 164, 0.22);
+    }
+
+    .why-header p {
+        color: var(--text-secondary, #B0B9B6);
+        margin: 0;
+    }
+
+    .why-grid {
+        display: grid;
+        grid-template-columns: 0.96fr 1.04fr;
+        gap: 1rem;
+    }
+
+    .why-panel,
+    .universe-card {
+        background: var(--card-bg, rgba(26, 31, 30, 0.7));
+        border: 1px solid rgba(24, 227, 164, 0.18);
+        border-radius: 12px;
+        padding: 0.95rem;
+        backdrop-filter: blur(6px);
+        transition: box-shadow 0.22s ease, transform 0.22s ease, border-color 0.22s ease;
+    }
+
+    .why-panel:hover,
+    .universe-card:hover {
+        border-color: rgba(24, 227, 164, 0.3);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32), 0 0 16px rgba(24, 227, 164, 0.16);
+        transform: translateY(-2px);
+    }
+
+    .ai-panel {
+        border-color: rgba(24, 227, 164, 0.42);
+        box-shadow: 0 0 0 1px rgba(24, 227, 164, 0.15) inset, 0 0 20px rgba(24, 227, 164, 0.16);
+    }
+
+    .why-panel h3 {
+        color: var(--primary-color, #18E3A4);
+        margin: 0 0 0.75rem;
+    }
+
+    .why-ai-text {
+        color: var(--text-color, #E6FFF6);
+        line-height: 1.55;
+        animation: aiFadeIn 320ms ease;
+    }
+
+    @keyframes aiFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(4px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .signal-row {
+        margin-bottom: 0.75rem;
+    }
+
+    .signal-label {
+        color: var(--text-secondary, #B0B9B6);
+        font-size: 0.85rem;
+        margin-bottom: 0.3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .signal-subtext {
+        color: var(--text-secondary, #B0B9B6);
+        font-size: 0.76rem;
+        margin-top: 0.28rem;
+        opacity: 0.9;
+    }
+
+    .signal-track {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+    }
+
+    .signal-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--primary-color, #18E3A4), var(--primary-dark, #13c891));
+    }
+
+    .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .chip {
+        padding: 0.3rem 0.65rem;
+        border-radius: 999px;
+        border: 1px solid rgba(24, 227, 164, 0.35);
+        color: var(--primary-color, #18E3A4);
+        background: rgba(24, 227, 164, 0.1);
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .why-actions {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.6rem 1rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .btn-secondary {
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        background: transparent;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(24, 227, 164, 0.1);
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        color: #0d0f0f;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+    }
+
+    @media (max-width: 900px) {
+        .why-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="why-page-wrap">
+    <div style="margin-bottom: 1rem;">
+        <a href="{{ path('discover') }}" class="btn btn-secondary">← Retour</a>
+    </div>
+
+    <div class="why-header">
+        <h1>Pourquoi je vois ceci ?</h1>
+        <p>Explication hybride: signaux de recommandation + interprétation IA.</p>
+    </div>
+
+    <div class="why-grid">
+        <div class="universe-card">
+            <div class="card-type">{{ postDetails.typeLabel }}</div>
+            <h2 class="card-title">{{ postDetails.title }}</h2>
+            <div class="card-genre-tags">
+                <span class="genre-tag">{{ post.tag }}</span>
+            </div>
+            <p class="card-description">{{ postDetails.description|default('') }}</p>
+        </div>
+
+        <div class="why-panel ai-panel">
+            <h3>Explication IA</h3>
+            <p class="why-ai-text">{{ aiExplanation }}</p>
+
+            <h3 style="margin-top:1rem;">Signaux</h3>
+            {% set b = post.score_breakdown %}
+
+            <div class="signal-row">
+                <div class="signal-label"><span>Tag Match</span></div>
+                <div class="signal-track"><div class="signal-fill" style="width: {{ (b.tag_similarity * 100)|round(0) }}%;"></div></div>
+                <div class="signal-subtext">Alignement avec vos intérêts</div>
+            </div>
+
+            <div class="signal-row">
+                <div class="signal-label"><span>Engagement</span></div>
+                <div class="signal-track"><div class="signal-fill" style="width: {{ (b.engagement_score * 100)|round(0) }}%;"></div></div>
+                <div class="signal-subtext">Popularité du contenu</div>
+            </div>
+
+            <div class="signal-row">
+                <div class="signal-label"><span>Récence</span></div>
+                <div class="signal-track"><div class="signal-fill" style="width: {{ (b.recency_decay * 100)|round(0) }}%;"></div></div>
+                <div class="signal-subtext">Publié récemment</div>
+            </div>
+
+            <div class="signal-row">
+                <div class="signal-label"><span>Comportement</span></div>
+                <div class="signal-track"><div class="signal-fill" style="width: {{ (b.behavior_similarity * 100)|round(0) }}%;"></div></div>
+                <div class="signal-subtext">Basé sur vos interactions</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="why-grid" style="margin-top:1rem;">
+        <div class="why-panel">
+            <h3>Vos signaux de profil</h3>
+            <p class="signal-label">Top tags de préférences</p>
+            <div class="chips">
+                {% for tag in topPreferenceTags %}
+                    <span class="chip">{{ tag }}</span>
+                {% else %}
+                    <span class="signal-label">Aucun tag de préférence.</span>
+                {% endfor %}
+            </div>
+
+            <p class="signal-label" style="margin-top:0.9rem;">Top tags de comportement</p>
+            <div class="chips">
+                {% for tag in topBehaviorTags %}
+                    <span class="chip">{{ tag }}</span>
+                {% else %}
+                    <span class="signal-label">Aucun signal comportemental.</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div></div>
+    </div>
+</div>
+</body>
+</html>

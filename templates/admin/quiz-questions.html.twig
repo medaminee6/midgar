@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Questions Quiz - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    
+    <style>
+        :root {
+            --bg-main: #0B0F0E;
+            --bg-panel: #141A19;
+            --bg-soft: #1A1F1E;
+            --bg-card: #1E2423;
+            --border: #2A3139;
+            --border-light: #3A424A;
+            --border-hover: #4A5259;
+
+            --accent: #18E3A4;
+            --accent-dark: #13c891;
+            --accent-light: rgba(24,227,164,0.12);
+            --accent-glow: rgba(24,227,164,0.25);
+            --danger: #EF5350;
+            --danger-light: rgba(239,83,80,0.12);
+            --warning: #FFA726;
+            --warning-light: rgba(255,167,38,0.12);
+            --info: #42A5F5;
+            --info-light: rgba(66,165,245,0.12);
+            --success: #66BB6A;
+            --purple: #AB47BC;
+
+            --text-main: #E6FFF6;
+            --text-light: #CBD5D1;
+            --text-muted: #9BA6A2;
+            --text-placeholder: #7A8580;
+
+            --sidebar-width: 280px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --shadow: 0 10px 25px rgba(0,0,0,0.3);
+            --shadow-lg: 0 15px 35px rgba(0,0,0,0.4);
+            --shadow-xl: 0 20px 50px rgba(0,0,0,0.5);
+            --shadow-accent: 0 0 25px rgba(24,227,164,0.3);
+            --shadow-hover: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body {
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Inter", Arial, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== LAYOUT ===== */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+
+        .admin-sidebar ul {
+            list-style: none;
+        }
+
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            margin: 0.25rem 0;
+            font-weight: 500;
+        }
+
+        .admin-sidebar a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .admin-sidebar a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent-light), transparent);
+            transition: width 0.4s ease;
+            z-index: -1;
+        }
+
+        .admin-sidebar a:hover::before,
+        .admin-sidebar a.active::before {
+            width: 100%;
+        }
+
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .admin-sidebar a:hover i,
+        .admin-sidebar a.active i {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px var(--accent-glow));
+        }
+
+        /* ===== CONTENT ===== */
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem 3rem;
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-main) 0%, #0F1413 100%);
+            position: relative;
+        }
+
+        .admin-content::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            z-index: 1;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .page-title i {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-left: 3.5rem;
+        }
+
+        /* ===== ALERT ===== */
+        .alert {
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            border-left: 4px solid;
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .alert i {
+            font-size: 1.4rem;
+        }
+
+        .alert-success {
+            background: rgba(24,227,164,0.08);
+            border-left-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .alert-danger {
+            background: rgba(239,83,80,0.08);
+            border-left-color: var(--danger);
+            color: var(--danger);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== STATS DASHBOARD ===== */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .analytics-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .analytics-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+
+        .analytics-title {
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .analytics-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--accent);
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-icon {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* ===== SEARCH AND SORT ===== */
+        .search-section {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+
+        .search-form-grid {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-select {
+            padding: 0.75rem;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+
+        .btn i {
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover i {
+            transform: scale(1.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            box-shadow: 0 4px 15px rgba(24,227,164,0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(24,227,164,0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(42,49,57,0.8);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #2A3139;
+            transform: translateY(-3px);
+        }
+
+        .btn-sm {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.9rem;
+            min-width: auto;
+            border-radius: 8px;
+        }
+
+        /* ===== CREATE BUTTON ===== */
+        .create-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .create-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.05rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow), var(--shadow-accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .create-btn i {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover), var(--shadow-accent);
+        }
+
+        .create-btn:hover i {
+            transform: rotate(90deg);
+        }
+
+        /* ===== FORM CARD ===== */
+        .form-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            transition: all 0.4s ease;
+            animation: cardAppear 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-card:hover {
+            box-shadow: var(--shadow-xl);
+            border-color: var(--border-hover);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .form-header i {
+            font-size: 1.8rem;
+            color: var(--accent);
+            background: var(--accent-light);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .form-subtitle {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-control, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        /* ===== TABLE ===== */
+        .table-container {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-light);
+            margin-top: 2rem;
+            animation: tableAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes tableAppear {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, rgba(26,31,30,0.9), rgba(32,38,37,0.9));
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        th {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+
+        th::after {
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        th:hover::after {
+            width: 100%;
+        }
+
+        td {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-light);
+            transition: all 0.2s ease;
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            animation: fadeRow 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+            position: relative;
+        }
+
+        tbody tr:hover {
+            background: rgba(24,227,164,0.05);
+        }
+
+        tbody tr:hover td {
+            color: var(--text-main);
+            transform: translateX(5px);
+        }
+
+        @keyframes fadeRow {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .badge i {
+            font-size: 0.7rem;
+        }
+
+        .bg-success {
+            background: rgba(24,227,164,0.15);
+            color: var(--accent);
+            border-color: rgba(24,227,164,0.3);
+        }
+
+        .bg-warning {
+            background: rgba(255,167,38,0.15);
+            color: var(--warning);
+            border-color: rgba(255,167,38,0.3);
+        }
+
+        .bg-danger {
+            background: rgba(239,83,80,0.15);
+            color: var(--danger);
+            border-color: rgba(239,83,80,0.3);
+        }
+
+        .bg-info {
+            background: rgba(66,165,245,0.15);
+            color: var(--info);
+            border-color: rgba(66,165,245,0.3);
+        }
+
+        .bg-purple {
+            background: rgba(171,71,188,0.15);
+            color: var(--purple);
+            border-color: rgba(171,71,188,0.3);
+        }
+
+        /* ===== TAG BADGE ===== */
+        .tag-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            background: rgba(171,71,188,0.1);
+            color: var(--purple);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.125rem;
+            border: 1px solid rgba(171,71,188,0.3);
+        }
+
+        .question-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-edit {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            text-decoration: none;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(24,227,164,0.3);
+        }
+
+        .btn-delete {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: linear-gradient(135deg, var(--danger), #D32F2F);
+            color: #FFFFFF;
+            text-decoration: none;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(239,83,80,0.3);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+            display: block;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-light);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .search-form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                width: 80px;
+                padding: 1.5rem 0;
+            }
+            
+            .admin-sidebar .logo-text,
+            .admin-sidebar a span {
+                display: none;
+            }
+            
+            .admin-sidebar a {
+                justify-content: center;
+                padding: 1rem;
+            }
+            
+            .admin-content {
+                margin-left: 80px;
+                padding: 2rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-edit, .btn-delete {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .admin-content {
+                padding: 1.5rem;
+            }
+            
+            .form-card {
+                padding: 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+            }
+        }
+
+        /* ===== ANIMATION DELAYS FOR ROWS ===== */
+        tbody tr:nth-child(1) { animation-delay: 0.1s; }
+        tbody tr:nth-child(2) { animation-delay: 0.2s; }
+        tbody tr:nth-child(3) { animation-delay: 0.3s; }
+        tbody tr:nth-child(4) { animation-delay: 0.4s; }
+        tbody tr:nth-child(5) { animation-delay: 0.5s; }
+        tbody tr:nth-child(6) { animation-delay: 0.6s; }
+        tbody tr:nth-child(7) { animation-delay: 0.7s; }
+        tbody tr:nth-child(8) { animation-delay: 0.8s; }
+        tbody tr:nth-child(9) { animation-delay: 0.9s; }
+        tbody tr:nth-child(10) { animation-delay: 1s; }
+    </style>
+</head>
+<body>
+
+<div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Midgar Admin</div>
+        </div>
+        <ul>
+            <li><a href="{{ path('admin_users') }}"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+            <li><a href="{{ path('admin_oeuvres') }}"><i class="fas fa-book"></i><span>Œuvres</span></a></li>
+            <li><a href="{{ path('admin_artefacts') }}"><i class="fas fa-gem"></i><span>Artefacts</span></a></li>
+            <li><a href="{{ path('admin_quiz_questions') }}" class="active"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+            <li><a href="{{ path('admin_produits') }}"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+            <li><a href="{{ path('admin_challenges') }}"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="admin-content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <h1 class="page-title"><i class="fas fa-question-circle"></i> Gestion des questions Quiz</h1>
+            <p class="page-subtitle">Créez et gérez les questions du questionnaire de préférences</p>
+        </div>
+
+        <!-- STATS DASHBOARD -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-question"></i></div>
+                <div class="stat-title">Questions Total</div>
+                <div class="stat-value">{{ questions|length }}</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-list-ul"></i></div>
+                <div class="stat-title">Réponses Total</div>
+                <div class="stat-value">{{ reponses|length }}</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-tags"></i></div>
+                <div class="stat-title">Tags Uniques</div>
+                <div class="stat-value">
+                    {% set uniqueTags = [] %}
+                    {% for reponse in reponses %}
+                        {% if reponse.tag not in uniqueTags %}
+                            {% set uniqueTags = uniqueTags|merge([reponse.tag]) %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ uniqueTags|length }}
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-title">Moyenne/Réponse</div>
+                <div class="stat-value">
+                    {% if questions|length > 0 %}
+                        {{ (reponses|length / questions|length)|round(1) }}
+                    {% else %}0{% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if piechart is defined and barchart is defined and linechart is defined %}
+            <div class="analytics-dashboard">
+                <div class="analytics-card">
+                    <div class="analytics-title">Répartition des tags</div>
+                    <div class="analytics-subtitle">Part de chaque tag dans les contenus recommandables.</div>
+                    {# Pie chart: distribution des tags recommandés #}
+                    {{ piechart(piechart) }}
+                </div>
+
+                <div class="analytics-card">
+                    <div class="analytics-title">Engagement par tag</div>
+                    <div class="analytics-subtitle">Score d'engagement calculé par tag (likes + 2× commentaires).</div>
+                    {# Bar chart: engagement par tag #}
+                    {{ barchart(barchart) }}
+                </div>
+
+                <div class="analytics-card">
+                    <div class="analytics-title">Tendance d'activité</div>
+                    <div class="analytics-subtitle">Volume d'interactions quotidien sur les 7 derniers jours.</div>
+                    {# Line chart: tendance journalière des interactions #}
+                    {{ linechart(linechart) }}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- ALERTS -->
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+        
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+
+        <!-- CREATE BUTTON -->
+        <div class="create-section">
+            <button class="create-btn" type="button" onclick="toggleQuestionForm()">
+                <i class="fas fa-plus"></i>
+                Ajouter une question
+            </button>
+        </div>
+
+        <!-- QUESTION FORM CARD -->
+        <div id="questionFormCard" class="form-card" style="display: {{ editQuestion is defined and editQuestion ? 'block' : 'none' }};">
+            <div class="form-header">
+                <i class="fas fa-{{ editQuestion is defined and editQuestion ? 'edit' : 'plus-circle' }}"></i>
+                <div>
+                    <div class="form-title">{{ editQuestion is defined and editQuestion ? 'Modifier la question' : 'Nouvelle question' }}</div>
+                    <div class="form-subtitle">{{ editQuestion is defined and editQuestion ? 'Modifiez la question existante' : 'Créez une nouvelle question pour le quiz' }}</div>
+                </div>
+            </div>
+            
+            {% if errors is defined and errors|length > 0 %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Erreurs de validation:</strong>
+                        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <form method="POST" action="{% if editQuestion is defined and editQuestion %}{{ path('admin_quiz_questions_update', {id: editQuestion.id}) }}{% else %}{{ path('admin_quiz_questions_create') }}{% endif %}">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-question"></i> Question
+                    </label>
+                    <textarea class="form-control" name="question" rows="3" required>{% if editQuestion is defined and editQuestion %}{{ editQuestion.question }}{% endif %}</textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-{{ editQuestion is defined and editQuestion ? 'save' : 'plus' }}"></i>
+                        {{ editQuestion is defined and editQuestion ? 'Mettre à jour' : 'Ajouter la question' }}
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="hideQuestionForm()">
+                        <i class="fas fa-times"></i>
+                        Annuler
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- SEARCH AND SORT -->
+        <div class="search-section">
+            <form method="GET" class="search-form-grid">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-search"></i> Rechercher
+                    </label>
+                    <input type="text" name="q" value="{{ search | default('') }}" 
+                        class="form-input"
+                        placeholder="Rechercher une question, option ou tag">
+                        
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-sort"></i> Trier par
+                    </label>
+                    <select name="sort" class="form-select">
+                        <option value="createdAt_desc" {% if sort == 'createdAt_desc' %}selected{% endif %}>Plus récent</option>
+                        <option value="createdAt_asc" {% if sort == 'createdAt_asc' %}selected{% endif %}>Plus ancien</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Rechercher</button>
+                    {% if search %}
+                        <a href="{{ path('admin_quiz_questions') }}" class="btn btn-secondary" style="margin-top: 0.5rem; display: block; text-align: center;">Réinitialiser</a>
+                    {% endif %}
+
+                </div>
+            </form>
+        </div>
+
+        <!-- QUESTIONS TABLE -->
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-question"></i> Question</th>
+                            <th><i class="fas fa-tags"></i> Tags</th>
+                            <th><i class="fas fa-calendar-alt"></i> Créée le</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if questions|length > 0 %}
+                            {% for question in questions %}
+                                <tr>
+                                    <td><strong>#{{ question.id }}</strong></td>
+                                    <td>
+                                        <div style="font-weight: 600; color: var(--text-main);">{{ question.question }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="question-tags">
+                                            {% set questionTags = [] %}
+                                            {% for reponse in reponses %}
+                                                {% if reponse.question.id == question.id %}
+                                                    {% if reponse.tag not in questionTags %}
+                                                        {% set questionTags = questionTags|merge([reponse.tag]) %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% for tag in questionTags %}
+                                                <span class="tag-badge">{{ tag }}</span>
+                                            {% else %}
+                                                <span style="color: var(--text-muted); font-size: 0.9rem;">Aucun tag</span>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td>{{ question.createdAt | date('d/m/Y H:i') }}</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="{{ path('admin_quiz_questions_edit', {id: question.id}) }}" class="btn-edit">
+                                                <i class="fas fa-edit"></i> Éditer
+                                            </a>
+                                            <form method="POST" action="{{ path('admin_quiz_questions_delete', {id: question.id}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette question ? Toutes les réponses associées seront également supprimées.');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_question_' ~ question.id) }}">
+                                                <button type="submit" class="btn-delete">
+                                                    <i class="fas fa-trash"></i> Supprimer
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <i class="fas fa-question-circle"></i>
+                                        <h3>Aucune question trouvée</h3>
+                                        <p>Commencez par créer votre première question !</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- RESPONSES SECTION -->
+        <div style="margin-top: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="color: var(--accent); font-size: 2rem; display: flex; align-items: center; gap: 1rem;">
+                    <i class="fas fa-list-ul"></i> Gestion des réponses
+                </h2>
+                <button class="create-btn" type="button" onclick="toggleReponseForm()">
+                    <i class="fas fa-plus"></i>
+                    Ajouter une réponse
+                </button>
+            </div>
+
+            <!-- REPONSE FORM CARD -->
+            <div id="reponseFormCard" class="form-card" style="display: {{ editReponse is defined and editReponse ? 'block' : 'none' }};">
+                <div class="form-header">
+                    <i class="fas fa-{{ editReponse is defined and editReponse ? 'edit' : 'plus-circle' }}"></i>
+                    <div>
+                        <div class="form-title">{{ editReponse is defined and editReponse ? 'Modifier la réponse' : 'Nouvelle réponse' }}</div>
+                        <div class="form-subtitle">{{ editReponse is defined and editReponse ? 'Modifiez la réponse existante' : 'Ajoutez une nouvelle réponse à une question' }}</div>
+                    </div>
+                </div>
+                
+                <form method="POST" action="{% if editReponse is defined and editReponse %}{{ path('admin_quiz_reponses_update', {id: editReponse.id}) }}{% else %}{{ path('admin_quiz_reponses_create') }}{% endif %}">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-tag"></i> Option
+                        </label>
+                        <input class="form-control" type="text" name="option" value="{% if editReponse is defined and editReponse %}{{ editReponse.option }}{% endif %}" required placeholder="Ex: Épic, Sombre, Magique...">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-hashtag"></i> Tag
+                        </label>
+                        <input class="form-control" type="text" name="tag" value="{% if editReponse is defined and editReponse %}{{ editReponse.tag }}{% endif %}" required placeholder="Ex: action, aventure, magie...">
+                        <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">Séparez les tags par des virgules pour en ajouter plusieurs</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-question"></i> Question associée
+                        </label>
+                        <select class="form-select" name="question_id" required>
+                            <option value="">-- Sélectionner une question --</option>
+                            {% for question in questions %}
+                                <option value="{{ question.id }}" {% if editReponse is defined and editReponse and editReponse.question.id == question.id %}selected{% endif %}>
+                                    #{{ question.id }} - {{ question.question[:50] }}{{ question.question|length > 50 ? '...' : '' }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-{{ editReponse is defined and editReponse ? 'save' : 'plus' }}"></i>
+                            {{ editReponse is defined and editReponse ? 'Mettre à jour' : 'Ajouter la réponse' }}
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="hideReponseForm()">
+                            <i class="fas fa-times"></i>
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- RESPONSES TABLE -->
+            <div class="table-container" style="margin-top: 2rem;">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-hashtag"></i> ID</th>
+                                <th><i class="fas fa-tag"></i> Option</th>
+                                <th><i class="fas fa-hashtag"></i> Tag</th>
+                                <th><i class="fas fa-question"></i> Question</th>
+                                <th><i class="fas fa-cogs"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if reponses|length > 0 %}
+                                {% for reponse in reponses %}
+                                    <tr>
+                                        <td><strong>#{{ reponse.id }}</strong></td>
+                                        <td style="font-weight: 600; color: var(--text-main);">{{ reponse.option }}</td>
+                                        <td><span class="tag-badge">{{ reponse.tag }}</span></td>
+                                        <td>
+                                            <div style="color: var(--text-light);">
+                                                #{{ reponse.question.id }} - {{ reponse.question.question[:50] }}{{ reponse.question.question|length > 50 ? '...' : '' }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="{{ path('admin_quiz_reponses_edit', {id: reponse.id}) }}" class="btn-edit">
+                                                    <i class="fas fa-edit"></i> Éditer
+                                                </a>
+                                                <form method="POST" action="{{ path('admin_quiz_reponses_delete', {id: reponse.id}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réponse ?');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_reponse_' ~ reponse.id) }}">
+                                                    <button type="submit" class="btn-delete">
+                                                        <i class="fas fa-trash"></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state">
+                                            <i class="fas fa-list-ul"></i>
+                                            <h3>Aucune réponse trouvée</h3>
+                                            <p>Ajoutez des réponses aux questions pour compléter le quiz.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    // Toggle question form
+    function toggleQuestionForm() {
+        const formCard = document.getElementById('questionFormCard');
+        if (formCard.style.display === 'none') {
+            formCard.style.display = 'block';
+            formCard.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            formCard.style.display = 'none';
+        }
+    }
+
+    function hideQuestionForm() {
+        document.getElementById('questionFormCard').style.display = 'none';
+        // Redirect to clear edit mode
+        window.location.href = "{{ path('admin_quiz_questions') }}";
+    }
+
+    // Toggle reponse form
+    function toggleReponseForm() {
+        const formCard = document.getElementById('reponseFormCard');
+        if (formCard.style.display === 'none') {
+            formCard.style.display = 'block';
+            formCard.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            formCard.style.display = 'none';
+        }
+    }
+
+    function hideReponseForm() {
+        document.getElementById('reponseFormCard').style.display = 'none';
+        // Redirect to clear edit mode
+        window.location.href = "{{ path('admin_quiz_questions') }}";
+    }
+
+    // Auto-show forms if in edit mode
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if editQuestion is defined and editQuestion %}
+            document.getElementById('questionFormCard').style.display = 'block';
+        {% endif %}
+        
+        {% if editReponse is defined and editReponse %}
+            document.getElementById('reponseFormCard').style.display = 'block';
+        {% endif %}
+    });
+
+    // Animation des cartes de statistiques
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Animation progressive des lignes du tableau
+    document.querySelectorAll('tbody tr').forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.05}s`;
+    });
+
+    // Animation des boutons de création
+    document.querySelectorAll('.create-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.add('active');
+            setTimeout(() => this.classList.remove('active'), 300);
+        });
+    });
+
+    // Focus sur les inputs
+    document.querySelectorAll('.form-control, .form-select, .form-input').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.boxShadow = '0 0 0 3px rgba(24,227,164,0.2)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.boxShadow = '';
+        });
+    });
+
+    // Confirmation pour les suppressions
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (this.form && this.form.onsubmit) return;
+        });
+    });
+</script>
+
+</body>
+</html>

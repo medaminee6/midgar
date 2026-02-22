@@ -1,0 +1,64 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+parameters:
+    uploads_directory: '%kernel.project_dir%/public/uploads'
+    user_photos_directory: '%kernel.project_dir%/public/uploads/avatars'
+    avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+    app_base_url: 'http://127.0.0.1:8000'
+    mailer_from: '%env(MAILER_FROM)%'
+    
+    # AI Configuration - lire depuis les variables d'environnement
+    ai_provider: '%env(AI_PROVIDER)%'
+    ai_model: '%env(AI_MODEL)%'
+
+services:
+    # Default configuration for services in this file
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        bind:
+            string $appBaseUrl: '%app_base_url%'
+            string $fromEmail: '%mailer_from%'
+
+    # Makes classes in src/ available to be used as services
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # Service AI
+    App\Service\ImageAnalysisService:
+        arguments:
+            $apiKey: '%env(AI_API_KEY)%'
+            $apiModel: '%ai_model%'
+            $apiProvider: '%ai_provider%'
+        calls:
+            - method: setGoogleApiKey
+              arguments:
+                  - '%env(GOOGLE_API_KEY)%'
+            - method: setAnthropicApiKey
+              arguments:
+                  - '%env(ANTHROPIC_API_KEY)%'
+
+    # Service GeminiPro
+    App\Service\GeminiProService:
+        arguments:
+             $projectId: '%env(GOOGLE_PROJECT_ID)%'
+             $serviceAccountPath: '%kernel.project_dir%/config/midgarapp-a2e246d71083.json'
+
+    # Avatar generator alias → local implementation
+    App\Avatar\AvatarGeneratorInterface:
+        alias: 'App\Avatar\LocalAvatarGenerator'
+        public: true
+
+    App\EventSubscriber\ContentCreatedEmailSubscriber:
+        tags:
+            - { name: doctrine.event_subscriber }
+
+    App\Service\AiExplanationService:
+        arguments:
+            $aiEnabled: '%env(bool:AI_EXPLANATION_ENABLED)%'
+            $groqApiKey: '%env(GROQ_API_KEY)%'
