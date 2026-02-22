@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Génération d’avatar</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f172a; color: #e5e7eb; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: #020617; padding: 25px; border-radius: 10px; width: 360px; box-shadow: 0 0 25px rgba(0,0,0,0.6); }
+        h2 { text-align: center; margin-bottom: 20px; color: #38bdf8; }
+        form { display: flex; flex-direction: column; gap: 12px; }
+        input[type="file"], select, button { padding: 10px; border-radius: 5px; border: none; font-size: 14px; }
+        input[type="file"] { background: #1e293b; color: #94a3b8; }
+        select { background: #1e293b; color: white; cursor: pointer; }
+        button { background: #38bdf8; color: #020617; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #0ea5e9; transform: scale(1.02); }
+        .result { margin-top: 20px; text-align: center; border-top: 1px solid #1e293b; padding-top: 20px; }
+        img { border-radius: 50%; border: 3px solid #38bdf8; margin-top: 10px; width: 180px; height: 180px; object-fit: cover; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+        .flash-error { background: #7f1d1d; color: #fecaca; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Génération d’avatar</h2>
+
+    {# Affichage des erreurs Symfony si l'API échoue #}
+    {% for message in app.flashes('error') %}
+        <div class="flash-error">{{ message }}</div>
+    {% endfor %}
+
+    <form action="{{ path('app_avatar_create') }}" method="post" enctype="multipart/form-data">
+        <label style="font-size: 12px; color: #94a3b8;">Ta photo :</label>
+        <input type="file" name="image" accept="image/*" required>
+
+        <label style="font-size: 12px; color: #94a3b8;">Style de l'avatar :</label>
+        <select name="theme">
+            <option value="anime style, masterpiece">Anime</option>
+            <option value="high fantasy, dnd character portrait">Fantasy</option>
+            <option value="cyberpunk 2077 style, neon lights">Cyberpunk</option>
+            <option value="dark gothic style, moody lighting">Dark</option>
+        </select>
+
+        <button type="submit" id="btn-submit">Générer l'avatar</button>
+    </form>
+
+    {% if avatar_path is defined %}
+    <div class="result">
+        <p style="color: #94a3b8;">Résultat :</p>
+        
+        {# Si c'est une URL externe, on ne met PAS asset() #}
+        {% if is_external is defined and is_external %}
+            <img src="{{ avatar_path }}" alt="Avatar généré">
+        {% else %}
+            <img src="{{ asset(avatar_path) }}" alt="Avatar généré">
+        {% endif %}
+        
+        <br><br>
+        <a href="{{ avatar_path }}" download target="_blank" style="color: #38bdf8; text-decoration: none; font-size: 13px;">📥 Télécharger</a>
+    </div>
+{% endif %}
+</div>
+
+<script>
+    // Petit script pour montrer que ça travaille (car l'API prend 2-5 secondes)
+    document.querySelector('form').onsubmit = function() {
+        const btn = document.getElementById('btn-submit');
+        btn.innerHTML = "Génération en cours...";
+        btn.style.opacity = "0.7";
+        btn.disabled = true;
+    };
+</script>
+
+</body>
+</html>

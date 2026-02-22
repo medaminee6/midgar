@@ -1,4 +1,15 @@
+<<<<<<< HEAD
 models/stable-diffusion-v1-5/
+=======
+
+# Local env files (may contain secrets)
+.env
+.env.dev
+models/stable-diffusion-v1-5/
+config/midgarapp-a2e246d71083.json
+
+
+>>>>>>> afea128 (generation des avatars)
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -7,4 +18,5 @@ models/stable-diffusion-v1-5/
 /public/bundles/
 /var/
 /vendor/
+//
 ###< symfony/framework-bundle ###

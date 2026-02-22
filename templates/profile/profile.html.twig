@@ -39,6 +39,7 @@
     </style>
 </head>
 <body>
+<<<<<<< HEAD
 <header>
     <div class="logo">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -50,6 +51,624 @@
             <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
         </svg>
         Midgar
+=======
+    <!-- VIDEO BACKGROUND -->
+    <div class="gradient-background" id="gradient-bg"></div>
+    <div class="video-overlay"></div>
+    <video id="bg-video" class="video-background" autoplay muted loop playsinline>
+        <source src="{{ asset('uploads/dragon.mp4') }}" type="video/mp4">
+        Votre navigateur ne supporte pas la vidéo HTML5.
+    </video>
+
+    <!-- SITE CONTENT -->
+    <div class="site-content">
+        <!-- HEADER -->
+        <header>
+            <div class="logo" onclick="window.location.href='{{ path('home') }}'">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+                    <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+                    <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+                    <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+                    <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+                    <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+                </svg>
+                Midgar
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="{{ path('home') }}" class="magic-btn">Accueil</a></li>
+                    <li><a href="/discover" class="magic-btn">Découvrir</a></li>
+                    <li><a href="/universes" class="magic-btn">Univers</a></li>
+                    <li><a href="/personnages" class="magic-btn">Personnages</a></li>
+                    <li><a href="/oeuvre" class="magic-btn">Œuvre</a></li>
+                    <li><a href="/artefact" class="magic-btn">Artefacts</a></li>
+                    <li><a href="/shop" class="magic-btn">Boutique</a></li>
+                    <li><a href="/challenges" class="magic-btn">Défis</a></li>
+                    {% if app.user %}
+                    <li>
+                        <a href="{{ path('generate_image') }}" class="magic-btn">
+                            <i class="fas fa-magic"></i> Avatar
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            
+            <div class="auth-buttons">
+                {% if app.user %}
+                    <button class="magic-btn" onclick="openModal('searchUserModal')" title="Rechercher un utilisateur">
+                        <i class="fas fa-search"></i>
+                    </button>
+
+                    <a href="{{ path('profile') }}" class="profile-link magic-btn">
+                        <div class="avatar">
+                            {% if app.user.avatar %}
+                                <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}">
+                            {% else %}
+                                <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}">
+                            {% endif %}
+                        </div>
+                        <span>{{ app.user.username }}</span>
+                    </a>
+                    
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin_users') }}" class="btn btn-warning btn-sm magic-btn">Admin</a>
+                    {% endif %}
+                    
+                    <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm magic-btn">Déconnexion</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm magic-btn">Connexion</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm magic-btn">S'inscrire</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main>
+            {% if user is defined %}
+            <section class="section">
+                <div class="container">
+                    <h1 class="section-title">
+                        {% if isOwner %}
+                            Mon Profil
+                        {% else %}
+                            Profil de {{ user.username }}
+                        {% endif %}
+                    </h1>
+                    
+                    <div class="profile-layout">
+                        <!-- SIDEBAR - INFOS UTILISATEUR -->
+                        <div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- Avatar -->
+                                    {% if user.avatar %}
+                                        <div class="profile-avatar">
+                                            <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="Avatar de {{ user.username }}">
+                                        </div>
+                                    {% else %}
+                                        <div class="profile-avatar-placeholder">
+                                            {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Infos de base -->
+                                    <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">{{ user.username }}</h2>
+                                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">{{ user.prenom }} {{ user.nom }}</p>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                                        <i class="fas fa-envelope"></i> {{ user.email }}
+                                    </p>
+                                    
+                                    {% if user.phoneNumber %}
+                                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                                            <i class="fas fa-phone"></i> {{ user.phoneNumber }}
+                                        </p>
+                                    {% endif %}
+                                    
+                                    <div style="display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
+                                        <span class="badge bg-primary">
+                                            {% if isOwner %}Mon compte{% else %}Membre{% endif %}
+                                        </span>
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            {{ user.createdAt|date('d/m/Y') }}
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Bio -->
+                                    {% if user.bio %}
+                                        <div class="bio-container">
+                                            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">À propos</h4>
+                                            <p style="color: var(--text-secondary); margin-bottom: 0;">{{ user.bio|nl2br }}</p>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Boutons d'action (uniquement si c'est le propriétaire) -->
+                                    {% if isOwner %}
+                                        <div style="margin-top: 2rem;">
+                                            <button class="btn btn-primary w-100 mb-2" onclick="openModal('editProfileModal')">
+                                                <i class="fas fa-edit me-2"></i> Éditer le profil
+                                            </button>
+                                            
+                                            <!-- BOUTON GÉNÉRATION AVATAR QUI OUVRE LA MODALE -->
+                                            <button class="btn btn-success w-100 mb-2" onclick="openModal('generateAvatarModal')">
+                                                <i class="fas fa-magic me-2"></i> Générer un avatar IA
+                                            </button>
+                                            
+                                            <button class="btn btn-secondary w-100" onclick="openModal('settingsModal')">
+                                                <i class="fas fa-cog me-2"></i> Paramètres
+                                            </button>
+                                        </div>
+                                    {% else %}
+                                        <!-- Message indiquant que c'est un profil public -->
+                                        <div style="margin-top: 2rem; padding: 1rem; background: rgba(24, 227, 164, 0.05); border-radius: 8px; text-align: center;">
+                                            <p style="color: var(--text-secondary); margin-bottom: 0;">
+                                                <i class="fas fa-eye me-2"></i> Profil public - Consultation seule
+                                            </p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MAIN CONTENT - CRÉATIONS ET FAVORIS -->
+                        <div class="content-grid">
+                            <!-- ARTEFACTS -->
+                            <div class="content-section">
+                                <h2><i class="fas fa-gem me-2"></i> Artefacts</h2>
+                                <div class="items-grid">
+                                    {% if artefacts is defined and artefacts|length > 0 %}
+                                        {% for artefact in artefacts %}
+                                            <div class="card" onclick="openArtefactModal({{ artefact.id }})">
+                                                <div class="card-image">
+                                                    {% if artefact.imageUrl is defined and artefact.imageUrl %}
+                                                        <img src="{{ asset(artefact.imageUrl) }}" alt="{{ artefact.name|default('Artefact') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            ⚔️
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3>{{ artefact.name|default('Sans nom') }}</h3>
+                                                    <p>{{ artefact.origins|default('Aucune description')|slice(0, 80) ~ '...' }}</p>
+                                                    <small style="color: var(--text-secondary);">
+                                                        {% if artefact.createdAt is defined and artefact.createdAt %}
+                                                            {{ artefact.createdAt|date('d/m/Y') }}
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="empty-state">
+                                            <span class="empty-icon">⚔️</span>
+                                            <p>Aucun artefact créé</p>
+                                            {% if isOwner %}
+                                                <a href="/artefact/create" class="btn btn-primary btn-sm mt-3">Créer un artefact</a>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- ŒUVRES -->
+                            <div class="content-section">
+                                <h2><i class="fas fa-pen-fancy me-2"></i> Œuvres</h2>
+                                <div class="items-grid">
+                                    {% if oeuvres is defined and oeuvres|length > 0 %}
+                                        {% for oeuvre in oeuvres %}
+                                            <div class="card" onclick="openOeuvreModal({{ oeuvre.id }})">
+                                                <div class="card-image">
+                                                    {% if oeuvre.imageUrl is defined and oeuvre.imageUrl %}
+                                                        <img src="{{ asset(oeuvre.imageUrl) }}" alt="{{ oeuvre.title|default('Œuvre') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            📚
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3>{{ oeuvre.title|default('Sans titre') }}</h3>
+                                                    <p>{{ oeuvre.description|default('Aucune description')|slice(0, 80) ~ '...' }}</p>
+                                                    <small style="color: var(--text-secondary);">
+                                                        {% if oeuvre.createdAt is defined and oeuvre.createdAt %}
+                                                            {{ oeuvre.createdAt|date('d/m/Y') }}
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="empty-state">
+                                            <span class="empty-icon">📚</span>
+                                            <p>Aucune œuvre créée</p>
+                                            {% if isOwner %}
+                                                <a href="/oeuvre/create" class="btn btn-primary btn-sm mt-3">Créer une œuvre</a>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- FAVORIS - ŒUVRES (uniquement pour le propriétaire) -->
+                            {% if isOwner and favoriOeuvres is defined %}
+                            <div class="content-section">
+                                <h2><i class="fas fa-heart me-2"></i> Favoris - Œuvres</h2>
+                                <div class="items-grid">
+                                    {% if favoriOeuvres|length > 0 %}
+                                        {% for o in favoriOeuvres %}
+                                            <div class="card" onclick="openOeuvreModal({{ o.id }})">
+                                                <div class="card-image">
+                                                    {% if o.imageUrl is defined and o.imageUrl %}
+                                                        <img src="{{ asset(o.imageUrl) }}" alt="{{ o.title|default('Œuvre') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            🎨
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3>{{ o.title|default('Sans titre') }}</h3>
+                                                    <p>{{ o.description|default('Aucune description')|slice(0, 80) ~ '...' }}</p>
+                                                    <button class="btn btn-sm magic-btn remove-favorite-btn" 
+                                                            style="width: 100%; margin-top: 0.5rem; border-color: #dc3545; color: #dc3545;"
+                                                            onclick="event.stopPropagation(); removeFavorite('oeuvre', {{ o.id }}, this)">
+                                                        <i class="fas fa-trash-alt me-2"></i> Retirer
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="empty-state">
+                                            <span class="empty-icon">❤️</span>
+                                            <p>Aucune œuvre favorite</p>
+                                            <a href="/oeuvre" class="btn btn-primary btn-sm mt-3">Découvrir des œuvres</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- FAVORIS - ARTEFACTS (uniquement pour le propriétaire) -->
+                            {% if isOwner and favoriArtefacts is defined %}
+                            <div class="content-section">
+                                <h2><i class="fas fa-heart me-2"></i> Favoris - Artefacts</h2>
+                                <div class="items-grid">
+                                    {% if favoriArtefacts|length > 0 %}
+                                        {% for a in favoriArtefacts %}
+                                            <div class="card" onclick="openArtefactModal({{ a.id }})">
+                                                <div class="card-image">
+                                                    {% if a.imageUrl is defined and a.imageUrl %}
+                                                        <img src="{{ asset(a.imageUrl) }}" alt="{{ a.name|default('Artefact') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            ⚔️
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3>{{ a.name|default('Sans nom') }}</h3>
+                                                    <p>{{ a.origins|default('Aucune description')|slice(0, 80) ~ '...' }}</p>
+                                                    <button class="btn btn-sm magic-btn remove-favorite-btn" 
+                                                            style="width: 100%; margin-top: 0.5rem; border-color: #dc3545; color: #dc3545;"
+                                                            onclick="event.stopPropagation(); removeFavorite('artefact', {{ a.id }}, this)">
+                                                        <i class="fas fa-trash-alt me-2"></i> Retirer
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="empty-state">
+                                            <span class="empty-icon">❤️</span>
+                                            <p>Aucun artefact favori</p>
+                                            <a href="/artefact" class="btn btn-primary btn-sm mt-3">Découvrir des artefacts</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% else %}
+                <section class="section">
+                    <div class="container" style="text-align: center; padding: 4rem 2rem;">
+                        <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">Utilisateur non trouvé</h2>
+                        <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
+                            Le profil que vous recherchez n'existe pas.
+                        </p>
+                        <a href="{{ path('home') }}" class="btn btn-primary magic-btn">Retour à l'accueil</a>
+                    </div>
+                </section>
+            {% endif %}
+        </main>
+
+        <!-- MODALE POUR ŒUVRES -->
+        <div id="oeuvreModal" class="modal">
+            <div class="modal-content modal-detail">
+                <span class="close" onclick="closeModal('oeuvreModal')">&times;</span>
+                <div class="modal-header">
+                    <h2 id="oeuvreTitle">Titre de l'Œuvre</h2>
+                    <div class="modal-subtitle" id="oeuvreAuthor">Par Auteur</div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-image">
+                        <img id="oeuvreImage" src="" alt="Image de l'œuvre">
+                    </div>
+                    <div class="modal-info">
+                        <div class="info-group">
+                            <span class="info-label">Type</span>
+                            <div class="info-value" id="oeuvreType">Roman</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Date de création</span>
+                            <div class="info-value" id="oeuvreDate">01/01/2024</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Statut</span>
+                            <div class="info-value" id="oeuvreStatus">Publié</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Tags</span>
+                            <div class="card-tags" id="oeuvreTags">
+                                <span class="tag">Fantasy</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-description">
+                        <h3>Description</h3>
+                        <p id="oeuvreDescription">Description détaillée de l'œuvre...</p>
+                    </div>
+                </div>
+                <div class="modal-actions" id="oeuvreModalActions">
+                    <button class="btn btn-secondary magic-btn" onclick="closeModal('oeuvreModal')">Fermer</button>
+                    <!-- Les boutons d'édition/suppression seront ajoutés dynamiquement si c'est le propriétaire -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALE POUR ARTEFACTS -->
+        <div id="artefactModal" class="modal">
+            <div class="modal-content modal-detail">
+                <span class="close" onclick="closeModal('artefactModal')">&times;</span>
+                <div class="modal-header">
+                    <h2 id="artefactName">Nom de l'Artefact</h2>
+                    <div class="modal-subtitle" id="artefactType">Type d'artefact</div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-image">
+                        <img id="artefactImage" src="" alt="Image de l'artefact">
+                    </div>
+                    <div class="modal-info">
+                        <div class="info-group">
+                            <span class="info-label">Rareté</span>
+                            <div class="info-value" id="artefactRarity">Légendaire</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Pouvoirs</span>
+                            <div class="info-value" id="artefactPowers">Magie élémentaire</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Date de création</span>
+                            <div class="info-value" id="artefactDate">01/01/2024</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Origine</span>
+                            <div class="info-value" id="artefactOrigin">Ancienne civilisation</div>
+                        </div>
+                    </div>
+                    <div class="modal-description">
+                        <h3>Histoire & Description</h3>
+                        <p id="artefactDescription">Description détaillée de l'artefact...</p>
+                    </div>
+                </div>
+                <div class="modal-actions" id="artefactModalActions">
+                    <button class="btn btn-secondary magic-btn" onclick="closeModal('artefactModal')">Fermer</button>
+                    <!-- Les boutons d'édition/suppression seront ajoutés dynamiquement si c'est le propriétaire -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALE POUR UNIVERS -->
+        <div id="universeModal" class="modal">
+            <div class="modal-content modal-detail">
+                <span class="close" onclick="closeModal('universeModal')">&times;</span>
+                <div class="modal-header">
+                    <h2 id="universeName">Nom de l'Univers</h2>
+                    <div class="modal-subtitle" id="universeCreator">Créé par Utilisateur</div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-image">
+                        <img id="universeImage" src="" alt="Image de l'univers">
+                    </div>
+                    <div class="modal-info">
+                        <div class="info-group">
+                            <span class="info-label">Thèmes</span>
+                            <div class="card-tags" id="universeThemes">
+                                <span class="tag">Fantasy</span>
+                                <span class="tag">Médiéval</span>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Favoris</span>
+                            <div class="info-value" id="universeFavorites">1,240</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Date de création</span>
+                            <div class="info-value" id="universeDate">01/01/2024</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Statut</span>
+                            <div class="info-value" id="universeStatus">Public</div>
+                        </div>
+                    </div>
+                    <div class="modal-description">
+                        <h3>Description</h3>
+                        <p id="universeDescription">Description détaillée de l'univers...</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary magic-btn" onclick="closeModal('universeModal')">Fermer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALE GÉNÉRATION AVATAR IA -->
+        <div id="generateAvatarModal" class="modal">
+            <div class="modal-content" style="max-width: 600px;">
+                <span class="close" onclick="closeModal('generateAvatarModal')">&times;</span>
+                <h2><i class="fas fa-magic me-2"></i> Générer un avatar IA</h2>
+                
+                <form id="avatarGenerateForm" method="POST" action="{{ path('generate_image') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label class="form-label">Photo de base</label>
+                        <input type="file" name="image" accept="image/*" required class="form-control" style="padding: 0.5rem; background: rgba(0,0,0,0.3);">
+                        <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">
+                            <i class="fas fa-info-circle"></i> Choisissez une photo pour la transformer en avatar stylisé
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Thème</label>
+                        <select name="theme" class="form-control" style="background: rgba(0,0,0,0.3);">
+                            <option value="fantasy">Fantasy</option>
+                            <option value="anime">Anime</option>
+                            <option value="cyberpunk">Cyberpunk</option>
+                            <option value="steampunk">Steampunk</option>
+                            <option value="dark_fantasy">Dark Fantasy</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary magic-btn" onclick="closeModal('generateAvatarModal')">
+                            <i class="fas fa-times me-2"></i> Annuler
+                        </button>
+                        <button type="submit" class="btn btn-success magic-btn" id="generateAvatarBtn">
+                            <i class="fas fa-magic me-2"></i> Générer
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Zone d'affichage du résultat (cachée par défaut) -->
+                <div id="generationResult" style="display: none; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(24, 227, 164, 0.2);">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Résultat</h3>
+                    <div style="text-align: center;">
+                        <img id="generatedAvatar" src="" alt="Avatar généré" style="max-width: 200px; border-radius: 50%; border: 3px solid var(--primary-color); margin-bottom: 1rem;">
+                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                            <button class="btn btn-primary magic-btn btn-sm" onclick="useGeneratedAvatar()">
+                                <i class="fas fa-check me-2"></i> Utiliser cet avatar
+                            </button>
+                            <button class="btn btn-secondary magic-btn btn-sm" onclick="resetGenerationForm()">
+                                <i class="fas fa-redo me-2"></i> Nouvelle génération
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL ÉDITER PROFIL (uniquement pour le propriétaire) -->
+        {% if isOwner %}
+        <div id="editProfileModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('editProfileModal')">&times;</span>
+                <h2>Éditer votre profil</h2>
+                {{ form_start(profileForm, {'attr': {'class': 'profile-form'}}) }}
+                    <div class="form-group">
+                        <label class="form-label">Nom d'utilisateur</label>
+                        {{ form_widget(profileForm.username, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        {{ form_widget(profileForm.email, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Avatar</label>
+                        {{ form_widget(profileForm.avatar, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                    <button class="btn btn-primary" type="submit" style="width: 100%;">Enregistrer</button>
+                {{ form_end(profileForm) }}
+            </div>
+        </div>
+
+        <!-- MODAL PARAMÈTRES (uniquement pour le propriétaire) -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('settingsModal')">&times;</span>
+                <h2>Paramètres</h2>
+
+                <button class="btn btn-primary w-100 mb-3" onclick="document.getElementById('passwordForm').style.display='block'">
+                    <i class="fas fa-key me-2"></i> Changer le mot de passe
+                </button>
+
+                <div id="passwordForm" style="display:none; margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Changement de mot de passe</h3>
+                    {{ form_start(passwordForm, {'attr': {'class': 'password-form'}}) }}
+                        <div class="form-group">
+                            <label class="form-label">Mot de passe actuel</label>
+                            {{ form_widget(passwordForm.oldPassword, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nouveau mot de passe</label>
+                            {{ form_widget(passwordForm.newPassword, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmer</label>
+                            {{ form_widget(passwordForm.confirmPassword, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <button class="btn btn-success w-100" type="submit">Modifier</button>
+                    {{ form_end(passwordForm) }}
+                </div>
+
+                <button class="btn btn-danger w-100" onclick="document.getElementById('deleteForm').style.display='block'">
+                    <i class="fas fa-trash-alt me-2"></i> Supprimer mon compte
+                </button>
+
+                <div id="deleteForm" style="display:none; margin-top: 1.5rem; padding: 1.5rem; background: rgba(220,53,69,0.1); border-radius: 8px;">
+                    <h3 style="color: #dc3545; margin-bottom: 0.5rem;">Suppression du compte</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Cette action est irréversible.</p>
+                    <form action="{{ path('profile_delete') }}" method="POST" onsubmit="return confirm('Confirmer la suppression ?');">
+                        <div class="form-group">
+                            <input type="password" name="password" placeholder="Votre mot de passe" required class="form-control">
+                        </div>
+                        <button class="btn btn-danger w-100" type="submit">Supprimer définitivement</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- MODALE RECHERCHE UTILISATEURS -->
+        <div id="searchUserModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('searchUserModal')">&times;</span>
+                <h2><i class="fas fa-search me-2"></i> Rechercher un membre</h2>
+                
+                <div class="form-group">
+                    <input type="text" 
+                           id="userSearchInput" 
+                           class="form-control" 
+                           placeholder="Nom d'utilisateur, prénom ou nom..."
+                           autocomplete="off">
+                </div>
+                
+                <div id="userSearchResults" class="search-results" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Les résultats apparaîtront ici -->
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="container">
+                <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
+            </div>
+        </footer>
+>>>>>>> afea128 (generation des avatars)
     </div>
 
     <nav>
@@ -63,10 +682,173 @@
         </ul>
     </nav>
 
+<<<<<<< HEAD
     <div class="auth-buttons">
         {% if app.user %}
             {% if is_granted('ROLE_ADMIN') %}
               <a href="{{ path('admin_users') }}" class="btn btn-warning btn-sm" style="margin-top:1rem;">Dashboard Admin</a>
+=======
+        // ===== FONCTIONS MODALES =====
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Fermer avec Echap
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal('editProfileModal');
+                closeModal('settingsModal');
+                closeModal('searchUserModal');
+                closeModal('oeuvreModal');
+                closeModal('artefactModal');
+                closeModal('universeModal');
+                closeModal('generateAvatarModal');
+            }
+        });
+
+        // Fermer en cliquant dehors
+        window.onclick = function(event) {
+            const modals = ['editProfileModal', 'settingsModal', 'searchUserModal', 'oeuvreModal', 'artefactModal', 'universeModal', 'generateAvatarModal'];
+            modals.forEach(id => {
+                const modal = document.getElementById(id);
+                if (event.target == modal) {
+                    closeModal(id);
+                }
+            });
+        }
+
+        // ===== FONCTIONS POUR LA GÉNÉRATION D'AVATAR =====
+        function resetGenerationForm() {
+            document.getElementById('avatarGenerateForm').reset();
+            document.getElementById('avatarGenerateForm').style.display = 'block';
+            document.getElementById('generationResult').style.display = 'none';
+            document.getElementById('generateAvatarBtn').disabled = false;
+            document.getElementById('generateAvatarBtn').innerHTML = '<i class="fas fa-magic me-2"></i> Générer';
+        }
+
+        function useGeneratedAvatar() {
+            const avatarUrl = document.getElementById('generatedAvatar').src;
+            
+            // Extraire le nom du fichier
+            const filename = avatarUrl.split('/').pop();
+            
+            // Envoyer une requête pour mettre à jour l'avatar de l'utilisateur
+            fetch('{{ path('update_avatar') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ avatar: filename })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mettre à jour l'avatar dans la page
+                    const avatarImages = document.querySelectorAll('.avatar img, .profile-avatar img');
+                    avatarImages.forEach(img => {
+                        img.src = avatarUrl + '?t=' + new Date().getTime();
+                    });
+                    
+                    // Fermer la modale
+                    closeModal('generateAvatarModal');
+                    
+                    // Afficher un message de succès
+                    alert('Avatar mis à jour avec succès !');
+                } else {
+                    alert('Erreur lors de la mise à jour de l\'avatar : ' + (data.error || 'Erreur inconnue'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Une erreur est survenue');
+            });
+        }
+
+        // Gestionnaire de soumission du formulaire
+        if (document.getElementById('avatarGenerateForm')) {
+            document.getElementById('avatarGenerateForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const submitBtn = document.getElementById('generateAvatarBtn');
+                
+                // Désactiver le bouton
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Génération...';
+                
+                try {
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Cacher le formulaire
+                        this.style.display = 'none';
+                        
+                        // Afficher le résultat
+                        document.getElementById('generatedAvatar').src = data.image;
+                        document.getElementById('generationResult').style.display = 'block';
+                    } else {
+                        alert('Erreur lors de la génération : ' + (data.error || 'Erreur inconnue'));
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-magic me-2"></i> Générer';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Une erreur est survenue lors de la génération');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-magic me-2"></i> Générer';
+                }
+            });
+        }
+
+        // ===== FONCTIONS POUR LES MODALES DÉTAILLÉES =====
+        function openOeuvreModal(id) {
+            currentOeuvreId = id;
+            
+            {% if oeuvres is defined and oeuvres|length > 0 %}
+                // Récupérer les données de l'œuvre spécifique
+                {% for oeuvre in oeuvres %}
+                    {% if loop.first %}
+                        const oeuvreData = {
+                            id: {{ oeuvre.id|default(0) }},
+                            title: "{{ oeuvre.title|default('Titre de l\'œuvre')|e('js') }}",
+                            author: "{{ user.username|e('js') }}",
+                            image: "{{ oeuvre.imageUrl|default('')|e('js') }}",
+                            type: "{{ oeuvre.type|default('Roman')|e('js') }}",
+                            date: "{{ oeuvre.createdAt ? oeuvre.createdAt|date('d/m/Y') : '01/01/2024' }}",
+                            status: "{{ oeuvre.status|default('Publié')|e('js') }}",
+                            tags: {{ oeuvre.tags|default(['Fantasy', 'Aventure'])|json_encode|raw }},
+                            description: "{{ oeuvre.description|default('Description de l\'œuvre...')|e('js') }}"
+                        };
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                const oeuvreData = {
+                    id: 0,
+                    title: "Œuvre",
+                    author: "{{ user.username|e('js') }}",
+                    image: "",
+                    type: "-",
+                    date: "-",
+                    status: "-",
+                    tags: [],
+                    description: "Aucune description disponible."
+                };
+>>>>>>> afea128 (generation des avatars)
             {% endif %}
 
             <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm">Déconnexion</a>
