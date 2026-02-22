@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Générer un défi avec IA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #0B0F0E;
+            --bg-panel: #141A19;
+            --bg-soft: #1A1F1E;
+            --bg-card: #1E2423;
+            --border: #2A3139;
+            --border-light: #3A424A;
+            --border-hover: #4A5259;
+            --accent: #18E3A4;
+            --accent-dark: #13c891;
+            --accent-light: rgba(24,227,164,0.12);
+            --accent-glow: rgba(24,227,164,0.25);
+            --danger: #EF5350;
+            --danger-light: rgba(239,83,80,0.12);
+            --purple: #8B5CF6;
+            --text-main: #E6FFF6;
+            --text-light: #CBD5D1;
+            --text-muted: #9BA6A2;
+            --sidebar-width: 280px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --shadow: 0 10px 25px rgba(0,0,0,0.3);
+            --shadow-lg: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Inter", Arial, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+
+        .admin-sidebar ul {
+            list-style: none;
+        }
+
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            padding: 3rem;
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-main) 0%, #0F1413 100%);
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-title i {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+            color: var(--purple);
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-left: 3.5rem;
+        }
+
+        .card {
+            background: linear-gradient(145deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-label i {
+            color: var(--purple);
+            margin-right: 0.5rem;
+        }
+
+        .form-control {
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-panel);
+            color: var(--text-main);
+            width: 100%;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .suggestions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .suggestion-chip {
+            padding: 0.5rem 1rem;
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--purple);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            box-shadow: 0 4px 15px rgba(24,227,164,0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(24,227,164,0.4);
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, var(--purple), #7C3AED);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-ai:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-secondary {
+            background: var(--bg-soft);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .result-card {
+            background: var(--bg-panel);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid var(--purple);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--purple), #7C3AED);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .result-subtitle {
+            color: var(--purple);
+            font-size: 0.9rem;
+        }
+
+        .result-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .result-label {
+            color: var(--purple);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .result-value {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            background: var(--bg-soft);
+            padding: 1rem;
+            border-radius: var(--radius);
+        }
+
+        .result-value.titre {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .result-value.theme {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--purple);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .error-card {
+            background: rgba(239, 83, 80, 0.15);
+            border: 1px solid var(--danger);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .error-card i {
+            font-size: 1.5rem;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent);
+            color: #000;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(24,227,164,0.4);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast i {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    function setPrompt(value) {
+        document.querySelector('textarea[name="prompt"]').value = value;
+    }
+
+    function copyToClipboard() {
+        const result = {{ result|json_encode|raw }};
+        const text = `Titre: ${result.titre}\nThème: ${result.theme}\nDescription: ${result.description}`;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Copié dans le presse-papiers!');
+        });
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.querySelector('span').textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+</script>
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Midgar Admin</div>
+        </div>
+        <ul>
+            <li><a href="/admin/users"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+            <li><a href="/admin/quiz-questions"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+            <li><a href="/admin/produits"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+            <li><a href="/admin/challenges" class="active"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+        </ul>
+    </aside>
+
+    <main class="admin-content">
+        <a href="{{ path('admin_challenges') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Retour aux défis
+        </a>
+
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-robot"></i>
+                Générateur de défi IA
+            </h1>
+            <p class="page-subtitle">Créez un défi créatif en quelques secondes grâce à l'intelligence artificielle</p>
+        </div>
+
+        <div class="card">
+            <form method="GET">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lightbulb"></i> Le thème ou idée
+                    </label>
+                    <div class="suggestions">
+                        <span class="suggestion-chip" onclick="setPrompt('écologie environnement')">🌱 Écologie</span>
+                        <span class="suggestion-chip" onclick="setPrompt('art digital créative')">🎨 Art</span>
+                        <span class="suggestion-chip" onclick="setPrompt('technologie innovation')">💻 Tech</span>
+                        <span class="suggestion-chip" onclick="setPrompt('santé bien-être')">❤️ Santé</span>
+                        <span class="suggestion-chip" onclick="setPrompt('sports compétition')">🏆 Sport</span>
+                        <span class="suggestion-chip" onclick="setPrompt('musique création')">🎵 Musique</span>
+                    </div>
+                    <textarea 
+                        name="prompt" 
+                        class="form-control" 
+                        placeholder="Décrivez votre idée de défi... Ex: Un défi sur le thème de l'océan et la protection des animaux marins"
+                        rows="4"
+                    >{{ prompt }}</textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-ai">
+                        <i class="fas fa-magic"></i> Générer avec IA
+                    </button>
+                </div>
+            </form>
+
+            {% if result is not null %}
+                {% if result.error is defined and result.error %}
+                    <div class="error-card">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Erreur:</strong> {{ result.error }}
+                        </div>
+                    </div>
+                {% elseif result.titre is defined and result.titre %}
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div class="result-icon">
+                                <i class="fas fa-check" style="color: #fff;"></i>
+                            </div>
+                            <div>
+                                <div class="result-title">Défi généré avec succès!</div>
+                                <div class="result-subtitle">Vous pouvez utiliser ces informations pour créer un nouveau défi</div>
+                            </div>
+                        </div>
+
+                        <div class="result-item">
+                            <div class="result-label"><i class="fas fa-heading"></i> Titre</div>
+                            <div class="result-value titre">{{ result.titre }}</div>
+                        </div>
+
+                        <div class="result-item">
+                            <div class="result-label"><i class="fas fa-tag"></i> Thème</div>
+                            <div class="result-value theme">{{ result.theme }}</div>
+                        </div>
+
+                        <div class="result-item">
+                            <div class="result-label"><i class="fas fa-align-left"></i> Description</div>
+                            <div class="result-value">{{ result.description }}</div>
+                        </div>
+
+                        <div class="btn-group">
+                            <a href="{{ path('admin_challenges', {'titre': result.titre, 'theme': result.theme, 'description': result.description}) }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Créer ce défi
+                            </a>
+                            <button onclick="copyToClipboard()" class="btn btn-secondary">
+                                <i class="fas fa-copy"></i> Copier
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<!-- Toast notification -->
+<div id="toast" class="toast">
+    <i class="fas fa-check-circle"></i>
+    <span>Message</span>
+</div>
+
+</body>
+</html>

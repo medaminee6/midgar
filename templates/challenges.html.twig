@@ -161,7 +161,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.7);
             z-index: -1;
         }
         
@@ -590,6 +590,112 @@
                 width: 70%;
                 padding: 0.8rem;
             }
+            
+            .filter-sidebar {
+                position: static;
+            }
+        }
+        
+        /* ===== UNIVERSES CONTAINER (Like artefact page) ===== */
+        .universes-container {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .filter-sidebar {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            min-width: 250px;
+            max-width: 280px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(24, 227, 164, 0.1);
+        }
+        
+        .filter-sidebar:hover {
+            border-color: rgba(24, 227, 164, 0.3);
+        }
+        
+        .filter-group {
+            margin-bottom: 2rem;
+        }
+        
+        .filter-group:last-child {
+            border-bottom: none;
+        }
+        
+        .filter-group h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .filter-option input[type="checkbox"],
+        .filter-option input[type="radio"] {
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+        
+        .filter-option label {
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(24, 227, 164, 0.3);
+            background: rgba(26, 31, 30, 0.8);
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+        
+        .search-box::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .filter-reset {
+            width: 100%;
+            margin-bottom: 0.5rem;
+            padding: 0.75rem;
+            text-align: center;
+        }
+        
+        .filter-reset:hover {
+            background-color: var(--primary-color);
+            color: #000;
+        }
+        
+        .universes-section {
+            flex: 1;
+        }
+        
+        .results-count {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .universes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
         }
     </style>
 </head>
@@ -655,75 +761,190 @@
         <main>
             <section class="section">
                 <div class="container">
-                    <!-- ACTIVE CHALLENGES -->
-                    <h2 style="color: var(--primary-color); margin-bottom: 2rem;">🔥 Défis Actifs</h2>
-                    {% set active_defis = defis|filter(defi => defi.statut.value == 'OUVERT') %}
-                    {% if active_defis|length > 0 %}
-                        <div class="grid grid-2 mb-4">
-                            {% for defi in active_defis %}
-                                <div class="card">
-                                    <div class="card-image">
-                                        {% if defi.imageCover %}
-                                            <img src="{{ vich_uploader_asset(defi, 'imageCoverFile') }}" alt="{{ defi.titre }}" onclick="openImageModal('{{ vich_uploader_asset(defi, 'imageCoverFile') }}', '{{ defi.titre }}')">
-                                        {% else %}
-                                            🎨
-                                        {% endif %}
-                                    </div>
-                                    <div class="card-body">
-                                        <h3 class="card-title">{{ defi.titre }}</h3>
-                                        <p class="card-text">{{ defi.description[:150] }}{{ defi.description|length > 150 ? '...' : '' }}</p>
-                                        <div class="card-tags mb-2">
-                                            <span class="tag">{{ defi.theme }}</span>
-                                            <span class="tag">Actif</span>
-                                        </div>
-                                        <div style="margin: 1rem 0; color: var(--primary-color); font-weight: 600;">📅 {{ defi.dateDebut|date('d/m/Y') }} → {{ defi.dateFin|date('d/m/Y') }}</div>
-                                        <a href="{{ path('challenges_participate', { id: defi.id }) }}" class="btn btn-primary btn-sm magic-btn" style="width: 100%;">Participer</a>
-                                    </div>
+                    <div class="universes-container">
+                        <div class="filter-sidebar">
+                            <form method="get" action="{{ path('challenges_index') }}">
+                                <div class="filter-group">
+                                    <input type="text" name="search" class="search-box" placeholder="Chercher un défi..." value="{{ search|default('') }}">
                                 </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="empty-state">
-                            <div>🌟</div>
-                            <h3>Aucun défi actif pour le moment</h3>
-                            <p>Revenez plus tard pour découvrir de nouveaux défis passionnants!</p>
-                        </div>
-                    {% endif %}
 
-                    <!-- PAST CHALLENGES -->
-                    <h2 style="color: var(--primary-color); margin-bottom: 2rem; margin-top: 3rem;">✨ Défis Passés</h2>
-                    {% set closed_defis = defis|filter(defi => defi.statut.value == 'FERME') %}
-                    {% if closed_defis|length > 0 %}
-                        <div class="grid grid-2">
-                            {% for defi in closed_defis %}
-                                <div class="card" style="opacity: 0.8;">
-                                    <div class="card-image">
-                                        {% if defi.imageCover %}
-                                            <img src="{{ vich_uploader_asset(defi, 'imageCoverFile') }}" alt="{{ defi.titre }}" onclick="openImageModal('{{ vich_uploader_asset(defi, 'imageCoverFile') }}', '{{ defi.titre }}')">
-                                        {% else %}
-                                            🏆
-                                        {% endif %}
+                                <div class="filter-group">
+                                    <h4>Statut</h4>
+                                    <div class="filter-option">
+                                        <input type="radio" name="statut" value="OUVERT" id="statut-ouvert" {% if statut == 'OUVERT' %}checked{% endif %}>
+                                        <label for="statut-ouvert">Ouvert</label>
                                     </div>
-                                    <div class="card-body">
-                                        <h3 class="card-title">{{ defi.titre }}</h3>
-                                        <p class="card-text">{{ defi.description[:150] }}{{ defi.description|length > 150 ? '...' : '' }}</p>
-                                        <div class="card-tags mb-2">
-                                            <span class="tag">{{ defi.theme }}</span>
-                                            <span class="tag">Terminé</span>
-                                        </div>
-                                        <div style="margin: 1rem 0; color: var(--text-secondary); font-weight: 600;">👁️ Voir les résultats</div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="statut" value="FERME" id="statut-ferme" {% if statut == 'FERME' %}checked{% endif %}>
+                                        <label for="statut-ferme">Fermé</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="statut" value="" id="statut-all" {% if not statut %}checked{% endif %}>
+                                        <label for="statut-all">Tous les statuts</label>
                                     </div>
                                 </div>
-                            {% endfor %}
+
+                                <div class="filter-group">
+                                    <h4>Trier par</h4>
+                                    <div class="filter-option">
+                                        <input type="radio" name="sort" value="recent" id="sort-recent" {% if sortBy|default('recent') == 'recent' %}checked{% endif %}>
+                                        <label for="sort-recent">Plus récents</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="sort" value="ancien" id="sort-ancien" {% if sortBy|default('recent') == 'ancien' %}checked{% endif %}>
+                                        <label for="sort-ancien">Plus anciens</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="sort" value="date" id="sort-date" {% if sortBy|default('recent') == 'date' %}checked{% endif %}>
+                                        <label for="sort-date">Par date</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="sort" value="theme" id="sort-theme" {% if sortBy|default('recent') == 'theme' %}checked{% endif %}>
+                                        <label for="sort-theme">Par thème</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="sort" value="statut" id="sort-statut" {% if sortBy|default('recent') == 'statut' %}checked{% endif %}>
+                                        <label for="sort-statut">Par statut</label>
+                                    </div>
+                                    <div class="filter-option">
+                                        <input type="radio" name="sort" value="titre" id="sort-titre" {% if sortBy|default('recent') == 'titre' %}checked{% endif %}>
+                                        <label for="sort-titre">A-Z</label>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="filter-reset magic-btn">Filtrer</button>
+                                <a href="{{ path('challenges_index') }}" class="filter-reset magic-btn">Réinitialiser</a>
+                            </form>
                         </div>
-                    {% else %}
-                        <div class="empty-state">
-                            <div>🎭</div>
-                            <h3>Aucun défi terminé</h3>
-                            <p>Les défis passés apparaîtront ici après leur conclusion.</p>
+
+                        <div class="universes-section">
+                            
+                            <!-- Loading indicator -->
+                            <div id="loadingIndicator" style="display: none; text-align: center; padding: 2rem;">
+                                <div style="color: var(--primary-color); font-size: 1.2rem;">Chargement...</div>
+                            </div>
+                            
+                            <!-- Results count -->
+                            <div id="resultsCount" style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem;"></div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 107, 107, 0.2);">
+                                <div>
+                                    <h2 style="margin: 0; color: var(--primary-color);">Défis</h2>
+                                    <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+                                        Affichage: <a href="{{ path('challenges_index') }}" style="color: var(--primary-color);">Défis</a>
+                                    </p>
+                                </div>
+                                <div class="results-count">
+                                    <span>{{ defis|length }}</span> défi(s)
+                                </div>
+                            </div>
+
+                            <!-- ACTIVE CHALLENGES (when not filtering by status) -->
+                            {% if not statut %}
+                                <h2 style="color: var(--primary-color); margin-bottom: 2rem;">🔥 Défis Actifs</h2>
+                                {% set active_defis = defis|filter(defi => defi.statut.value == 'OUVERT') %}
+                                {% if active_defis|length > 0 %}
+                                    <div id="activeChallengesContainer" class="universes-grid mb-4">
+                                        {% for defi in active_defis %}
+                                            <div class="card" onclick="location.href='{{ path('challenges_participate', { id: defi.id }) }}'" style="cursor: pointer;">
+                                                <div class="card-image">
+                                                    {% if defi.imageCover %}
+                                                        <img src="{{ vich_uploader_asset(defi, 'imageCoverFile') }}" alt="{{ defi.titre }}" onclick="event.stopPropagation(); openImageModal('{{ vich_uploader_asset(defi, 'imageCoverFile') }}', '{{ defi.titre }}')">
+                                                    {% else %}
+                                                        🎨
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3 class="card-title">{{ defi.titre }}</h3>
+                                                    <p class="card-text">{{ defi.description[:100] }}{{ defi.description|length > 100 ? '...' : '' }}</p>
+                                                    <div class="card-tags mb-2">
+                                                        <span class="tag">{{ defi.theme }}</span>
+                                                        <span class="tag" style="background: rgba(24, 227, 164, 0.2); border-color: var(--primary-color);">Actif</span>
+                                                    </div>
+                                                    <div style="margin: 1rem 0; color: var(--primary-color); font-weight: 600; font-size: 0.85rem;">📅 {{ defi.dateDebut|date('d/m/Y') }} → {{ defi.dateFin|date('d/m/Y') }}</div>
+                                                    <div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: auto;">Cliquez pour participer</div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="empty-state">
+                                        <div>🌟</div>
+                                        <h3>Aucun défi actif pour le moment</h3>
+                                        <p>Revenez plus tard pour découvrir de nouveaux défis passionnants!</p>
+                                    </div>
+                                {% endif %}
+
+                                <!-- PAST CHALLENGES -->
+                                <h2 style="color: var(--primary-color); margin-bottom: 2rem; margin-top: 3rem;">✨ Défis Passés</h2>
+                                {% set closed_defis = defis|filter(defi => defi.statut.value == 'FERME') %}
+                                {% if closed_defis|length > 0 %}
+                                    <div id="closedChallengesContainer" class="universes-grid">
+                                        {% for defi in closed_defis %}
+                                            <div class="card" onclick="location.href='#'" style="cursor: pointer; opacity: 0.8;">
+                                                <div class="card-image">
+                                                    {% if defi.imageCover %}
+                                                        <img src="{{ vich_uploader_asset(defi, 'imageCoverFile') }}" alt="{{ defi.titre }}" onclick="event.stopPropagation(); openImageModal('{{ vich_uploader_asset(defi, 'imageCoverFile') }}', '{{ defi.titre }}')">
+                                                    {% else %}
+                                                        🏆
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3 class="card-title">{{ defi.titre }}</h3>
+                                                    <p class="card-text">{{ defi.description[:100] }}{{ defi.description|length > 100 ? '...' : '' }}</p>
+                                                    <div class="card-tags mb-2">
+                                                        <span class="tag">{{ defi.theme }}</span>
+                                                        <span class="tag" style="background: rgba(255, 107, 107, 0.2); border-color: #ff6b6b;">Terminé</span>
+                                                    </div>
+                                                    <div style="margin: 1rem 0; color: var(--text-secondary); font-weight: 600; font-size: 0.85rem;">👁️ Voir les résultats</div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="empty-state">
+                                        <div>🎭</div>
+                                        <h3>Aucun défi terminé</h3>
+                                        <p>Les défis passés apparaîtront ici après leur conclusion.</p>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                {# When filtering by status, show all results in one grid #}
+                                <div class="universes-grid">
+                                    {% for defi in defis %}
+                                        <div class="card" onclick="location.href='{% if defi.statut.value == 'OUVERT' %}{{ path('challenges_participate', { id: defi.id }) }}{% else %}#{% endif %}'" style="cursor: pointer;">
+                                            <div class="card-image">
+                                                {% if defi.imageCover %}
+                                                    <img src="{{ vich_uploader_asset(defi, 'imageCoverFile') }}" alt="{{ defi.titre }}" onclick="event.stopPropagation(); openImageModal('{{ vich_uploader_asset(defi, 'imageCoverFile') }}', '{{ defi.titre }}')">
+                                                {% else %}
+                                                    {{ defi.statut.value == 'OUVERT' ? '🎨' : '🏆' }}
+                                                {% endif %}
+                                            </div>
+                                            <div class="card-body">
+                                                <h3 class="card-title">{{ defi.titre }}</h3>
+                                                <p class="card-text">{{ defi.description[:100] }}{{ defi.description|length > 100 ? '...' : '' }}</p>
+                                                <div class="card-tags mb-2">
+                                                    <span class="tag">{{ defi.theme }}</span>
+                                                    <span class="tag" style="{{ defi.statut.value == 'OUVERT' ? 'background: rgba(24, 227, 164, 0.2); border-color: var(--primary-color);' : 'background: rgba(255, 107, 107, 0.2); border-color: #ff6b6b;' }}">{{ defi.statut.value }}</span>
+                                                </div>
+                                                <div style="margin: 1rem 0; color: var(--text-secondary); font-weight: 600; font-size: 0.85rem;">📅 {{ defi.dateDebut|date('d/m/Y') }} → {{ defi.dateFin|date('d/m/Y') }}</div>
+                                                {% if defi.statut.value == 'OUVERT' %}
+                                                    <div style="color: var(--primary-color); font-size: 0.85rem; margin-top: auto;">Cliquez pour participer</div>
+                                                {% else %}
+                                                    <div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: auto;">Défi terminé</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="empty-state">
+                                            <div>🔍</div>
+                                            <h3>Aucun défi trouvé</h3>
+                                            <p>Essayez avec d'autres critères de recherche.</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </div>
             </section>
         </main>
 
@@ -769,6 +990,171 @@
                 }
             });
         });
+
+        // ===== FILTER SIDEBAR FUNCTIONALITY (AJAX) =====
+        const filterForm = document.querySelector('.filter-sidebar form');
+        
+        if (filterForm) {
+            // Listen for radio button changes
+            filterForm.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    performFilterSearch();
+                });
+            });
+            
+            // Listen for search input with debounce
+            const searchInput = filterForm.querySelector('input[name="search"]');
+            if (searchInput) {
+                let debounceTimer;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(performFilterSearch, 300);
+                });
+            }
+        }
+        
+        function performFilterSearch() {
+            const formData = new FormData(filterForm);
+            const search = formData.get('search') || '';
+            const sort = formData.get('sort') || 'recent';
+            const statut = formData.get('statut') || '';
+            
+            // Show loading
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) loadingIndicator.style.display = 'block';
+            
+            // Update URL without reload
+            const url = new URL(window.location.href);
+            if (search) {
+                url.searchParams.set('search', search);
+            } else {
+                url.searchParams.delete('search');
+            }
+            url.searchParams.set('sort', sort);
+            if (statut) {
+                url.searchParams.set('statut', statut);
+            } else {
+                url.searchParams.delete('statut');
+            }
+            window.history.pushState({}, '', url);
+            
+            // Fetch results via AJAX
+            fetch(`{{ path('challenges_search') }}?search=${encodeURIComponent(search)}&sort=${encodeURIComponent(sort)}&statut=${encodeURIComponent(statut)}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateChallengesDisplay(data, statut);
+                    if (loadingIndicator) loadingIndicator.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error fetching challenges:', error);
+                    if (loadingIndicator) loadingIndicator.style.display = 'none';
+                });
+        }
+        
+        function updateChallengesDisplay(data, currentStatut) {
+            const resultsCount = document.getElementById('resultsCount');
+            const mainSection = document.querySelector('.universes-section');
+            
+            if (!mainSection) return;
+            
+            // Update results count
+            if (resultsCount) {
+                resultsCount.textContent = `${data.count} défi(s) trouvé(s)`;
+            }
+            
+            let html = '';
+            
+            if (!currentStatut) {
+                // Show both active and closed sections
+                html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 107, 107, 0.2);">
+                    <div>
+                        <h2 style="margin: 0; color: var(--primary-color);">Défis</h2>
+                        <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+                            Affichage: <a href="{{ path('challenges_index') }}" style="color: var(--primary-color);">Défis</a>
+                        </p>
+                    </div>
+                    <div class="results-count">
+                        <span>${data.count}</span> défi(s)
+                    </div>
+                </div>`;
+                
+                // Active challenges
+                html += `<h2 style="color: var(--primary-color); margin-bottom: 2rem;">🔥 Défis Actifs</h2>`;
+                if (data.active.length > 0) {
+                    html += `<div class="universes-grid mb-4">`;
+                    data.active.forEach(defi => {
+                        html += renderChallengeCard(defi, 'active');
+                    });
+                    html += `</div>`;
+                } else {
+                    html += `<div class="empty-state"><div>🌟</div><h3>Aucun défi actif trouvé</h3><p>Essayez avec d'autres critères de recherche!</p></div>`;
+                }
+                
+                // Closed challenges
+                html += `<h2 style="color: var(--primary-color); margin-bottom: 2rem; margin-top: 3rem;">✨ Défis Passés</h2>`;
+                if (data.closed.length > 0) {
+                    html += `<div class="universes-grid">`;
+                    data.closed.forEach(defi => {
+                        html += renderChallengeCard(defi, 'closed');
+                    });
+                    html += `</div>`;
+                } else {
+                    html += `<div class="empty-state"><div>🎭</div><h3>Aucun défi terminé</h3><p>Les défis passés apparaîtront ici après leur conclusion.</p></div>`;
+                }
+            } else {
+                // Show single grid when filtering by status
+                html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 107, 107, 0.2);">
+                    <div>
+                        <h2 style="margin: 0; color: var(--primary-color);">Défis</h2>
+                        <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+                            Affichage: <a href="{{ path('challenges_index') }}" style="color: var(--primary-color);">Défis</a>
+                        </p>
+                    </div>
+                    <div class="results-count">
+                        <span>${data.count}</span> défi(s)
+                    </div>
+                </div>`;
+                
+                if (data.count > 0) {
+                    html += `<div class="universes-grid">`;
+                    [...data.active, ...data.closed].forEach(defi => {
+                        html += renderChallengeCard(defi, defi.statut === 'OUVERT' ? 'active' : 'closed');
+                    });
+                    html += `</div>`;
+                } else {
+                    html += `<div class="empty-state"><div>🔍</div><h3>Aucun défi trouvé</h3><p>Essayez avec d'autres critères de recherche.</p></div>`;
+                }
+            }
+            
+            mainSection.innerHTML = html;
+        }
+        
+        function renderChallengeCard(defi, type) {
+            const imageHtml = defi.imageCover 
+                ? `<img src="/uploads/defis/${defi.imageCover}" alt="${defi.titre}" onclick="event.stopPropagation(); openImageModal('/uploads/defis/${defi.imageCover}', '${defi.titre}')">`
+                : (type === 'active' ? '🎨' : '🏆');
+            
+            const link = type === 'active' ? `/challenges/${defi.id}/participer` : '#';
+            const actionText = type === 'active' ? 'Cliquez pour participer' : 'Défi terminé';
+            const statusBadge = type === 'active' 
+                ? '<span class="tag" style="background: rgba(24, 227, 164, 0.2); border-color: var(--primary-color);">Actif</span>'
+                : '<span class="tag" style="background: rgba(255, 107, 107, 0.2); border-color: #ff6b6b;">Terminé</span>';
+            const dateColor = type === 'active' ? 'var(--primary-color)' : 'var(--text-secondary)';
+            
+            return `<div class="card" onclick="location.href='${link}'" style="cursor: pointer; opacity: ${type === 'closed' ? '0.8' : '1'};">
+                <div class="card-image">${imageHtml}</div>
+                <div class="card-body">
+                    <h3 class="card-title">${defi.titre}</h3>
+                    <p class="card-text">${defi.description.substring(0, 100)}${defi.description.length > 100 ? '...' : ''}</p>
+                    <div class="card-tags mb-2">
+                        <span class="tag">${defi.theme}</span>
+                        ${statusBadge}
+                    </div>
+                    <div style="margin: 1rem 0; color: ${dateColor}; font-weight: 600; font-size: 0.85rem;">📅 ${defi.dateDebut} → ${defi.dateFin}</div>
+                    <div style="color: ${type === 'active' ? 'var(--primary-color)' : 'var(--text-secondary)'}; font-size: 0.85rem; margin-top: auto;">${actionText}</div>
+                </div>
+            </div>`;
+        }
 
         // ===== BACKGROUND INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', function() {

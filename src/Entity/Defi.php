@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\StatutDefiEnum;
+use App\Enum\DifficulteEnum;
 use App\Repository\DefiRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -35,9 +36,9 @@ class Defi
     #[Assert\Length(min: 3, max: 255, minMessage: 'Le titre doit contenir au moins 3 caractères', maxMessage: 'Le titre ne peut pas dépasser 255 caractères')]
     private ?string $titre = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 850)]
     #[Assert\NotBlank(message: 'La description ne doit pas être vide')]
-    #[Assert\Length(min: 10, max: 255, minMessage: 'La description doit contenir au moins 10 caractères', maxMessage: 'La description ne peut pas dépasser 255 caractères')]
+    #[Assert\Length(min: 10, max: 850, minMessage: 'La description doit contenir au moins 10 caractères', maxMessage: 'La description ne peut pas dépasser 850 caractères')]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
@@ -55,12 +56,22 @@ class Defi
     )]
     private ?File $imageCoverFile = null;
 
+    // Image de référence pour aider les participants à peindre
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imageReference = null;
+
+    #[Vich\UploadableField(mapping: 'defi_reference', fileNameProperty: 'imageReference')]
+    #[Assert\File(
+        maxSize: '5M',
+        mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+        mimeTypesMessage: 'Veuillez téléverser une image de référence (JPEG, PNG, GIF ou WebP).'
+    )]
+    private ?File $imageReferenceFile = null;
+
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\NotNull(message: 'La date de début ne doit pas être vide')]
     private ?\DateTime $dateDebut = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\NotNull(message: 'La date de fin ne doit pas être vide')]
     private ?\DateTime $dateFin = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -68,6 +79,9 @@ class Defi
 
     #[ORM\Column(enumType: StatutDefiEnum::class)]
     private StatutDefiEnum $statut = StatutDefiEnum::OUVERT;
+
+    #[ORM\Column(enumType: DifficulteEnum::class, nullable: true)]
+    private ?DifficulteEnum $difficulte = null;
 
     #[ORM\Column]
     private ?int $createurId = null;
@@ -147,6 +161,37 @@ class Defi
         return $this;
     }
 
+    // Méthodes pour imageReference (image de référence pour peindre)
+    public function getImageReference(): ?string
+    {
+        return $this->imageReference;
+    }
+
+    public function setImageReference(?string $imageReference): static
+    {
+        $this->imageReference = $imageReference;
+
+        return $this;
+    }
+
+    public function getImageReferenceFile(): ?File
+    {
+        return $this->imageReferenceFile;
+    }
+
+    public function setImageReferenceFile(?File $imageReferenceFile): static
+    {
+        if ($imageReferenceFile instanceof UploadedFile && !$imageReferenceFile->isValid()) {
+            $imageReferenceFile = null;
+        }
+        $this->imageReferenceFile = $imageReferenceFile;
+        if (null !== $imageReferenceFile) {
+            $this->updatedAt = new \DateTime();
+        }
+
+        return $this;
+    }
+
     public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
@@ -203,6 +248,18 @@ class Defi
     public function setStatut(StatutDefiEnum $statut): static
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+    public function getDifficulte(): ?DifficulteEnum
+    {
+        return $this->difficulte;
+    }
+
+    public function setDifficulte(?DifficulteEnum $difficulte): static
+    {
+        $this->difficulte = $difficulte;
 
         return $this;
     }

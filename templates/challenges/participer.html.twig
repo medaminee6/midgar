@@ -161,7 +161,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.7);
             z-index: -1;
         }
         
@@ -658,11 +658,11 @@
                             <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Participer à ce défi</h3>
                             <p class="text-muted" style="margin-bottom: 1rem; font-size: 0.9rem;">Indiquez l'ID d'une œuvre déjà en ligne ou <a href="{{ path('challenges_peindre', {'id': defi.id}) }}" class="magic-btn" style="display: inline; padding: 0.2rem 0.5rem; border: 1px solid var(--primary-color);">peignez une œuvre</a> dans l'éditeur.</p>
                             
-                            {{ form_start(form, { 'attr': { 'class': 'participation-form', 'enctype': 'multipart/form-data' } }) }}
+                            {{ form_start(form, { 'attr': { 'class': 'participation-form', 'enctype': 'multipart/form-data', 'novalidate': true, 'id': 'participation-form' } }) }}
                                 <div class="mb-3">
                                     {{ form_label(form.description, null, { 'label_attr': {'style': 'color: var(--text-color); font-weight: 600;'} }) }}
-                                    {{ form_widget(form.description, { 'attr': { 'class': 'form-control', 'rows': 5 } }) }}
-                                    {{ form_errors(form.description) }}
+                                    {{ form_widget(form.description, { 'attr': { 'class': 'form-control', 'rows': 5, 'id': 'description-field', 'onblur': 'validateField(this, "description")' } }) }}
+                                    <div id="description-error" class="text-danger mt-1" style="font-size: 0.85rem; display: none;"></div>
                                 </div>
                                 
                                 <div style="margin-bottom: 1rem;">
@@ -671,18 +671,23 @@
                                         <li>Utiliser une œuvre déjà en ligne en indiquant son ID ci-dessous.</li>
                                         <li>Ou <strong>peindre une nouvelle œuvre</strong> dans l'éditeur en ligne.</li>
                                     </ul>
-                                    <a href="{{ path('challenges_peindre', {'id': defi.id}) }}" class="btn btn-secondary magic-btn" style="margin-right: 1rem;">Peindre une œuvre</a>
+                                    <a href="{{ path('challenges_peindre', {'id': defi.id}) }}" class="btn btn-secondary magic-btn">Peindre une œuvre</a>
                                 </div>
+                                
+
                                 
                                 <div class="mb-3">
                                     {{ form_label(form.artworkId, null, { 'label_attr': {'style': 'color: var(--text-color); font-weight: 600;'} }) }}
-                                    {{ form_widget(form.artworkId, { 'attr': { 'class': 'form-control', 'min': 1, 'placeholder': 'Ex: 1' } }) }}
-                                    {{ form_errors(form.artworkId) }}
+                                    {{ form_widget(form.artworkId, { 'attr': { 'class': 'form-control', 'placeholder': 'Ex: 1', 'id': 'artworkId-field', 'onblur': 'validateField(this, "artworkId")' } }) }}
+                                    <div id="artworkId-error" class="text-danger mt-1" style="font-size: 0.85rem; display: none;"></div>
                                 </div>
                                 
-                                <div class="mt-4">
+                                <div class="mt-4" id="submit-section" style="display: none;">
                                     <button type="submit" class="btn btn-primary magic-btn">Envoyer ma participation</button>
                                     <a href="{{ path('challenges_index') }}" class="btn btn-secondary magic-btn">Annuler</a>
+                                </div>
+                                <div class="mt-4" id="validation-hint">
+                                    <p class="text-muted" style="font-size: 0.9rem;">💡 Remplissez tous les champs correctement pour activer le bouton de soumission</p>
                                 </div>
                             {{ form_end(form) }}
                         </div>
@@ -713,6 +718,83 @@
     </div>
 
     <script>
+        // ===== FORM VALIDATION STATE =====
+        let validationState = {
+            description: false,
+            artworkId: true // Optional field, so initially valid
+        };
+        
+        function updateSubmitButton() {
+            const submitSection = document.getElementById('submit-section');
+            const hintSection = document.getElementById('validation-hint');
+            
+            if (validationState.description && validationState.artworkId) {
+                submitSection.style.display = 'block';
+                hintSection.style.display = 'none';
+            } else {
+                submitSection.style.display = 'none';
+                hintSection.style.display = 'block';
+            }
+        }
+        
+        // ===== DYNAMIC VALIDATION =====
+        function validateField(field, fieldName) {
+            const value = field.value;
+            const errorDiv = document.getElementById(fieldName + '-error');
+            
+            // If empty, only validate if it's required
+            if (!value.trim()) {
+                if (fieldName === 'description') {
+                    errorDiv.style.display = 'block';
+                    errorDiv.innerHTML = '<span style="color: #ff4d4d;">La description est requise.</span>';
+                    field.style.borderColor = '#ff4d4d';
+                    validationState[fieldName] = false;
+                } else if (fieldName === 'artworkId') {
+                    // Optional field - show neutral state with hint
+                    errorDiv.style.display = 'block';
+                    errorDiv.innerHTML = '<span style="color: #B0B9B6;">Optionnel - Laissez vide si vous n\'avez pas d\'œuvre</span>';
+                    field.style.borderColor = '';
+                    validationState[fieldName] = true;
+                }
+                updateSubmitButton();
+                return;
+            }
+            
+            // Show loading
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '<span style="color: #ff4d4d;">Validation en cours...</span>';
+            
+            // Send validation request
+            fetch('{{ path('validate_field') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'fieldName=' + encodeURIComponent(fieldName) + '&value=' + encodeURIComponent(value)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    errorDiv.style.display = 'none';
+                    field.style.borderColor = '#18E3A4';
+                    validationState[fieldName] = true;
+                } else {
+                    errorDiv.style.display = 'block';
+                    errorDiv.innerHTML = '<span style="color: #ff4d4d;">' + data.message + '</span>';
+                    field.style.borderColor = '#ff4d4d';
+                    validationState[fieldName] = false;
+                }
+                updateSubmitButton();
+            })
+            .catch(error => {
+                console.error('Validation error:', error);
+                errorDiv.style.display = 'none';
+                field.style.borderColor = '';
+                validationState[fieldName] = true; // Allow submission on error
+                updateSubmitButton();
+            });
+        }
+
         // ===== MAGIC BUTTON PARTICLE EFFECT =====
         document.querySelectorAll('.magic-btn, .btn-primary, .btn-secondary').forEach(btn => {
             btn.addEventListener('click', function(e) {
@@ -817,6 +899,9 @@
                 link.classList.add('active');
             }
         });
+    </script>
+    
+    <script>
     </script>
 </body>
 </html>

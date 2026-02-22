@@ -5,7 +5,9 @@
     <title>Admin · Défis</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* ===== VARIABLES ===== */
         :root {
             --bg-main: #0B0F0E;
             --bg-panel: #141A19;
@@ -44,6 +46,7 @@
             --shadow-hover: 0 10px 30px rgba(0,0,0,0.5);
         }
 
+        /* ===== RESET & BASE ===== */
         * { 
             box-sizing: border-box; 
             margin: 0; 
@@ -207,7 +210,7 @@
             margin-left: 3.5rem;
         }
 
-        /* ===== ALERT ===== */
+        /* ===== ALERTS ===== */
         .alert {
             padding: 1.25rem 1.5rem;
             border-radius: var(--radius);
@@ -230,192 +233,19 @@
             border-left-color: var(--accent);
             color: var(--accent);
         }
+        
+        .alert-danger {
+            background: rgba(239,83,80,0.15);
+            border-left-color: var(--danger);
+            color: var(--danger);
+        }
 
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== CREATE BUTTON ===== */
-        .create-section {
-            margin-bottom: 2.5rem;
-        }
-
-        .create-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem 2rem;
-            border-radius: var(--radius);
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 1.05rem;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-            color: #000;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow), var(--shadow-accent);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .create-btn i {
-            font-size: 1.2rem;
-            transition: transform 0.3s ease;
-        }
-
-        .create-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-hover), var(--shadow-accent);
-        }
-
-        .create-btn:hover i {
-            transform: rotate(90deg);
-        }
-
-        .create-btn::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.7);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%);
-            transform-origin: 50% 50%;
-        }
-
-        .create-btn:focus:not(:active)::after {
-            animation: ripple 1s ease-out;
-        }
-
-        @keyframes ripple {
-            0% { transform: scale(0, 0); opacity: 0.5; }
-            100% { transform: scale(30, 30); opacity: 0; }
-        }
-
-        /* ===== FORM CARD ===== */
-        .form-card {
-            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
-            border-radius: var(--radius-lg);
-            padding: 2.5rem;
-            margin-bottom: 3rem;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-light);
-            transition: all 0.4s ease;
-            animation: cardAppear 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-        }
-
-        .form-card:hover {
-            box-shadow: var(--shadow-xl);
-            border-color: var(--border-hover);
-        }
-
-        @keyframes cardAppear {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .form-header i {
-            font-size: 1.8rem;
-            color: var(--accent);
-            background: var(--accent-light);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .form-title {
-            font-size: 1.8rem;
-            color: var(--text-main);
-            font-weight: 700;
-        }
-
-        .form-subtitle {
-            color: var(--accent);
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        /* ===== FORM ELEMENTS ===== */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.75rem;
-            color: var(--text-light);
-            font-weight: 600;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-label i {
-            color: var(--accent);
-            font-size: 0.9rem;
-        }
-
-        .form-control, .form-select {
-            padding: 1rem 1.25rem;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            background: var(--bg-panel);
-            color: var(--text-main);
-            width: 100%;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .form-control:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-light), inset 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .form-control::placeholder {
-            color: var(--text-placeholder);
-        }
-
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
-        }
-
         /* ===== BUTTONS ===== */
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-        }
-
         .btn {
             padding: 0.875rem 2rem;
             border-radius: var(--radius);
@@ -484,7 +314,251 @@
             transform: scale(1.1);
         }
 
-        /* ===== STATS DASHBOARD ===== */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .create-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.05rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow), var(--shadow-accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .create-btn i {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover), var(--shadow-accent);
+        }
+
+        .create-btn:hover i {
+            transform: rotate(90deg);
+        }
+
+        .btn-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-sm i {
+            font-size: 1rem;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, var(--accent), #13c891);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(24, 227, 164, 0.3);
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(24,227,164,0.5);
+        }
+
+        .btn-view {
+            background: linear-gradient(135deg, rgba(66, 165, 245, 0.3), rgba(66, 165, 245, 0.1));
+            color: #42A5F5;
+            border: 1px solid rgba(66, 165, 245, 0.3);
+        }
+
+        .btn-view:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(66,165,245,0.4);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, rgba(239, 83, 80, 0.3), rgba(239, 83, 80, 0.1));
+            color: #EF5350;
+            border: 1px solid rgba(239, 83, 80, 0.3);
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(239,83,80,0.4);
+        }
+
+        /* ===== FORMS ===== */
+        .form-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            transition: all 0.4s ease;
+            animation: cardAppear 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-card:hover {
+            box-shadow: var(--shadow-xl);
+            border-color: var(--border-hover);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .form-header i {
+            font-size: 1.8rem;
+            color: var(--accent);
+            background: var(--accent-light);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .form-subtitle {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-panel);
+            color: var(--text-main);
+            width: 100%;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light), inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px var(--danger-light);
+        }
+
+        .form-control.is-valid, .form-select.is-valid {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-placeholder);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-error {
+            margin-top: 0.5rem;
+        }
+
+        .form-error ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .form-error li {
+            color: var(--danger);
+            font-size: 0.85rem;
+            background: rgba(239, 83, 80, 0.15);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--danger);
+            margin-top: 0.4rem;
+            font-weight: 500;
+        }
+
+        .global-error {
+            background: rgba(239,83,80,0.15);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* ===== STATS CARDS ===== */
         .dashboard-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -525,6 +599,35 @@
         .stat-card:hover::before {
             opacity: 1;
         }
+        
+        /* ===== GRAPHIQUES STATISTIQUES ===== */
+        .chart-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .chart-card h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .chart-card canvas {
+            max-height: 250px;
+        }
 
         .stat-icon {
             font-size: 2.2rem;
@@ -550,97 +653,123 @@
             text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
-        /* ===== TABLE ===== */
-        .table-container {
-            background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+        .status-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
             border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            position: relative;
             overflow: hidden;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border-light);
-            margin-top: 2rem;
-            animation: tableAppear 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
         }
 
-        @keyframes tableAppear {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+        .status-card-open {
+            background: linear-gradient(135deg, rgba(24, 227, 164, 0.15), rgba(24, 227, 164, 0.05));
+            border: 1px solid rgba(24, 227, 164, 0.3);
         }
 
-        .table-wrapper {
-            overflow-x: auto;
+        .status-card-closed {
+            background: linear-gradient(135deg, rgba(239, 83, 80, 0.15), rgba(239, 83, 80, 0.05));
+            border: 1px solid rgba(239, 83, 80, 0.3);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1000px;
-        }
-
-        thead {
-            background: linear-gradient(135deg, rgba(26,31,30,0.9), rgba(32,38,37,0.9));
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            backdrop-filter: blur(10px);
-        }
-
-        th {
-            padding: 1.5rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-light);
-            font-weight: 700;
-            color: var(--accent);
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: relative;
-        }
-
-        th::after {
-            content: "";
+        .status-card-bg {
             position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent);
-            transition: width 0.3s ease;
+            top: -20px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
         }
 
-        th:hover::after {
-            width: 100%;
+        .status-card-bg-open {
+            background: radial-gradient(circle, rgba(24, 227, 164, 0.3), transparent);
         }
 
-        td {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-light);
-            color: var(--text-light);
-            transition: all 0.2s ease;
-            vertical-align: middle;
+        .status-card-bg-closed {
+            background: radial-gradient(circle, rgba(239, 83, 80, 0.3), transparent);
         }
 
-        tbody tr {
-            animation: fadeRow 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+        .status-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
             position: relative;
+            z-index: 1;
         }
 
-        tbody tr:hover {
-            background: rgba(24,227,164,0.05);
+        .status-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
-        tbody tr:hover td {
+        .status-icon-open {
+            background: linear-gradient(135deg, #18E3A4, #13c891);
+        }
+
+        .status-icon-closed {
+            background: linear-gradient(135deg, #EF5350, #d32f2f);
+        }
+
+        .status-icon i {
+            color: #000;
+            font-size: 1.2rem;
+        }
+
+        .status-icon-closed i {
+            color: #fff;
+        }
+
+        .status-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .status-label-open {
+            color: #18E3A4;
+        }
+
+        .status-label-closed {
+            color: #EF5350;
+        }
+
+        .status-count {
             color: var(--text-main);
-            transform: translateX(5px);
+            font-size: 1.8rem;
+            font-weight: 800;
         }
 
-        tbody tr:last-child td {
-            border-bottom: none;
+        .progress-bar {
+            margin-top: 1rem;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
         }
 
-        @keyframes fadeRow {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .progress-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill-open {
+            background: linear-gradient(90deg, #18E3A4, #13c891);
+        }
+
+        .progress-fill-closed {
+            background: linear-gradient(90deg, #EF5350, #d32f2f);
         }
 
         /* ===== BADGES ===== */
@@ -661,36 +790,173 @@
             font-size: 0.7rem;
         }
 
-        .bg-success {
-            background: rgba(24,227,164,0.15);
+        .badge-success {
+            background: linear-gradient(135deg, rgba(24, 227, 164, 0.3), rgba(24, 227, 164, 0.1));
+            color: #18E3A4;
+            border: 1px solid rgba(24, 227, 164, 0.3);
+        }
+
+        .badge-warning {
+            background: linear-gradient(135deg, rgba(255, 167, 38, 0.3), rgba(255, 167, 38, 0.1));
+            color: #FFA726;
+            border: 1px solid rgba(255, 167, 38, 0.3);
+        }
+
+        .badge-danger {
+            background: linear-gradient(135deg, rgba(239, 83, 80, 0.3), rgba(239, 83, 80, 0.1));
+            color: #EF5350;
+            border: 1px solid rgba(239, 83, 80, 0.3);
+        }
+
+        .badge-purple {
+            background: rgba(171, 71, 188, 0.2);
+            color: #AB47BC;
+        }
+
+        .participant-badge {
+            background: linear-gradient(135deg, var(--accent), #13c891);
+            color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(24, 227, 164, 0.3);
+        }
+
+        /* ===== TABLE ===== */
+        .table-card {
+            background: linear-gradient(145deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-light);
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            color: var(--text-light);
+            min-width: 1000px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, rgba(26,31,30,0.9), rgba(32,38,37,0.9));
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
             color: var(--accent);
-            border-color: rgba(24,227,164,0.3);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
         }
 
-        .bg-warning {
-            background: rgba(255,167,38,0.15);
+        th i {
+            margin-right: 5px;
+            opacity: 0.7;
+        }
+
+        td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-light);
+            transition: all 0.2s ease;
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+            animation: fadeInRow 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        tbody tr:hover {
+            background: rgba(24,227,164,0.08);
+            transform: translateX(5px);
+        }
+
+        tbody tr:hover td {
+            color: var(--text-main);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        @keyframes fadeInRow {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Animation delays for rows */
+        tbody tr:nth-child(1) { animation-delay: 0.1s; }
+        tbody tr:nth-child(2) { animation-delay: 0.2s; }
+        tbody tr:nth-child(3) { animation-delay: 0.3s; }
+        tbody tr:nth-child(4) { animation-delay: 0.4s; }
+        tbody tr:nth-child(5) { animation-delay: 0.5s; }
+        tbody tr:nth-child(6) { animation-delay: 0.6s; }
+        tbody tr:nth-child(7) { animation-delay: 0.7s; }
+        tbody tr:nth-child(8) { animation-delay: 0.8s; }
+        tbody tr:nth-child(9) { animation-delay: 0.9s; }
+        tbody tr:nth-child(10) { animation-delay: 1s; }
+
+        .id-badge {
+            background: var(--bg-soft);
+            color: var(--text-muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .theme-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .date-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-display i {
+            color: var(--accent);
+        }
+
+        .date-display i.warning {
             color: var(--warning);
-            border-color: rgba(255,167,38,0.3);
         }
 
-        .bg-danger {
-            background: rgba(239,83,80,0.15);
-            color: var(--danger);
-            border-color: rgba(239,83,80,0.3);
-        }
-
-        /* ===== ACTION BUTTONS ===== */
         .action-buttons {
             display: flex;
             gap: 0.75rem;
             flex-wrap: wrap;
-        }
-
-        .btn-sm {
-            padding: 0.625rem 1.25rem;
-            font-size: 0.9rem;
-            min-width: auto;
-            border-radius: 8px;
+            justify-content: center;
         }
 
         /* ===== EMPTY STATE ===== */
@@ -698,6 +964,7 @@
             text-align: center;
             padding: 5rem 2rem;
             color: var(--text-muted);
+            position: relative;
         }
 
         .empty-state i {
@@ -713,6 +980,500 @@
             margin-bottom: 0.5rem;
         }
 
+        .empty-icon-wrapper {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(145deg, var(--bg-soft), var(--bg-main));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--border);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .empty-icon-wrapper i {
+            font-size: 3rem;
+            color: var(--border);
+        }
+
+        .empty-bg {
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--accent-light), transparent);
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+
+        .empty-bg-right {
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(66, 165, 245, 0.2), transparent);
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+
+        .empty-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .create-first-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, var(--accent), #13c891);
+            color: #000;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(24, 227, 164, 0.4);
+        }
+
+        /* ===== AI GENERATION ===== */
+        .btn-ai {
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-ai:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-ai:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== AI MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, var(--bg-card), var(--bg-soft));
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-light);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .modal-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .modal-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .modal-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+
+        /* ===== DELETE CONFIRMATION MODAL ===== */
+        .delete-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .delete-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .delete-modal-content {
+            background: linear-gradient(145deg, #1a1f1e, #141a19);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(239, 83, 80, 0.3);
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        .delete-modal-overlay.show .delete-modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .delete-modal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(239, 83, 80, 0.2), rgba(239, 83, 80, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            border: 2px solid rgba(239, 83, 80, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 83, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0); }
+        }
+
+        .delete-modal-icon i {
+            font-size: 2rem;
+            color: var(--danger);
+        }
+
+        .delete-modal-title {
+            font-size: 1.6rem;
+            color: var(--text-main);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .delete-modal-message {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .delete-modal-defi-name {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            padding: 0.75rem 1rem;
+            background: rgba(24, 227, 164, 0.1);
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .delete-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .delete-modal-btn {
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 140px;
+        }
+
+        .delete-modal-btn-cancel {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--border-light);
+        }
+
+        .delete-modal-btn-cancel:hover {
+            background: var(--bg-soft);
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+        }
+
+        .delete-modal-btn-confirm {
+            background: linear-gradient(135deg, var(--danger), #D32F2F);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 83, 80, 0.3);
+        }
+
+        .delete-modal-btn-confirm:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(239, 83, 80, 0.5);
+        }
+
+        .delete-modal-btn-confirm i {
+            font-size: 1rem;
+        }
+
+        .delete-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 0.5rem;
+        }
+
+        .delete-modal-close:hover {
+            color: var(--danger);
+        }
+
+        .delete-form {
+            display: inline;
+        }
+
+        .ai-prompt-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-panel);
+            color: var(--text-main);
+            font-size: 1rem;
+            min-height: 100px;
+            resize: vertical;
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-prompt-input:focus {
+            outline: none;
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .ai-suggestions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-suggestion-chip {
+            padding: 0.5rem 1rem;
+            background: rgba(139, 92, 246, 0.2);
+            color: #8B5CF6;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ai-suggestion-chip:hover {
+            background: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .ai-result {
+            background: var(--bg-panel);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            display: none;
+        }
+
+        .ai-result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .ai-result-title {
+            color: #8B5CF6;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-result-content {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--border);
+            border-top-color: #8B5CF6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .create-section {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        /* ===== DECORATIVE ELEMENTS ===== */
+        .bg-decoration {
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, var(--accent-light), transparent);
+            border-radius: 50%;
+        }
+
+        .bg-decoration-bottom {
+            position: absolute;
+            bottom: -20px;
+            left: -20px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(66, 165, 245, 0.2), transparent);
+            border-radius: 50%;
+        }
+
+        .table-header {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-icon {
+            background: var(--accent);
+            color: #000;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .defi-count {
+            margin-left: auto;
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .table-footer {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* ===== UTILITIES ===== */
+        .collapse {
+            display: none;
+        }
+        
+        .collapse.show {
+            display: block;
+        }
+        
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
             .form-grid {
@@ -723,7 +1484,7 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-
+        
         @media (max-width: 992px) {
             .admin-sidebar {
                 width: 80px;
@@ -811,24 +1572,12 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--border-light);
         }
-
-        /* ===== ANIMATION DELAYS FOR ROWS ===== */
-        tbody tr:nth-child(1) { animation-delay: 0.1s; }
-        tbody tr:nth-child(2) { animation-delay: 0.2s; }
-        tbody tr:nth-child(3) { animation-delay: 0.3s; }
-        tbody tr:nth-child(4) { animation-delay: 0.4s; }
-        tbody tr:nth-child(5) { animation-delay: 0.5s; }
-        tbody tr:nth-child(6) { animation-delay: 0.6s; }
-        tbody tr:nth-child(7) { animation-delay: 0.7s; }
-        tbody tr:nth-child(8) { animation-delay: 0.8s; }
-        tbody tr:nth-child(9) { animation-delay: 0.9s; }
-        tbody tr:nth-child(10) { animation-delay: 1s; }
     </style>
 </head>
 <body>
 
 <div class="admin-layout">
-    <!-- SIDEBAR -->
+    <!-- ===== SIDEBAR ===== -->
     <aside class="admin-sidebar">
         <div class="sidebar-logo">
             <div class="logo-icon">⚡</div>
@@ -838,19 +1587,35 @@
             <li><a href="/admin/users"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
             <li><a href="/admin/quiz-questions"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
             <li><a href="/admin/produits"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
-            <li><a href="/admin/challenges" class="active"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+            <li><a href="/admin/challenges"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+            <li><a href="/admin/challenges/analytics"><i class="fas fa-chart-line"></i><span>Analytics</span></a></li>
         </ul>
     </aside>
 
-    <!-- CONTENT -->
+    <!-- ===== MAIN CONTENT ===== -->
     <main class="admin-content">
-        <!-- PAGE HEADER -->
+        <!-- ===== PAGE HEADER ===== -->
         <div class="page-header">
             <h1 class="page-title"><i class="fas fa-trophy"></i> Gestion des défis</h1>
             <p class="page-subtitle">Créez et gérez les défis de la plateforme</p>
         </div>
-
-        <!-- STATS -->
+        
+        <!-- ===== ALERTS ===== -->
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+        
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+        
+        <!-- ===== STATISTIQUES ===== -->
         <div class="dashboard-stats">
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-flag"></i></div>
@@ -866,220 +1631,450 @@
             
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-users"></i></div>
-                <div class="stat-title">Participants Totaux</div>
+                <div class="stat-title">Participants</div>
                 <div class="stat-value">{{ defis|reduce((total, d) => total + d.participations|length, 0) }}</div>
             </div>
+        </div>
+        
+        <!-- ===== RÉSUMÉ DES STATUTS ===== -->
+        <div class="status-summary">
+            <!-- Statut OUVERT -->
+            <div class="status-card status-card-open">
+                <div class="status-card-bg status-card-bg-open"></div>
+                <div class="status-content">
+                    <div class="status-icon status-icon-open">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div>
+                        <div class="status-label status-label-open">Ouverts</div>
+                        <div class="status-count">{{ defis|filter(d => d.statut.value == 'OUVERT')|length }}</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-fill-open" style="width: {{ defis|length > 0 ? (defis|filter(d => d.statut.value == 'OUVERT')|length / defis|length * 100) : 0 }}%;"></div>
+                </div>
+            </div>
             
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-                <div class="stat-title">À Venir</div>
-                <div class="stat-value">{{ defis|filter(d => d.statut.value == 'PLANIFIE')|length }}</div>
+            <!-- Statut FERMÉ -->
+            <div class="status-card status-card-closed">
+                <div class="status-card-bg status-card-bg-closed"></div>
+                <div class="status-content">
+                    <div class="status-icon status-icon-closed">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <div>
+                        <div class="status-label status-label-closed">Fermés</div>
+                        <div class="status-count">{{ defis|filter(d => d.statut.value == 'FERME' or d.statut.value == 'FERMEE')|length }}</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-fill-closed" style="width: {{ defis|length > 0 ? (defis|filter(d => d.statut.value == 'FERME' or d.statut.value == 'FERMEE')|length / defis|length * 100) : 0 }}%;"></div>
+                </div>
             </div>
         </div>
 
-        <!-- ALERTS -->
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i>
-                <div>{{ message }}</div>
+        <!-- ===== GRAPHIQUES STATISTIQUES ===== -->
+        <div class="chart-section">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-pie"></i> Statut des défis</h3>
+                <canvas id="statusChart"></canvas>
             </div>
-        {% endfor %}
-
-        <!-- CREATE BUTTON -->
+            
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-line"></i> Évolution des participations</h3>
+                <canvas id="evolutionChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- ===== BOUTON DE CRÉATION ===== -->
         <div class="create-section">
-            <button class="create-btn" type="button" data-bs-toggle="collapse" data-bs-target="#createDefiForm">
-                <i class="fas fa-plus"></i>
-                Créer un nouveau défi
+            <button class="create-btn" type="button" id="toggleFormBtn">
+                <i class="fas fa-{% if defi is defined and defi %}edit{% else %}plus{% endif %}"></i>
+                {% if defi is defined and defi %}Modifier le défi{% else %}Créer un nouveau défi{% endif %}
             </button>
+            <a href="{{ path('admin_challenges_ai_create') }}" class="btn btn-ai">
+                <i class="fas fa-magic"></i> Générer avec IA
+            </a>
         </div>
 
-        <!-- FORM CARD -->
-        <div class="collapse mb-4 {{ form_errors(form)|raw ? 'show' : '' }}" id="createDefiForm">
+        <!-- ===== FORMULAIRE DE CRÉATION/ÉDITION ===== -->
+        <div class="collapse mb-4 {% if form.vars.submitted %}{% if not form.vars.valid %}show{% endif %}{% endif %}" id="createDefiForm">
             <div class="form-card">
                 <div class="form-header">
-                    <i class="fas fa-{{ defi ? 'edit' : 'plus-circle' }}"></i>
+                    <i class="fas fa-{% if defi is defined and defi %}edit{% else %}plus-circle{% endif %}"></i>
                     <div>
-                        <div class="form-title">{{ defi ? 'Modifier le défi' : 'Nouveau défi' }}</div>
-                        <div class="form-subtitle">{{ defi ? defi.titre : 'Remplissez les informations du défi' }}</div>
+                        <div class="form-title">{% if defi is defined and defi %}Modifier le défi{% else %}Nouveau défi{% endif %}</div>
+                        <div class="form-subtitle">{% if defi is defined and defi %}{{ defi.titre }}{% else %}Remplissez les informations du défi{% endif %}</div>
                     </div>
                 </div>
                 
-                {{ form_errors(form) }}
-                {{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data', 'class': 'defi-form' } }) }}
+                {% if form.vars.errors|length > 0 %}
+                    <div class="global-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>{{ form_errors(form) }}</div>
+                    </div>
+                {% endif %}
+                
+                {{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data', 'class': 'defi-form', 'novalidate': 'novalidate' } }) }}
                 
                 <div class="form-grid">
                     <div class="form-group">
                         {{ form_label(form.titre, null, { 'label_attr': { 'class': 'form-label' } }) }}
-                        {{ form_widget(form.titre, { 'attr': { 'class': 'form-control', 'placeholder': 'Ex: Défi Éco-Responsable' } }) }}
-                        {{ form_errors(form.titre) }}
+                        {{ form_widget(form.titre, { 'attr': { 'class': 'form-control' ~ (form.titre.vars.errors|length > 0 ? ' is-invalid' : ''), 'placeholder': 'Ex: Défi Éco-Responsable' } }) }}
+                        {% if form.titre.vars.errors|length > 0 %}
+                            <div class="form-error">
+                                {{ form_errors(form.titre) }}
+                            </div>
+                        {% endif %}
                     </div>
                     
                     <div class="form-group">
                         {{ form_label(form.theme, null, { 'label_attr': { 'class': 'form-label' } }) }}
-                        {{ form_widget(form.theme, { 'attr': { 'class': 'form-control', 'placeholder': 'Ex: Environnement, Santé...' } }) }}
-                        {{ form_errors(form.theme) }}
+                        {{ form_widget(form.theme, { 'attr': { 'class': 'form-control' ~ (form.theme.vars.errors|length > 0 ? ' is-invalid' : ''), 'placeholder': 'Ex: Environnement, Santé...' } }) }}
+                        {% if form.theme.vars.errors|length > 0 %}
+                            <div class="form-error">
+                                {{ form_errors(form.theme) }}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
                 
                 <div class="form-group">
                     {{ form_label(form.description, null, { 'label_attr': { 'class': 'form-label' } }) }}
-                    {{ form_widget(form.description, { 'attr': { 'class': 'form-control', 'rows': 4, 'placeholder': 'Décrivez le défi en détail...' } }) }}
-                    {{ form_errors(form.description) }}
+                    {{ form_widget(form.description, { 'attr': { 'class': 'form-control' ~ (form.description.vars.errors|length > 0 ? ' is-invalid' : ''), 'rows': 4, 'placeholder': 'Décrivez le défi en détail...' } }) }}
+                    {% if form.description.vars.errors|length > 0 %}
+                        <div class="form-error">
+                            {{ form_errors(form.description) }}
+                        </div>
+                    {% endif %}
                 </div>
                 
                 <div class="form-grid">
                     <div class="form-group">
                         {{ form_label(form.dateDebut, null, { 'label_attr': { 'class': 'form-label' } }) }}
-                        {{ form_widget(form.dateDebut, { 'attr': { 'class': 'form-control' } }) }}
-                        {{ form_errors(form.dateDebut) }}
+                        {{ form_widget(form.dateDebut, { 'attr': { 'class': 'form-control' ~ (form.dateDebut.vars.errors|length > 0 ? ' is-invalid' : ''), 'type': 'date' } }) }}
+                        {% if form.dateDebut.vars.errors|length > 0 %}
+                            <div class="form-error">
+                                {{ form_errors(form.dateDebut) }}
+                            </div>
+                        {% endif %}
                     </div>
                     
                     <div class="form-group">
                         {{ form_label(form.dateFin, null, { 'label_attr': { 'class': 'form-label' } }) }}
-                        {{ form_widget(form.dateFin, { 'attr': { 'class': 'form-control' } }) }}
-                        {{ form_errors(form.dateFin) }}
+                        {{ form_widget(form.dateFin, { 'attr': { 'class': 'form-control' ~ (form.dateFin.vars.errors|length > 0 ? ' is-invalid' : ''), 'type': 'date' } }) }}
+                        {% if form.dateFin.vars.errors|length > 0 %}
+                            <div class="form-error">
+                                {{ form_errors(form.dateFin) }}
+                            </div>
+                        {% endif %}
                     </div>
                     
-                    <div class="form-group">
-                        {{ form_label(form.dateLimite, null, { 'label_attr': { 'class': 'form-label' } }) }}
-                        {{ form_widget(form.dateLimite, { 'attr': { 'class': 'form-control' } }) }}
-                        {{ form_errors(form.dateLimite) }}
-                    </div>
                 </div>
                 
                 <div class="form-grid">
                     <div class="form-group">
                         {{ form_label(form.statut, null, { 'label_attr': { 'class': 'form-label' } }) }}
-                        {{ form_widget(form.statut, { 'attr': { 'class': 'form-select' } }) }}
-                        {{ form_errors(form.statut) }}
+                        {{ form_widget(form.statut, { 'attr': { 'class': 'form-select' ~ (form.statut.vars.errors|length > 0 ? ' is-invalid' : '') } }) }}
+                        {% if form.statut.vars.errors|length > 0 %}
+                            <div class="form-error">
+                                {{ form_errors(form.statut) }}
+                            </div>
+                        {% endif %}
                     </div>
                     
                     <div class="form-group">
                         {{ form_label(form.imageCoverFile, null, { 'label_attr': { 'class': 'form-label' } }) }}
-                        {{ form_widget(form.imageCoverFile, { 'attr': { 'class': 'form-control', 'accept': 'image/*' } }) }}
-                        {{ form_errors(form.imageCoverFile) }}
+                        {{ form_widget(form.imageCoverFile, { 'attr': { 'class': 'form-control' ~ (form.imageCoverFile.vars.errors|length > 0 ? ' is-invalid' : ''), 'accept': 'image/*' } }) }}
+                        {% if form.imageCoverFile.vars.errors|length > 0 %}
+                            <div class="form-error">
+                                {{ form_errors(form.imageCoverFile) }}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
                 
                 <div class="btn-group">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-{{ defi ? 'save' : 'plus' }}"></i>
-                        {{ defi ? 'Mettre à jour' : 'Créer le défi' }}
+                        <i class="fas fa-{% if defi is defined and defi %}save{% else %}plus{% endif %}"></i>
+                        {% if defi is defined and defi %}Mettre à jour{% else %}Créer le défi{% endif %}
                     </button>
-                    
-                    {% if defi %}
-                        <a href="{{ path('admin_challenges') }}" class="btn btn-warning">
-                            <i class="fas fa-times"></i>
-                            Annuler
-                        </a>
-                    {% endif %}
                 </div>
                 
                 {{ form_end(form) }}
             </div>
         </div>
 
-        <!-- TABLE DES DÉFIS -->
-        <div class="table-container">
+        <!-- ===== TABLEAU DES DÉFIS ===== -->
+        {% if defis|length > 0 %}
+        <div class="table-card">
+            <!-- Éléments décoratifs -->
+            <div class="bg-decoration"></div>
+            <div class="bg-decoration-bottom"></div>
+            
+            <div class="table-header">
+                <span class="header-icon">
+                    <i class="fas fa-trophy"></i>
+                </span>
+                Liste des défis
+                <span class="defi-count">
+                    {{ defis|length }} défi(s)
+                </span>
+            </div>
+            
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th><i class="fas fa-hashtag"></i> ID</th>
-                            <th><i class="fas fa-heading"></i> Titre</th>
-                            <th><i class="fas fa-align-left"></i> Description</th>
-                            <th><i class="fas fa-chart-line"></i> Statut</th>
-                            <th><i class="fas fa-calendar-alt"></i> Date limite</th>
-                            <th><i class="fas fa-users"></i> Participants</th>
-                            <th><i class="fas fa-cogs"></i> Actions</th>
+                            <th><i class="fas fa-hashtag"></i>ID</th>
+                            <th><i class="fas fa-heading"></i>Titre</th>
+                            <th><i class="fas fa-palette"></i>Thème</th>
+                            <th><i class="fas fa-play"></i>Début</th>
+                            <th><i class="fas fa-stop"></i>Fin</th>
+                            <th style="text-align: center;"><i class="fas fa-users"></i>Participants</th>
+                            <th style="text-align: center;"><i class="fas fa-signal"></i>Difficulté</th>
+                            <th style="text-align: center;"><i class="fas fa-toggle-on"></i>Statut</th>
+                            <th style="text-align: center;"><i class="fas fa-cogs"></i>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for defi in defis %}
-                            <tr>
-                                <td><strong>#{{ defi.id }}</strong></td>
-                                <td>
-                                    <strong>{{ defi.titre }}</strong>
-                                    <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">
-                                        <i class="fas fa-tag"></i> {{ defi.theme }}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="description-truncate" title="{{ defi.description }}">
-                                        {{ defi.description|slice(0,80) }}{{ defi.description|length > 80 ? '...' : '' }}
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge {% if defi.statut.value == 'OUVERT' %}bg-success{% elseif defi.statut.value == 'TERMINE' %}bg-danger{% else %}bg-warning{% endif %}">
-                                        <i class="fas fa-circle"></i>
-                                        {{ defi.statut.value }}
-                                    </span>
-                                </td>
-                                <td>
-                                    {% if defi.dateLimite %}
-                                        <div class="date-display">
-                                            <i class="fas fa-calendar"></i>
-                                            {{ defi.dateLimite|date('d/m/Y') }}
-                                        </div>
-                                    {% else %}
-                                        <span style="color: var(--text-muted);">—</span>
+                        <tr style="animation-delay: {{ loop.index * 0.1 }}s;">
+                            <td>
+                                <span class="id-badge">
+                                    #{{ defi.id }}
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600; color: var(--text-main); font-size: 1rem;">{{ defi.titre }}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">{{ defi.description|length > 50 ? defi.description|slice(0, 50) ~ '...' : defi.description }}</div>
+                            </td>
+                            <td>
+                                <span class="theme-badge badge-purple">
+                                    <i class="fas fa-tag" style="margin-right: 5px;"></i>{{ defi.theme }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="date-display">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>{{ defi.dateDebut|date('d/m/Y') }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-display">
+                                    <i class="fas fa-calendar-check warning"></i>
+                                    <span>{{ defi.dateFin|date('d/m/Y') }}</span>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="participant-badge">
+                                    <i class="fas fa-user-friends" style="margin-right: 5px;"></i>{{ defi.participations|length }}
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                {% if defi.difficulte %}
+                                    {% set diff = defi.difficulte.value %}}
+                                    {% if diff == 'facile' %}
+                                        <span class="badge" style="background: linear-gradient(135deg, #18E3A4, #13c891); color: #000; font-weight: 600;">
+                                            <i class="fas fa-star"></i> Facile
+                                        </span>
+                                    {% elseif diff == 'moyen' %}
+                                        <span class="badge" style="background: linear-gradient(135deg, #FFE66D, #FFD93D); color: #000; font-weight: 600;">
+                                            <i class="fas fa-star"></i><i class="fas fa-star"></i> Moyen
+                                        </span>
+                                    {% elseif diff == 'difficile' %}
+                                        <span class="badge" style="background: linear-gradient(135deg, #FF6B6B, #EE5A5A); color: #fff; font-weight: 600;">
+                                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> Difficile
+                                        </span>
+                                    {% elseif diff == 'expert' %}
+                                        <span class="badge" style="background: linear-gradient(135deg, #AA96DA, #8B7BCF); color: #fff; font-weight: 600;">
+                                            <i class="fas fa-crown"></i> Expert
+                                        </span>
                                     {% endif %}
-                                </td>
-                                <td>
-                                    <div class="participants-count">
-                                        <i class="fas fa-user-friends"></i>
-                                        <strong>{{ defi.participations|length }}</strong>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="{{ path('admin_defi_participations', { id: defi.id }) }}" 
-                                           class="btn btn-info btn-sm"
-                                           title="Voir les participants">
-                                            <i class="fas fa-users"></i> Participants
-                                        </a>
-                                        <a href="{{ path('defi_edit', { id: defi.id }) }}" 
-                                           class="btn btn-warning btn-sm"
-                                           title="Modifier le défi">
-                                            <i class="fas fa-edit"></i> Modifier
-                                        </a>
-                                        <form method="post" 
-                                              action="{{ path('defi_delete', { id: defi.id }) }}" 
-                                              style="display:inline;"
-                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce défi et toutes ses participations ? Cette action est irréversible.');">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ defi.id) }}">
-                                            <button type="submit" class="btn btn-danger btn-sm" title="Supprimer le défi">
-                                                <i class="fas fa-trash"></i> Supprimer
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="7">
-                                    <div class="empty-state">
-                                        <i class="fas fa-trophy"></i>
-                                        <h3>Aucun défi trouvé</h3>
-                                        <p>Commencez par créer votre premier défi !</p>
-                                    </div>
-                                </td>
-                            </tr>
+                                {% else %}
+                                    <form method="post" action="{{ path('defi_generate_difficulte', {id: defi.id}) }}" style="display: inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('generate_difficulte' ~ defi.id) }}">
+                                        <button type="submit" class="btn-sm" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED); color: #fff; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem;" title="Générer la difficulté avec IA">
+                                            <i class="fas fa-magic"></i> Générer
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: center;">
+                                {% if defi.statut.value == 'OUVERT' %}
+                                <span class="badge badge-success">
+                                    <i class="fas fa-check-circle"></i>Ouvert
+                                </span>
+                                {% elseif defi.statut.value == 'FERME' or defi.statut.value == 'FERMEE' %}
+                                <span class="badge badge-danger">
+                                    <i class="fas fa-check-double"></i>Fermé
+                                </span>
+                                {% elseif defi.statut.value == 'TERMINE' %}
+                                <span class="badge badge-danger">
+                                    <i class="fas fa-check-double"></i>Terminé
+                                </span>
+                                {% elseif defi.statut.value == 'PLANIFIE' %}
+                                <span class="badge badge-warning">
+                                    <i class="fas fa-clock"></i>Planifié
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: center;">
+                                <div class="action-buttons">
+                                    <a href="{{ path('defi_edit', {id: defi.id}) }}" class="btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ path('admin_defi_participations', {id: defi.id}) }}" class="btn-sm btn-view">
+                                        <i class="fas fa-users"></i>
+                                    </a>
+                                    <form method="post" action="{{ path('defi_delete', {id: defi.id}) }}" style="display: inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce défi?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ defi.id) }}">
+                                        <button type="submit" class="btn-sm btn-delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Pied de tableau -->
+            <div class="table-footer">
+                <span><i class="fas fa-info-circle" style="margin-right: 5px;"></i>Affichage de {{ defis|length }} défi(s)</span>
+                <span><i class="fas fa-clock" style="margin-right: 5px;"></i>Dernière mise à jour: {{ 'now'|date('H:i') }}</span>
+            </div>
         </div>
+        
+        <!-- ===== ÉTAT VIDE ===== -->
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-bg"></div>
+            <div class="empty-bg-right"></div>
+            
+            <div class="empty-content">
+                <div class="empty-icon-wrapper">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3 style="color: var(--text-main); font-size: 1.5rem; margin-bottom: 0.75rem; font-weight: 700;">Aucun défi trouvé</h3>
+                <p style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--text-light);">Commencez votre premier défi créatif !</p>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Cliquez sur le bouton ci-dessous pour créer votre premier défi.</p>
+                <button onclick="document.getElementById('toggleFormBtn').click()" class="create-first-btn">
+                    <i class="fas fa-rocket"></i>
+                    Créer mon premier défi
+                </button>
+            </div>
+        </div>
+        {% endif %}
     </main>
 </div>
 
+<!-- ===== SCRIPTS ===== -->
 <script>
-    // Animation pour le bouton de création
-    document.querySelector('.create-btn')?.addEventListener('click', function() {
-        this.classList.add('active');
-        setTimeout(() => this.classList.remove('active'), 300);
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle du formulaire de création
+    const createBtn = document.getElementById('toggleFormBtn');
+    const formCard = document.getElementById('createDefiForm');
+    
+    // Vérifier si on est en mode édition
+    const isEditing = createBtn && createBtn.textContent.includes('Modifier');
+    const createText = 'Créer un nouveau défi';
+    const editText = 'Modifier le défi';
+    const hideText = 'Masquer le formulaire';
+    
+    if (createBtn && formCard) {
+        // Mettre à jour le texte du bouton si le formulaire est déjà ouvert
+        if (formCard.classList.contains('show')) {
+            createBtn.innerHTML = '<i class="fas fa-minus"></i> ' + hideText;
+        }
+        
+        createBtn.addEventListener('click', function() {
+            formCard.classList.toggle('show');
+            const icon = this.querySelector('i');
+            if (formCard.classList.contains('show')) {
+                icon.className = 'fas fa-minus';
+                this.innerHTML = '<i class="fas fa-minus"></i> ' + hideText;
+            } else {
+                icon.className = isEditing ? 'fas fa-edit' : 'fas fa-plus';
+                this.innerHTML = '<i class="fas fa-' + (isEditing ? 'edit' : 'plus') + '"></i> ' + (isEditing ? editText : createText);
+            }
+        });
+    }
 
+    // ===== GRAPHIQUES DYNAMIQUES =====
+    const stats = {{ stats|json_encode|raw }};
+    const monthlyStats = {{ monthlyStats|json_encode|raw }};
+    
+    // Graphique en anneau - Statut des défis
+    const statusCtx = document.getElementById('statusChart');
+    if (statusCtx) {
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Ouverts', 'Fermés'],
+                datasets: [{
+                    data: [stats.defisOuverts, stats.defisFermes],
+                    backgroundColor: ['#18E3A4', '#EF5350'],
+                    borderColor: '#141A19',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#CBD5D1', padding: 15 }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Graphique linéaire - Évolution des participations
+    const evolutionCtx = document.getElementById('evolutionChart');
+    if (evolutionCtx) {
+        new Chart(evolutionCtx, {
+            type: 'line',
+            data: {
+                labels: monthlyStats.labels,
+                datasets: [{
+                    label: 'Participations',
+                    data: monthlyStats.data,
+                    borderColor: '#18E3A4',
+                    backgroundColor: 'rgba(24, 227, 164, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#CBD5D1' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#CBD5D1' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#CBD5D1' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    }
+                }
+            }
+        });
+    }
+    
     // Animation des cartes de statistiques
     document.querySelectorAll('.stat-card').forEach(card => {
         card.addEventListener('mouseenter', function() {
@@ -1091,36 +2086,6 @@
         });
     });
 
-    // Gestion du formulaire
-    const form = document.querySelector('.defi-form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            const submitBtn = this.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
-                submitBtn.disabled = true;
-            }
-        });
-    }
-
-    // Toggle du formulaire de création
-    const createBtn = document.querySelector('.create-btn');
-    const formCard = document.querySelector('#createDefiForm');
-    
-    if (createBtn && formCard) {
-        createBtn.addEventListener('click', function() {
-            formCard.classList.toggle('show');
-            const icon = this.querySelector('i');
-            if (formCard.classList.contains('show')) {
-                icon.className = 'fas fa-minus';
-                this.innerHTML = '<i class="fas fa-minus"></i> Masquer le formulaire';
-            } else {
-                icon.className = 'fas fa-plus';
-                this.innerHTML = '<i class="fas fa-plus"></i> Créer un nouveau défi';
-            }
-        });
-    }
-
     // Highlight des lignes au survol
     document.querySelectorAll('tbody tr').forEach(row => {
         row.addEventListener('mouseenter', function() {
@@ -1131,12 +2096,42 @@
             this.style.backgroundColor = '';
         });
     });
-
-    // Animation progressive des lignes du tableau
-    document.querySelectorAll('tbody tr').forEach((row, index) => {
-        row.style.animationDelay = `${index * 0.05}s`;
-    });
+});
 </script>
 
 </body>
+<script>
+// Auto-fill form fields from URL parameters (from AI generation)
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const titre = urlParams.get('titre');
+    const theme = urlParams.get('theme');
+    const description = urlParams.get('description');
+    
+    if (titre || theme || description) {
+        // Find the form fields
+        const titreField = document.querySelector('input[name="defi[titre]"]');
+        const themeField = document.querySelector('input[name="defi[theme]"]');
+        const descriptionField = document.querySelector('textarea[name="defi[description]"]');
+        
+        if (titreField && titre) {
+            titreField.value = titre;
+        }
+        if (themeField && theme) {
+            themeField.value = theme;
+        }
+        if (descriptionField && description) {
+            descriptionField.value = description;
+        }
+        
+        // Show a toast notification
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.innerHTML = '<i class="fas fa-magic"></i> Données IA importées - Vous pouvez modifier avant de créer';
+        toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,#8B5CF6,#7C3AED);color:#fff;padding:1rem 1.5rem;border-radius:12px;font-weight:600;box-shadow:0 4px 15px rgba(139,92,246,0.4);z-index:9999;animation:slideIn 0.3s ease';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    }
+});
+</script>
 </html>

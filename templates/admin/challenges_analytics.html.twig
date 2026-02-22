@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Défis | Midgar Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ===== VARIABLES ===== */
+        :root {
+            --bg-main: #0B0F0E;
+            --bg-panel: #141A19;
+            --bg-soft: #1A1F1E;
+            --bg-card: #1E2423;
+            --border: #2A3139;
+            --border-light: #3A424A;
+            --border-hover: #4A5259;
+
+            --accent: #18E3A4;
+            --accent-dark: #13c891;
+            --accent-light: rgba(24,227,164,0.12);
+            --accent-glow: rgba(24,227,164,0.25);
+            --danger: #EF5350;
+            --danger-light: rgba(239,83,80,0.12);
+            --warning: #FFA726;
+            --warning-light: rgba(255,167,38,0.12);
+            --info: #42A5F5;
+            --info-light: rgba(66,165,245,0.12);
+            --success: #66BB6A;
+            --purple: #AB47BC;
+            --purple-light: rgba(171,71,188,0.12);
+
+            --text-main: #E6FFF6;
+            --text-light: #CBD5D1;
+            --text-muted: #9BA6A2;
+            --text-placeholder: #7A8580;
+
+            --sidebar-width: 280px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --shadow: 0 10px 25px rgba(0,0,0,0.3);
+            --shadow-lg: 0 15px 35px rgba(0,0,0,0.4);
+            --shadow-xl: 0 20px 50px rgba(0,0,0,0.5);
+            --shadow-accent: 0 0 25px rgba(24,227,164,0.3);
+            --shadow-hover: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* ===== RESET & BASE ===== */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body {
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Inter", Arial, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== LAYOUT ===== */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+
+        .admin-sidebar ul {
+            list-style: none;
+        }
+
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            margin: 0.25rem 0;
+            font-weight: 500;
+        }
+
+        .admin-sidebar a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .admin-sidebar a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent-light), transparent);
+            transition: width 0.4s ease;
+            z-index: -1;
+        }
+
+        .admin-sidebar a:hover::before,
+        .admin-sidebar a.active::before {
+            width: 100%;
+        }
+
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .admin-sidebar a:hover i,
+        .admin-sidebar a.active i {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px var(--accent-glow));
+        }
+
+        /* ===== CONTENT ===== */
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem 3rem;
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-main) 0%, #0F1413 100%);
+            position: relative;
+        }
+
+        .admin-content::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            z-index: 1;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon.primary { background: var(--accent-light); color: var(--accent); }
+        .stat-icon.warning { background: var(--warning-light); color: var(--warning); }
+        .stat-icon.danger { background: var(--danger-light); color: var(--danger); }
+        .stat-icon.info { background: var(--info-light); color: var(--info); }
+
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* ===== AI SECTIONS ===== */
+        .ai-section {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--purple), var(--accent), var(--info));
+        }
+
+        .ai-section h5 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-section.purple::before {
+            background: linear-gradient(90deg, var(--purple), #7B1FA2);
+        }
+
+        .ai-section.warning::before {
+            background: linear-gradient(90deg, var(--warning), #FF9800);
+        }
+
+        .ai-section.info::before {
+            background: linear-gradient(90deg, var(--info), #1976D2);
+        }
+
+        .ai-section.danger::before {
+            background: linear-gradient(90deg, var(--danger), #D32F2F);
+        }
+
+        .insight-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+
+        /* ===== TREND INDICATORS ===== */
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .trend-indicator.up {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .trend-indicator.down {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .trend-indicator.stable {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        /* ===== PREDICTION CARD ===== */
+        .prediction-card {
+            background: linear-gradient(135deg, var(--purple-light) 0%, rgba(24,227,164,0.05) 100%);
+            border: 1px solid rgba(171,71,188,0.3);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .prediction-card h5 {
+            color: var(--purple);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ===== RECOMMENDATION CARD ===== */
+        .recommendation-card {
+            background: linear-gradient(135deg, var(--warning-light) 0%, rgba(24,227,164,0.05) 100%);
+            border: 1px solid rgba(255,167,38,0.3);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .recommendation-card h5 {
+            color: var(--warning);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ===== THEMES PERFORMANCE ===== */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .theme-item {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .theme-name {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .theme-stat {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .theme-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* ===== CHART/TABLE CARD ===== */
+        .chart-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card h5 {
+            color: var(--accent);
+            margin-bottom: 1.25rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ===== TABLE ===== */
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-custom th {
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-custom td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-light);
+        }
+
+        .table-custom tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-custom tr:hover td {
+            background: var(--bg-soft);
+        }
+
+        .badge-statut {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-ouvert { background: var(--accent-light); color: var(--accent); }
+        .badge-ferme { background: var(--danger-light); color: var(--danger); }
+
+        .badge-theme {
+            background: var(--purple-light);
+            color: var(--purple);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .rank-badge {
+            font-size: 1.25rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                width: 70px;
+            }
+            
+            .admin-content {
+                margin-left: 70px;
+                padding: 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 1.75rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">Midgar</div>
+            </div>
+            <ul>
+                <li><a href="/admin/users"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+                <li><a href="/admin/quiz-questions"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+                <li><a href="/admin/produits"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+                <li><a href="/admin/challenges"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+                <li><a href="/admin/challenges/analytics" class="active"><i class="fas fa-chart-line"></i><span>Analytics</span></a></li>
+            </ul>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="admin-content">
+            <!-- ===== PAGE HEADER ===== -->
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-chart-line"></i> Analytics des défis</h1>
+                <p class="page-subtitle">Intelligence Artificielle • Prédictions • Recommandations</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-value">{{ totalDefis }}</div>
+                    <div class="stat-label">Total Défis</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">{{ totalParticipations }}</div>
+                    <div class="stat-label">Participations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-door-open"></i>
+                    </div>
+                    <div class="stat-value">{{ defisOuverts }}</div>
+                    <div class="stat-label">Défis Ouverts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon danger">
+                        <i class="fas fa-door-closed"></i>
+                    </div>
+                    <div class="stat-value">{{ defisFermes }}</div>
+                    <div class="stat-label">Défis Fermés</div>
+                </div>
+            </div>
+
+            <!-- AI Trend Analysis -->
+            {% if trendAnalysis %}
+            <div class="ai-section info">
+                <h5><i class="fas fa-chart-pie"></i>📊 Analyse des Tendances</h5>
+                <div class="trend-indicator {{ trendAnalysis.direction }}">
+                    <i class="fas 
+                        {% if trendAnalysis.direction == 'up' %}fa-arrow-up
+                        {% elseif trendAnalysis.direction == 'down' %}fa-arrow-down
+                        {% else %}fa-minus{% endif %}">
+                    </i>
+                    {{ trendAnalysis.message|raw }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- AI Predictions -->
+            {% if predictions %}
+            <div class="prediction-card">
+                <h5><i class="fas fa-crystal-ball"></i>🔮 Prédictions IA</h5>
+                {% for prediction in predictions %}
+                    <div class="insight-item">
+                        {{ prediction|raw }}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- AI Insights -->
+            <div class="ai-section purple">
+                <h5><i class="fas fa-robot"></i>🤖 Insights IA</h5>
+                {% for insight in aiInsights %}
+                    <div class="insight-item">
+                        {{ insight|raw }}
+                    </div>
+                {% else %}
+                    <div class="insight-item">
+                        <em>Aucune donnée disponible pour générer des insights</em>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- AI Recommendations -->
+            {% if recommendations %}
+            <div class="recommendation-card">
+                <h5><i class="fas fa-lightbulb"></i>💡 Recommandations IA</h5>
+                {% for recommendation in recommendations %}
+                    <div class="insight-item">
+                        {{ recommendation|raw }}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Themes Performance -->
+            {% if topThemes %}
+            <div class="ai-section">
+                <h5><i class="fas fa-palette"></i>🎨 Performance par Thème</h5>
+                <div class="theme-grid">
+                    {% for theme, data in topThemes %}
+                        <div class="theme-item">
+                            <div class="theme-name">{{ theme }}</div>
+                            <div class="theme-stat">{{ data.avg }}</div>
+                            <div class="theme-label">avg participations</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                {{ data.defis }} défis • {{ data.participations }} participations
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Top Challenges Table -->
+            <div class="chart-card">
+                <h5><i class="fas fa-trophy"></i>🏆 Top Défis par Participations</h5>
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Rang</th>
+                            <th>Défi</th>
+                            <th>Thème</th>
+                            <th>Participations</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set rank = 1 %}
+                        {% for id, defi in topDefis %}
+                            <tr>
+                                <td>
+                                    <span class="rank-badge">
+                                    {% if rank == 1 %}🥇
+                                    {% elseif rank == 2 %}🥈
+                                    {% elseif rank == 3 %}🥉
+                                    {% else %}{{ rank }}
+                                    {% endif %}
+                                    </span>
+                                </td>
+                                <td>{{ defi.titre }}</td>
+                                <td>
+                                    <span class="badge-theme">{{ defi.theme }}</span>
+                                </td>
+                                <td><strong>{{ defi.count }}</strong></td>
+                                <td>
+                                    <span class="badge-statut {{ defi.statut == 'OUVERT' ? 'badge-ouvert' : 'badge-ferme' }}">
+                                        {{ defi.statut }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% set rank = rank + 1 %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">Aucun défi trouvé</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

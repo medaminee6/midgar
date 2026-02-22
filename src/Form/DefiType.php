@@ -20,21 +20,28 @@ class DefiType extends AbstractType
         $builder
             ->add('titre', TextType::class, [
                 'label' => 'Titre du défi',
+                'required' => false,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Entrez le titre du défi'
+                    'placeholder' => 'Entrez le titre du défi',
+                    'minlength' => 3,
+                    'maxlength' => 255
                 ]
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
+                'required' => false,
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'Décrivez le défi',
-                    'rows' => 5
+                    'rows' => 5,
+                    'minlength' => 10,
+                    'maxlength' => 850
                 ]
             ])
             ->add('theme', TextType::class, [
                 'label' => 'Thème',
+                'required' => false,
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'Ex: Science-fiction, Fantasy, etc.'
@@ -55,6 +62,8 @@ class DefiType extends AbstractType
             ])
             ->add('dateDebut', DateType::class, [
                 'label' => 'Date de début',
+                'required' => true,
+                'mapped' => false,
                 'widget' => 'single_text',
                 'attr' => [
                     'class' => 'form-control'
@@ -62,14 +71,8 @@ class DefiType extends AbstractType
             ])
             ->add('dateFin', DateType::class, [
                 'label' => 'Date de fin',
-                'widget' => 'single_text',
-                'attr' => [
-                    'class' => 'form-control'
-                ]
-            ])
-            ->add('dateLimite', DateType::class, [
-                'label' => 'Date limite de participation',
-                'required' => false,
+                'required' => true,
+                'mapped' => false,
                 'widget' => 'single_text',
                 'attr' => [
                     'class' => 'form-control'
