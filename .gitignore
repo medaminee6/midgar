@@ -1,4 +1,4 @@
-
+models/stable-diffusion-v1-5/
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
