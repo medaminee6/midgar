@@ -1,0 +1,126 @@
+/* Admin sidebar layout overrides to ensure vertical stacked navigation */
+:root {
+    --sidebar-width: 260px;
+    --sidebar-bg: #1A1F1E;
+    --accent: #18E3A4;
+    --muted: #B0B9B6;
+}
+
+/* Defensive: prevent page horizontal scrolling */
+html, body { overflow-x: hidden; }
+
+/* Ensure page wrapper uses flex (no grid) so content sits to the right of the fixed sidebar */
+.admin-layout { display: flex !important; }
+
+/* Sidebar container */
+.admin-sidebar {
+    width: var(--sidebar-width) !important;
+    box-sizing: border-box;
+}
+
+/* Make nav a vertical stack */
+.admin-sidebar nav ul {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important; /* ensure children fill width */
+    gap: 0;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.admin-sidebar nav li {
+    width: 100% !important;
+}
+
+/* Make the anchor fill the li so the whole row is clickable */
+.admin-sidebar nav a {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 12px 1.5rem !important;
+    text-decoration: none !important;
+}
+
+/* Ensure icons/emojis and text have spacing but don't cause wrapping issues */
+.admin-sidebar nav a > * { flex-shrink: 0; }
+.admin-sidebar nav a span, .admin-sidebar nav a svg { margin-right: 0.5rem; }
+
+/* Hover and active states (kept lightweight here) */
+.admin-sidebar nav a:hover { background-color: #0B0F0E; color: var(--accent); }
+.admin-sidebar nav a.active { background-color: #0B0F0E; color: var(--accent); font-weight: 600; }
+
+/* Small screens: reduce sidebar width but keep vertical layout */
+@media (max-width: 540px) {
+    :root { --sidebar-width: 200px; }
+    .admin-sidebar { width: var(--sidebar-width) !important; }
+}
+
+/* ==========================================
+   Admin background and spacing fixes
+   Apply globally to admin pages to remove white strip
+   ========================================== */
+html, body {
+    background-color: #0B0F0E !important;
+    margin: 0 !important;
+    height: 100% !important;
+}
+
+.admin-layout, .admin-content {
+    background-color: #0B0F0E !important;
+}
+
+.admin-content {
+    min-height: 100vh !important;
+    padding-left: 0 !important; /* remove container side paddings if any */
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Remove Bootstrap-like container paddings inside admin content to avoid white gutters */
+.admin-content .container,
+.admin-content .container-fluid,
+.admin-content > .container,
+.admin-content > .container-fluid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Defensive: make sure rows don't introduce horizontal gutters inside admin content */
+.admin-content .row { margin-left: 0 !important; margin-right: 0 !important; }
+
+/* ---------- Scrollbar styling to avoid white track/gutter ---------- */
+/* WebKit-based browsers (Chrome, Edge, Safari) */
+.admin-sidebar::-webkit-scrollbar,
+.admin-content::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 14px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track,
+.admin-content::-webkit-scrollbar-track,
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+    background: #0B0F0E; /* match admin background */
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb,
+.admin-content::-webkit-scrollbar-thumb,
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+    background-color: rgba(24,227,164,0.18);
+    border-radius: 8px;
+    border: 3px solid #0B0F0E; /* gives padded look */
+}
+
+/* Firefox: use native scrollbar-color */
+.admin-sidebar, .admin-content, html, body {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(24,227,164,0.18) #0B0F0E;
+}
+
+

@@ -1,0 +1,1478 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Adventure - Midgar Quiz{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {# CSS is inline below - matching universes.html.twig exactly #}
+{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== VARIABLES - matching universes.html.twig exactly ===== */
+    :root {
+        --primary-color: #18E3A4;
+        --primary-dark: #13c891;
+        --text-color: #E6FFF6;
+        --text-secondary: #B0B9B6;
+        --bg-primary: #1A1F1E;
+        --bg-dark: #0D0F0F;
+        --card-bg: rgba(26, 31, 30, 0.7);
+        --glass-bg: rgba(26, 31, 30, 0.5);
+        --border-radius: 12px;
+    }
+    
+    .adventure-page {
+        min-height: 100vh;
+        padding: 2rem 0 4rem;
+        background-color: var(--bg-primary);
+    }
+
+    .site-content > header {
+        display: none;
+    }
+
+    .adventure-page .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Hero */
+    .adventure-hero {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2.5rem 2rem;
+        background: linear-gradient(135deg, rgba(24, 227, 164, 0.08) 0%, rgba(26, 31, 30, 0.9) 100%);
+        border: 1px solid rgba(24, 227, 164, 0.15);
+        border-radius: var(--border-radius);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .adventure-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    }
+
+    .adventure-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+
+    .adventure-hero h1 span {
+        color: var(--primary-color);
+    }
+
+    .adventure-hero .subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+    }
+
+    /* Sections */
+    .selector-section {
+        margin-bottom: 2rem;
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        border: 1px solid rgba(24, 227, 164, 0.1);
+    }
+
+    .section-header {
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-description {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    /* Grid */
+    .characters-grid,
+    .universes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.5rem;
+    }
+
+    /* Cards */
+    .character-card,
+    .universe-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 0;
+        border: 1px solid rgba(24, 227, 164, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .character-card:hover,
+    .universe-card:hover {
+        border-color: rgba(24, 227, 164, 0.4);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .character-card.selected,
+    .universe-card.selected {
+        border-color: var(--primary-color);
+        background: linear-gradient(135deg, rgba(24, 227, 164, 0.15) 0%, var(--card-bg) 100%);
+    }
+
+    .character-card.selected::after,
+    .universe-card.selected::after {
+        content: '✓';
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 24px;
+        height: 24px;
+        background: var(--primary-color);
+        color: var(--bg-dark);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        z-index: 10;
+    }
+
+    .character-visual,
+    .card-banner {
+        width: 100%;
+        height: 160px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .character-portrait,
+    .card-banner img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .character-card:hover .character-portrait,
+    .universe-card:hover .card-banner img {
+        transform: scale(1.1);
+    }
+
+    .character-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-dark) 100%);
+    }
+
+    .character-info,
+    .card-content {
+        padding: 1.25rem;
+    }
+
+    .character-info h3,
+    .card-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.35rem;
+    }
+
+    .character-class,
+    .card-genre-tags {
+        color: var(--primary-color);
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .card-description {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+    }
+
+    .character-stats-mini {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .character-stats-mini .stat {
+        background: rgba(24, 227, 164, 0.1);
+        color: var(--primary-color);
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .universe-themes {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .theme-badge {
+        background: rgba(24, 227, 164, 0.1);
+        color: var(--primary-color);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        text-transform: capitalize;
+    }
+
+    /* Start Button */
+    .adventure-actions {
+        text-align: center;
+        padding: 2rem;
+        background-color: var(--card-bg);
+        border: 1px solid rgba(24, 227, 164, 0.1);
+        border-radius: var(--border-radius);
+        margin-top: 1rem;
+    }
+
+    .adventure-actions .tf-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+        font-weight: 700;
+        background-color: var(--primary-color);
+        color: var(--bg-dark);
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .adventure-actions .tf-button:hover:not(:disabled) {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(24, 227, 164, 0.3);
+    }
+
+    .adventure-actions .tf-button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .selection-hint {
+        color: var(--text-secondary);
+        margin-top: 1rem;
+        font-size: 0.95rem;
+        transition: color 0.3s ease;
+    }
+
+    .selection-hint.ready {
+        color: var(--primary-color);
+    }
+
+    /* Game Container */
+    .game-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        width: 90%;
+    }
+
+    .game-container.hidden {
+        display: none;
+    }
+
+    /* Overworld */
+    .overworld-section {
+        background-color: var(--card-bg);
+        border: 1px solid rgba(24, 227, 164, 0.1);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+    }
+
+    .overworld-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .overworld-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+
+    .overworld-header p {
+        color: var(--primary-color);
+        font-size: 1rem;
+    }
+
+    .overworld-canvas-wrapper {
+        position: relative;
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-dark) 100%);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    #overworld-canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 450px;
+    }
+
+    .overworld-info {
+        text-align: center;
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: rgba(24, 227, 164, 0.05);
+        border-radius: 8px;
+    }
+
+    .overworld-info p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    /* Battle UI */
+    .battle-card {
+        position: relative;
+    }
+
+    /* ===== IMPROVED BATTLE UI STYLES ===== */
+    
+    /* Battle animations */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    @keyframes popIn {
+        0% { transform: scale(0.8); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(24, 227, 164, 0.4); }
+        50% { box-shadow: 0 0 0 10px rgba(24, 227, 164, 0); }
+    }
+    
+    @keyframes damageFloat {
+        0% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(-30px); opacity: 0; }
+    }
+    
+    @keyframes turnGlow {
+        0%, 100% { box-shadow: 0 0 10px rgba(24, 227, 164, 0.3); }
+        50% { box-shadow: 0 0 25px rgba(24, 227, 164, 0.6); }
+    }
+    
+    .damage-shake {
+        animation: shake 0.4s ease-in-out;
+    }
+    
+    .damage-popup {
+        position: absolute;
+        font-size: 28px;
+        font-weight: bold;
+        color: #ff4444;
+        text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
+        animation: damageFloat 0.8s ease-out forwards;
+        pointer-events: none;
+        z-index: 100;
+    }
+    
+    .damage-to-player { top: 20%; left: 25%; }
+    .damage-to-enemy { top: 20%; right: 25%; }
+    
+    .active-turn {
+        animation: turnGlow 1s ease-in-out infinite;
+    }
+    
+    .turn-change {
+        transform: scale(1.02);
+    }
+    
+    /* Battle title */
+    .battle-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .battle-title h2 {
+        font-size: 2rem;
+        letter-spacing: 4px;
+    }
+    
+    .title-icon {
+        font-size: 1.5rem;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    /* VS Divider */
+    .battle-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .vs-badge {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b6b, #ffd700);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+        color: #000;
+        box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+    }
+    
+    /* Character visual sprite area */
+    .character-visual {
+        width: 100%;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .sprite-container {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(24, 227, 164, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+    }
+    
+    .player-sprite::before { content: '🧙'; }
+    .enemy-sprite::before { content: '👾'; }
+    
+    /* Improved health bars */
+    .health-bar-container { position: relative; }
+    
+    .health-bar { height: 28px; position: relative; overflow: hidden; }
+    
+    .health-fill.damaged { filter: brightness(1.5); }
+    
+    .health-shine {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 50%;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+        pointer-events: none;
+    }
+    
+    .health-text {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 4px;
+    }
+    
+    .hp-value { font-size: 1.1rem; font-weight: bold; color: #fff; }
+    .hp-separator { color: #666; }
+    .hp-max { color: #aaa; }
+    .hp-label { color: #666; font-size: 0.8rem; margin-left: 4px; }
+    
+    /* Improved action buttons */
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 15px 20px;
+        min-height: 80px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .action-btn::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.5s;
+    }
+    
+    .action-btn:hover::before { left: 100%; }
+    
+    .action-btn.pressed { transform: scale(0.95); }
+    
+    .btn-icon { font-size: 1.5rem; margin-bottom: 4px; }
+    .btn-label { font-weight: bold; font-size: 0.95rem; }
+    .btn-desc { font-size: 0.7rem; opacity: 0.7; }
+    
+    /* Battle result */
+    .battle-result { text-align: center; animation: popIn 0.5s ease-out; }
+    
+    .result-icon { font-size: 4rem; margin-bottom: 1rem; }
+    
+    .battle-result.victory h3 {
+        color: #ffd700;
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+    
+    .battle-result.defeat h3 { color: #ff4444; }
+    
+    /* Thinking dots */
+    .thinking-dots span { animation: blink 1.4s infinite both; }
+    .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
+    
+    .battle-waiting { text-align: center; color: #888; }
+    
+    /* ===== GAME TRANSITION SCREEN ===== */
+    
+    .game-transition {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s;
+    }
+    
+    .game-transition.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+    
+    .transition-content {
+        text-align: center;
+    }
+    
+    .transition-title {
+        font-size: 3rem;
+        color: #18E3A4;
+        text-shadow: 0 0 30px rgba(24, 227, 164, 0.5);
+        margin-bottom: 1rem;
+    }
+    
+    .transition-subtitle {
+        font-size: 1.2rem;
+        color: #aaa;
+        margin-bottom: 2rem;
+    }
+    
+    .transition-loader { display: flex; gap: 8px; justify-content: center; }
+    
+    .transition-loader span {
+        width: 12px; height: 12px;
+        background: #18E3A4;
+        border-radius: 50%;
+        animation: bounce 1.4s infinite both;
+    }
+    
+    .transition-loader span:nth-child(1) { animation-delay: -0.32s; }
+    .transition-loader span:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+    .save-choice-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.72);
+        z-index: 1200;
+        padding: 20px;
+    }
+
+    .save-choice-modal.active {
+        display: flex;
+    }
+
+    .save-choice-card {
+        width: min(520px, 92vw);
+        background: rgba(26, 31, 30, 0.94);
+        border: 1px solid rgba(24, 227, 164, 0.25);
+        border-radius: 12px;
+        padding: 1.4rem;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        text-align: center;
+    }
+
+    .save-choice-card h3 {
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+
+    .save-choice-card p {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    }
+
+    .save-choice-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .save-slots-list {
+        margin-top: 1rem;
+        display: grid;
+        gap: 0.55rem;
+        max-height: 220px;
+        overflow-y: auto;
+        text-align: left;
+    }
+
+    .save-slot-btn {
+        width: 100%;
+        background: rgba(24, 227, 164, 0.07);
+        border: 1px solid rgba(24, 227, 164, 0.25);
+        color: #dffcef;
+        padding: 0.55rem 0.7rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.86rem;
+    }
+
+    .save-slot-btn:hover {
+        border-color: rgba(24, 227, 164, 0.55);
+        background: rgba(24, 227, 164, 0.12);
+    }
+    
+    /* ===== EXISTING BATTLE UI STYLES ===== */
+    
+    .battle-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.6) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 40;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        border-radius: var(--border-radius);
+    }
+
+    .battle-overlay.show {
+        opacity: 1;
+    }
+
+    .battle-container {
+        background-color: rgba(26, 31, 30, 0.9);
+        border: 1px solid rgba(24, 227, 164, 0.15);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        position: relative;
+        z-index: 50;
+    }
+
+    .adventure-battle {
+        color: var(--text-color);
+    }
+
+    .battle-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid rgba(24, 227, 164, 0.2);
+    }
+
+    .battle-header h2 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .battle-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    .battle-field {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .character-side {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .adventure-battle .character-card {
+        width: 100%;
+        max-width: 300px;
+        background-color: rgba(13, 15, 15, 0.8);
+        border: 2px solid rgba(24, 227, 164, 0.3);
+        border-radius: var(--border-radius);
+        padding: 1.25rem;
+        position: relative;
+    }
+
+    .adventure-battle .enemy-card {
+        border-color: rgba(255, 107, 107, 0.4);
+    }
+
+    .character-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.25rem;
+        text-align: center;
+    }
+
+    .adventure-battle .character-class {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .health-bar-container {
+        margin-bottom: 1rem;
+    }
+
+    .health-bar {
+        background: rgba(0, 0, 0, 0.5);
+        border: 2px solid rgba(24, 227, 164, 0.2);
+        border-radius: 6px;
+        height: 24px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .health-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+        transition: width 0.5s ease;
+        border-radius: 4px;
+    }
+
+    .health-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+    }
+
+    .health-fill.enemy {
+        background: linear-gradient(90deg, #ff6b6b, #ee5a5a);
+    }
+
+    .health-text {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        text-align: center;
+        margin-top: 0.35rem;
+    }
+
+    .adventure-battle .character-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+
+    .stat-item {
+        background: rgba(24, 227, 164, 0.08);
+        border: 1px solid rgba(24, 227, 164, 0.2);
+        border-radius: 6px;
+        padding: 0.5rem;
+        text-align: center;
+    }
+
+    .stat-label {
+        display: block;
+        color: var(--text-secondary);
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+    }
+
+    .stat-value {
+        display: block;
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .battle-log-container {
+        background: rgba(13, 15, 15, 0.8);
+        border: 1px solid rgba(24, 227, 164, 0.1);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .battle-log-container h4 {
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .battle-log {
+        max-height: 150px;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 6px;
+        padding: 0.5rem;
+    }
+
+    .log-message {
+        margin: 0.4rem 0;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        line-height: 1.4;
+        padding: 0.4rem;
+        border-left: 3px solid rgba(24, 227, 164, 0.3);
+    }
+
+    .battle-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+    }
+
+    .action-btn {
+        background: rgba(24, 227, 164, 0.1);
+        border: 2px solid rgba(24, 227, 164, 0.3);
+        color: #fff;
+        padding: 0.85rem;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .action-btn:hover:not(:disabled) {
+        background: rgba(24, 227, 164, 0.2);
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+    .action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .action-btn .btn-label {
+        color: var(--primary-color);
+    }
+
+    .action-btn .btn-desc {
+        color: var(--text-secondary);
+        font-size: 0.7rem;
+    }
+
+    .battle-waiting {
+        text-align: center;
+        padding: 1.5rem;
+        background: rgba(24, 227, 164, 0.05);
+        border: 1px dashed rgba(24, 227, 164, 0.3);
+        border-radius: 10px;
+        color: var(--primary-color);
+        font-weight: 600;
+        grid-column: 1 / -1;
+    }
+
+    /* Results */
+    .battle-results-screen {
+        text-align: center;
+        padding: 2.5rem 2rem;
+        background-color: rgba(26, 31, 30, 0.9);
+        border: 1px solid rgba(24, 227, 164, 0.15);
+        border-radius: var(--border-radius);
+    }
+
+    .results-header {
+        margin-bottom: 2rem;
+        padding: 1.25rem;
+        border-radius: 10px;
+    }
+
+    .results-header.victory {
+        background: linear-gradient(135deg, rgba(24, 227, 164, 0.15) 0%, rgba(26, 31, 30, 0.9) 100%);
+        border: 2px solid var(--primary-color);
+    }
+
+    .results-header.defeat {
+        background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(26, 31, 30, 0.9) 100%);
+        border: 2px solid #ff6b6b;
+    }
+
+    .results-header h2 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .results-header.victory h2 {
+        color: var(--primary-color);
+    }
+
+    .results-header.defeat h2 {
+        color: #ff6b6b;
+    }
+
+    .results-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .result-stat {
+        background: rgba(13, 15, 15, 0.8);
+        border: 1px solid rgba(24, 227, 164, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .result-stat .stat-label {
+        display: block;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .result-stat .stat-value {
+        display: block;
+        color: #fff;
+        font-size: 1.15rem;
+        font-weight: 700;
+    }
+
+    .result-stat .stat-value.loot {
+        color: var(--primary-color);
+    }
+
+    .results-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .results-actions .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .results-actions .btn-primary {
+        background: var(--primary-color);
+        color: var(--bg-dark);
+        border: none;
+    }
+
+    .results-actions .btn-primary:hover {
+        background: var(--primary-dark);
+    }
+
+    .results-actions .btn-secondary {
+        background: transparent;
+        color: #fff;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .results-actions .btn-secondary:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    /* Loading */
+    .game-loading {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-color);
+    }
+
+    .game-loading .spinner {
+        border: 4px solid rgba(24, 227, 164, 0.15);
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .game-loading p {
+        color: var(--text-secondary);
+    }
+
+    .game-error {
+        text-align: center;
+        padding: 2.5rem;
+        background: rgba(26, 31, 30, 0.9);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        border-radius: var(--border-radius);
+    }
+
+    .game-error h3 {
+        color: #ff6b6b;
+        margin-bottom: 1rem;
+    }
+
+    .game-error p {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.5s ease both;
+    }
+
+    .action-btn:focus,
+    .tf-button:focus,
+    .btn:focus {
+        outline: 3px solid rgba(24, 227, 164, 0.4);
+        outline-offset: 2px;
+    }
+
+    @media (max-width: 992px) {
+        .battle-field {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        .battle-actions {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .adventure-hero h1 {
+            font-size: 2rem;
+        }
+        .characters-grid,
+        .universes-grid {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+        .battle-container {
+            padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .adventure-page .container,
+        .game-container {
+            width: 95%;
+        }
+        .characters-grid,
+        .universes-grid {
+            grid-template-columns: 1fr;
+        }
+        .battle-actions {
+            grid-template-columns: 1fr;
+        }
+        .results-actions {
+            flex-direction: column;
+        }
+        .results-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="adventure-page">
+    <div class="container">
+        <!-- Hero -->
+        <header class="adventure-hero" role="banner">
+            <h1>Adventure <span>Mode</span></h1>
+            <p class="subtitle">Choose your character and universe to begin your epic journey</p>
+        </header>
+
+        <!-- Character Selector -->
+        <section class="selector-section characters-selector" aria-labelledby="characters-heading">
+            <div class="section-header">
+                <h2 id="characters-heading">Select Your Character</h2>
+                <p class="section-description">Choose a hero to guide your adventure</p>
+            </div>
+            
+            <div class="characters-grid" role="listbox" aria-label="Available characters">
+                {% for personnage in personnages %}
+                {% set portraitSrc = personnage.getPortraitImage() %}
+                <div class="character-card" 
+                     data-character-id="{{ personnage.id }}" 
+                     data-universe-id="{{ personnage.universe.id }}"
+                     role="option" 
+                     tabindex="0"
+                     aria-selected="false">
+                    <div class="character-visual">
+                        {% if portraitSrc %}
+                            <img src="{{ portraitSrc }}" 
+                                 alt="{{ personnage.name }}" 
+                                 class="character-portrait">
+                        {% else %}
+                            <div class="character-placeholder">{{ personnage.name|slice(0, 1) }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="character-info">
+                        <h3>{{ personnage.name }}</h3>
+                        <p class="character-class">{{ personnage.classRole }}</p>
+                        <div class="character-stats-mini">
+                            <span class="stat">ATK {{ personnage.strength }}</span>
+                            <span class="stat">DEF {{ personnage.defense }}</span>
+                            <span class="stat">MAG {{ personnage.magic }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Universe Selector -->
+        <section class="selector-section universes-selector" aria-labelledby="universes-heading">
+            <div class="section-header">
+                <h2 id="universes-heading">Select Your Universe</h2>
+                <p class="section-description">Choose where your adventure takes place</p>
+            </div>
+            
+            <div class="universes-grid" role="listbox" aria-label="Available universes">
+                {% for universe in universes %}
+                <div class="universe-card" 
+                     data-universe-id="{{ universe.id }}"
+                     role="option"
+                     tabindex="0"
+                     aria-selected="false">
+                    <div class="card-banner">
+                        {% if universe.bannerImage %}
+                            <img src="data:image/png;base64,{{ universe.bannerImage|base64_encode }}" 
+                                 alt="{{ universe.name }}">
+                        {% else %}
+                            <div class="character-placeholder">{{ universe.name|slice(0, 1) }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">{{ universe.name }}</h3>
+                        <div class="card-genre-tags">
+                            <span class="genre-tag">{{ universe.genre }}</span>
+                        </div>
+                        <p class="card-description">{{ universe.shortDescription }}</p>
+                        {% if universe.themes %}
+                        <div class="universe-themes">
+                            {% for theme in universe.themes|slice(0, 2) %}
+                                <span class="theme-badge">{{ theme }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Start Buttons -->
+        <div class="adventure-actions">
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button id="start-adventure-btn" class="tf-button" disabled aria-describedby="selection-hint">
+                    <span>⚔️ Battle Mode</span>
+                    <span class="btn-icon">→</span>
+                </button>
+                <button id="start-overworld-btn" class="tf-button" disabled aria-describedby="selection-hint">
+                    <span>🌍 Overworld</span>
+                    <span class="btn-icon">→</span>
+                </button>
+            </div>
+            <p id="selection-hint" class="selection-hint">Select a character to continue</p>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container" class="game-container hidden" aria-live="polite">
+    </div>
+
+    <!-- Transition Screen -->
+    <div id="game-transition" class="game-transition">
+        <div class="transition-content">
+            <h1 class="transition-title">ENTERING WORLD</h1>
+            <p class="transition-subtitle" id="transition-text">Preparing your adventure...</p>
+            <div class="transition-loader">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="save-choice-modal" class="save-choice-modal" aria-hidden="true">
+        <div class="save-choice-card" role="dialog" aria-modal="true" aria-labelledby="save-choice-title">
+            <h3 id="save-choice-title">Overworld Save</h3>
+            <p>Choose exactly which database save to continue, or start a completely fresh run.</p>
+            <div id="save-slots-list" class="save-slots-list"></div>
+            <div class="save-choice-actions">
+                <button id="new-run-btn" class="tf-button" style="background:#e35b5b;color:#fff;">Start New Run</button>
+                <button id="refresh-saves-btn" class="tf-button" style="background:transparent; color:var(--text-color); border:1px solid rgba(24, 227, 164, 0.25);">Refresh Saves</button>
+            </div>
+            <button id="save-choice-cancel-btn" class="tf-button" style="margin-top:0.8rem; background:transparent; color:var(--text-secondary); border:1px solid rgba(24, 227, 164, 0.25);">Cancel</button>
+        </div>
+    </div>
+</div>
+
+	<!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	
+	<!-- Battle System Modules -->
+	<script src="{{ asset('js/adventure/battle.js') }}"></script>
+	<script src="{{ asset('js/adventure/battle-ui.js') }}"></script>
+	<script src="{{ asset('js/adventure/battle-ai.js') }}"></script>
+	<script src="{{ asset('js/adventure/battle-bullets.js') }}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let selectedCharacterId = null;
+    let selectedUniverseId = null;
+
+    const characterCards = document.querySelectorAll('.character-card');
+    const universeCards = document.querySelectorAll('.universe-card');
+    const startBtn = document.getElementById('start-adventure-btn');
+    const overworldBtn = document.getElementById('start-overworld-btn');
+    const selectionHint = document.getElementById('selection-hint');
+    const gameContainer = document.getElementById('game-container');
+    const saveChoiceModal = document.getElementById('save-choice-modal');
+    const newRunBtn = document.getElementById('new-run-btn');
+    const refreshSavesBtn = document.getElementById('refresh-saves-btn');
+    const saveChoiceCancelBtn = document.getElementById('save-choice-cancel-btn');
+    const saveSlotsList = document.getElementById('save-slots-list');
+
+    async function loadSaveSlots() {
+        if (!selectedCharacterId || !saveSlotsList) return;
+
+        saveSlotsList.innerHTML = '<div style="color: var(--text-secondary);">Loading saves...</div>';
+
+        try {
+            const response = await fetch('/overworld/saves/' + selectedCharacterId);
+            if (!response.ok) {
+                throw new Error('Failed to load saves');
+            }
+
+            const payload = await response.json();
+            const saves = Array.isArray(payload.saves) ? payload.saves : [];
+
+            if (!saves.length) {
+                saveSlotsList.innerHTML = '<div style="color: var(--text-secondary);">No save found. Start a new run.</div>';
+                return;
+            }
+
+            saveSlotsList.innerHTML = saves.map(function(save) {
+                return '<button class="save-slot-btn" data-run-id="' + save.id + '">'
+                    + 'Slot #' + save.id
+                    + ' • Lv.' + (save.level ?? 1)
+                    + ' • HP ' + (save.health ?? 0)
+                    + ' • MP ' + (save.mp ?? 0)
+                    + ' • Kills ' + (save.kills ?? 0)
+                    + ' • Coins ' + (save.coins ?? 0)
+                    + (save.updatedAt ? ' • ' + save.updatedAt : '')
+                    + '</button>';
+            }).join('');
+
+            saveSlotsList.querySelectorAll('.save-slot-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const runId = this.getAttribute('data-run-id');
+                    window.location.href = '/overworld/' + selectedCharacterId + '?runId=' + runId;
+                });
+            });
+        } catch (e) {
+            saveSlotsList.innerHTML = '<div style="color:#ff9f9f;">Could not load save slots.</div>';
+        }
+    }
+
+    function getParam(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+    }
+
+    function selectCard(card, type) {
+        const cards = type === 'character' ? characterCards : universeCards;
+        cards.forEach(c => {
+            c.classList.remove('selected');
+            c.setAttribute('aria-selected', 'false');
+        });
+        card.classList.add('selected');
+        card.setAttribute('aria-selected', 'true');
+        
+        if (type === 'character') {
+            selectedCharacterId = card.dataset.characterId;
+        } else {
+            selectedUniverseId = card.dataset.universeId;
+        }
+        updateStartButton();
+    }
+
+    characterCards.forEach(card => {
+        card.addEventListener('click', function() {
+            selectCard(this, 'character');
+        });
+        
+        card.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                selectCard(this, 'character');
+            }
+        });
+    });
+
+    universeCards.forEach(card => {
+        card.addEventListener('click', function() {
+            selectCard(this, 'universe');
+        });
+        
+        card.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                selectCard(this, 'universe');
+            }
+        });
+    });
+
+    function updateStartButton() {
+        if (selectedCharacterId && selectedUniverseId) {
+            startBtn.disabled = false;
+            selectionHint.textContent = 'Ready to adventure — click to begin';
+            selectionHint.classList.add('ready');
+        } else if (selectedCharacterId) {
+            startBtn.disabled = true;
+            selectionHint.textContent = 'Character selected — choose a universe for Battle Mode, or start Overworld now';
+            selectionHint.classList.add('ready');
+        } else {
+            startBtn.disabled = true;
+            selectionHint.textContent = 'Select a character to continue';
+            selectionHint.classList.remove('ready');
+        }
+
+        overworldBtn.disabled = !selectedCharacterId;
+    }
+
+    startBtn.addEventListener('click', function() {
+        if (selectedCharacterId && selectedUniverseId) {
+            // Navigate to full-screen game
+            window.location.href = '/adventure/play/' + selectedCharacterId + '/' + selectedUniverseId;
+        }
+    });
+
+    // Overworld button handler
+    overworldBtn.addEventListener('click', function() {
+        if (selectedCharacterId) {
+            if (saveChoiceModal) {
+                saveChoiceModal.classList.add('active');
+                saveChoiceModal.setAttribute('aria-hidden', 'false');
+                loadSaveSlots();
+            } else {
+                window.location.href = '/overworld/' + selectedCharacterId;
+            }
+        }
+    });
+
+    refreshSavesBtn?.addEventListener('click', function() {
+        loadSaveSlots();
+    });
+
+    newRunBtn?.addEventListener('click', function() {
+        if (!selectedCharacterId) return;
+        window.location.href = '/overworld/' + selectedCharacterId + '?newRun=1';
+    });
+
+    saveChoiceCancelBtn?.addEventListener('click', function() {
+        saveChoiceModal.classList.remove('active');
+        saveChoiceModal.setAttribute('aria-hidden', 'true');
+    });
+
+    saveChoiceModal?.addEventListener('click', function(e) {
+        if (e.target === saveChoiceModal) {
+            saveChoiceModal.classList.remove('active');
+            saveChoiceModal.setAttribute('aria-hidden', 'true');
+        }
+    });
+
+    const preselected = getParam('universe');
+    if (preselected) {
+        const match = document.querySelector('.universe-card[data-universe-id="' + preselected + '"]');
+        if (match) {
+            selectCard(match, 'universe');
+            match.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+});
+</script>
+{% endblock %}

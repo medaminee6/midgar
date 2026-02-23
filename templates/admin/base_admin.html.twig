@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin{% endblock %}</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --sidebar-bg: #1A1F1E;
+            --accent: #18E3A4;
+            --muted: #B0B9B6;
+            --panel-bg: #0B0F0E;
+            --border: #2A3139;
+            --border-light: #3A424A;
+            --text-muted: #9BA6A2;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { margin:0; padding:0; height:100%; }
+        .admin-layout { display:flex; min-height:100vh; }
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0B0F0E 0%, #161C1B 100%);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 100;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 10px rgba(24,227,164,0.25));
+        }
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+        .admin-sidebar ul { list-style:none; padding:0; margin:0; }
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            margin: 0.25rem 0;
+            font-weight: 500;
+        }
+        .admin-sidebar a i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .admin-sidebar a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: rgba(24,227,164,0.08);
+            transition: width 0.3s ease;
+            z-index: -1;
+        }
+        .admin-sidebar a:hover::before,
+        .admin-sidebar a.active::before {
+            width: 100%;
+        }
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+        .admin-sidebar a:hover i,
+        .admin-sidebar a.active i {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px rgba(24,227,164,0.25));
+        }
+        .admin-content { margin-left: var(--sidebar-width); padding:2rem; min-height:100vh; }
+        .admin-header { margin-bottom:2rem; padding-bottom:1rem; border-bottom:1px solid #2A3139; }
+        .admin-header h1 { margin:0; color: var(--accent); }
+        .table-wrapper { background-color: #1A1F1E; border-radius:6px; overflow:hidden; }
+        table { width:100%; border-collapse:collapse; }
+        th { background-color: var(--panel-bg); padding:1rem 1.5rem; color: var(--accent); border-bottom:1px solid #2A3139; font-weight:600; text-align:left; }
+        td { padding:1rem 1.5rem; border-bottom:1px solid #2A3139; color:#E6FFF6; }
+        tr:hover { background-color:#252A29; }
+        .action-buttons { display:flex; gap:0.5rem; }
+        .btn-edit { background-color: var(--accent); color:#0B0F0E; padding:4px 12px; border-radius:3px; text-decoration:none; }
+        .btn-delete { background-color:#BD3B44; color:#E6FFF6; padding:4px 12px; border-radius:3px; text-decoration:none; border:none; cursor:pointer; }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">Midgar Admin</div>
+            </div>
+            <ul>
+                <li><a href="/admin/dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
+                <li><a href="/admin/users"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+                <li><a href="/admin/quiz-questions"><i class="fas fa-question-circle"></i><span>Quiz</span></a></li>
+                <li><a href="/admin/produits"><i class="fas fa-shopping-cart"></i><span>Shop</span></a></li>
+                <li><a href="/admin/challenges"><i class="fas fa-trophy"></i><span>Défis</span></a></li>
+            </ul>
+        </aside>
+        <main class="admin-content">
+            <div class="admin-header">
+                <h1>{% block header %}Admin{% endblock %}</h1>
+            </div>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

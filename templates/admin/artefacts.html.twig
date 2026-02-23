@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Artefacts - Admin</title>
+    <link rel="stylesheet" href="/css/midgar.css">
+    <style>
+        .admin-layout { display: grid; grid-template-columns: 250px 1fr; gap: 0; min-height: 100vh; }
+        .admin-sidebar { background-color: #1A1F1E; border-right: 1px solid #2A3139; padding: 2rem 0; position: fixed; left: 0; top: 0; width: 250px; height: 100vh; overflow-y: auto; }
+        .admin-sidebar .logo { padding: 1rem 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid #2A3139; }
+        .admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+        .admin-sidebar nav li { margin: 0; }
+        .admin-sidebar nav a { display: block; padding: 12px 1.5rem; color: #B0B9B6; text-decoration: none; border-left: 3px solid transparent; transition: all 0.3s; }
+        .admin-sidebar nav a:hover { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; }
+        .admin-sidebar nav a.active { background-color: #0B0F0E; color: #18E3A4; border-left-color: #18E3A4; font-weight: 600; }
+        .admin-content { margin-left: 250px; padding: 2rem; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #2A3139; }
+        .admin-header h1 { margin: 0; color: #18E3A4; }
+        .table-wrapper { background-color: #1A1F1E; border-radius: 6px; overflow: hidden; }
+        .table-wrapper table { width: 100%; border-collapse: collapse; }
+        .table-wrapper th { background-color: #0B0F0E; padding: 1rem 1.5rem; text-align: left; color: #18E3A4; font-weight: 600; border-bottom: 1px solid #2A3139; }
+        .table-wrapper td { padding: 1rem 1.5rem; border-bottom: 1px solid #2A3139; color: #E6FFF6; }
+        .table-wrapper tr:hover { background-color: #252A29; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .badge-rare { background-color: rgba(24, 227, 164, 0.2); color: #18E3A4; }
+        .badge-common { background-color: rgba(176, 185, 182, 0.2); color: #B0B9B6; }
+        .action-buttons { display: flex; gap: 0.5rem; }
+        .action-buttons a { padding: 4px 12px; font-size: 0.85rem; text-decoration: none; border-radius: 3px; }
+        .btn-edit { background-color: #18E3A4; color: #0B0F0E; }
+        .btn-delete { background-color: #BD3B44; color: #E6FFF6; }
+    </style>
+</head>
+<body style="margin: 0;">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="logo" style="color: #18E3A4; font-weight: 700; font-size: 1.2rem;">⚙️ Admin</div>
+            <nav>
+                <ul>
+                    <li><a href="/admin/dashboard">📊 Tableau de Bord</a></li>
+                    <li><a href="/admin/users">👥 Utilisateurs</a></li>
+                    <li><a href="/admin/oeuvres">📖 Œuvres</a></li>
+                    <li><a href="/admin/artefacts" class="active">⚔️ Artefacts</a></li>
+                    <li><a href="/admin/univers">🌍 Univers</a></li>
+                    <li><a href="/admin/personnages">👹 Personnages</a></li>
+                    <li><a href="/admin/produits">🛍️ Produits</a></li>
+                    <li><a href="/admin/commandes">📦 Commandes</a></li>
+                    <li><a href="/admin/challenges">🎯 Défis</a></li>
+                    <li><a href="/admin/submissions">📤 Soumissions</a></li>
+                    <li><a href="/admin/quiz-questions">❓ Questions Quiz</a></li>
+                    <li><a href="/admin/quiz-reponses">✅ Réponses Quiz</a></li>
+                    <li><a href="/admin/preferences">⚙️ Préférences</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div class="admin-content">
+            <div class="admin-header">
+                <h1>Gestion des Artefacts</h1>
+                <button class="btn btn-primary btn-sm">+ Ajouter Artefact</button>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Rareté</th>
+                            <th>Puissance</th>
+                            <th>Origine</th>
+                            <th>Créé</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#1</td>
+                            <td>Épée Légendaire</td>
+                            <td><span class="badge badge-rare">Légendaire</span></td>
+                            <td>9/10</td>
+                            <td>Nuit Éternelle</td>
+                            <td>2026-01-15</td>
+                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
+                        </tr>
+                        <tr>
+                            <td>#2</td>
+                            <td>Amulet de Protection</td>
+                            <td><span class="badge badge-common">Rare</span></td>
+                            <td>6/10</td>
+                            <td>Châteaux Flottants</td>
+                            <td>2026-01-10</td>
+                            <td><div class="action-buttons"><a href="#" class="btn-edit">Éditer</a><a href="#" class="btn-delete">Supprimer</a></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

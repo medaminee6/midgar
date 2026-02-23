@@ -1,0 +1,3090 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Overworld - {{ personnage.name|default('Hero') }}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        button, input, textarea, select {
+            font-family: inherit;
+        }
+
+        #world-bg-video {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0.95;
+            pointer-events: none;
+        }
+
+        #world-bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.08) 20%, rgba(0, 0, 0, 0.45) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            z-index: 2;
+        }
+        
+        #game-canvas {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background: rgba(0, 0, 0, 0.18);
+            border: 4px solid #444;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+            overflow: hidden;
+        }
+        
+        #map-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        #collision-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            display: none;
+            z-index: 10;
+        }
+        
+        #entities-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+        }
+        
+        .entity {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            transition: left 0.05s linear, top 0.05s linear;
+        }
+        
+        #player {
+            width: 64px;
+            height: 64px;
+            z-index: 100;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+            background-image: url('{{ asset('assets/adventure/playablecharachter/1F.png') }}');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            image-rendering: pixelated;
+        }
+        
+        #player img {
+            display: none;
+        }
+        
+        .enemy {
+            width: 44px;
+            height: 44px;
+            z-index: 50;
+            filter: drop-shadow(0 0 6px rgba(255, 0, 0, 0.6));
+            animation: enemyBounce 1s infinite ease-in-out;
+        }
+        
+        .enemy img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .enemy.boss {
+            width: 192px;
+            height: 192px;
+            filter: drop-shadow(0 0 15px rgba(255, 100, 0, 0.8));
+        }
+        
+        @keyframes enemyBounce {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+            50% { transform: translate(-50%, -50%) translateY(-8px); }
+        }
+        
+        .coin {
+            width: 28px;
+            height: 28px;
+            z-index: 40;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            line-height: 1;
+            animation: coinSpin 2s infinite linear;
+        }
+        
+        @keyframes coinSpin {
+            0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+            50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.08); }
+            100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+        }
+        
+        .exit-portal {
+            width: 60px;
+            height: 70px;
+            z-index: 30;
+            filter: drop-shadow(0 0 20px rgba(0, 255, 100, 0.8));
+            animation: portalPulse 1.5s infinite ease-in-out;
+        }
+        
+        .exit-portal::before {
+            content: '🌟';
+            font-size: 48px;
+            display: block;
+            text-align: center;
+            line-height: 70px;
+        }
+        
+        .door {
+            width: 60px;
+            height: 80px;
+            z-index: 100;
+            filter: drop-shadow(0 0 20px rgba(100, 149, 237, 0.8));
+            animation: portalPulse 1.5s infinite ease-in-out;
+            cursor: pointer;
+        }
+        
+        .door::before {
+            content: '🚪';
+            font-size: 48px;
+            display: block;
+            text-align: center;
+            line-height: 80px;
+        }
+        
+        .door.hidden {
+            display: none;
+        }
+        
+        @keyframes portalPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+        }
+        
+        .exit-portal.hidden {
+            display: none;
+        }
+        
+        /* Collision indicator */
+        .wall-indicator {
+            display: none;
+        }
+        
+        .wall-indicator.active {
+            display: block;
+        }
+        
+        @keyframes wallBump {
+            0% { transform: translate(-50%, -50%) scale(1.5); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        #hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, rgba(24, 24, 24, 0.82), rgba(52, 52, 52, 0.62));
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 16px;
+            padding: 18px 20px;
+            color: #fff;
+            z-index: 1000;
+            min-width: 250px;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
+            backdrop-filter: blur(6px);
+            overflow: hidden;
+        }
+
+        #hud::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            left: -20%;
+            width: 80%;
+            height: 220%;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
+            pointer-events: none;
+        }
+
+        .menu-theme-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        .menu-theme-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.68) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        #hud h3 {
+            color: #ffffff;
+            margin-bottom: 14px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 8px;
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65);
+        }
+        
+        .hud-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 9px 10px;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 10px;
+        }
+        
+        .hud-label {
+            color: #f0f0f0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .hud-symbol {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .coin-emoji {
+            font-size: 15px;
+            line-height: 1;
+        }
+        
+        .hud-value {
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .hud-value.kills {
+            color: #ffb1b1;
+        }
+        
+        .hud-value.coins {
+            color: #ffdf68;
+            text-shadow: 0 0 12px rgba(255, 209, 51, 0.55);
+        }
+
+        .hud-new-run {
+            background: linear-gradient(135deg, #ff7676, #bc2f2f);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            box-shadow: 0 6px 14px rgba(170, 35, 35, 0.32);
+        }
+
+        .hud-new-run:hover {
+            filter: brightness(1.08);
+        }
+        
+        #level-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.55);
+            border: 2px solid rgba(255, 255, 255, 0.28);
+            border-radius: 12px;
+            padding: 15px 25px;
+            color: #fff;
+            z-index: 1000;
+            box-shadow: 0 0 24px rgba(0, 0, 0, 0.45);
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+        }
+        
+        #level-indicator h2 {
+            color: #f6f6f6;
+            font-size: 20px;
+            margin: 0;
+            text-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+        }
+        
+        #battle-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #battle-overlay.hidden {
+            display: none;
+        }
+        
+        #battle-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #battle-overlay h1 {
+            color: #DDF247;
+            font-size: 56px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 40px rgba(221, 242, 71, 0.6);
+            animation: battleTextPulse 1s infinite;
+        }
+        
+        @keyframes battleTextPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+        }
+        
+        #battle-iframe {
+            width: 90%;
+            max-width: 1000px;
+            height: 75%;
+            border: 3px solid #444;
+            border-radius: 12px;
+            background: #000;
+        }
+        
+        #battle-close {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: #444;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        #battle-close:hover {
+            background: #555;
+        }
+        
+        #victory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 3000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #victory-overlay.active {
+            display: flex;
+        }
+        
+        #victory-overlay h1 {
+            color: #ffd700;
+            font-size: 72px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 60px rgba(255, 215, 0, 0.8);
+            animation: victoryPulse 1.5s infinite;
+        }
+        
+        @keyframes victoryPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        
+        #victory-overlay p {
+            color: #fff;
+            font-size: 28px;
+            margin-bottom: 40px;
+        }
+        
+        #victory-overlay button {
+            background: linear-gradient(135deg, #4a4, #6b6);
+            border: none;
+            color: #fff;
+            padding: 18px 50px;
+            font-size: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+        }
+        
+        #victory-overlay button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.6);
+        }
+
+        .final-results-root {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            background: #0b0f10;
+        }
+
+        .final-results-bg-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+        }
+
+        .final-results-dim {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 18% 22%, rgba(24, 227, 164, 0.2) 0%, rgba(11, 15, 16, 0.9) 42%, rgba(8, 11, 12, 0.95) 100%);
+        }
+
+        .final-results-shell {
+            position: relative;
+            z-index: 2;
+            width: min(1160px, 95vw);
+            max-height: 92vh;
+            margin: 4vh auto;
+            overflow: auto;
+            border-radius: 18px;
+            border: 1px solid rgba(24, 227, 164, 0.34);
+            background: linear-gradient(150deg, rgba(12, 18, 19, 0.9), rgba(16, 25, 24, 0.76));
+            box-shadow: 0 26px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            padding: 26px;
+        }
+
+        .final-results-title {
+            margin: 0;
+            color: #18E3A4;
+            font-size: clamp(30px, 4vw, 44px);
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            animation: none !important;
+            transform: none !important;
+        }
+
+        .final-results-subtitle {
+            margin: 10px 0 0;
+            color: #d8ece6;
+            font-size: clamp(16px, 2.1vw, 20px);
+            line-height: 1.45;
+            max-width: 900px;
+        }
+
+        .final-kpi-grid {
+            margin-top: 22px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .final-kpi {
+            border-radius: 12px;
+            padding: 12px 14px;
+            background: rgba(26, 31, 30, 0.6);
+            border: 1px solid rgba(24, 227, 164, 0.16);
+        }
+
+        .final-kpi-label {
+            color: #9ac9bb;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 4px;
+        }
+
+        .final-kpi-value {
+            color: #f1fffa;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .final-charts {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 16px;
+        }
+
+        .final-chart-card {
+            border-radius: 14px;
+            padding: 16px;
+            background: rgba(15, 23, 22, 0.72);
+            border: 1px solid rgba(24, 227, 164, 0.2);
+        }
+
+        .final-chart-title {
+            margin: 0 0 12px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: #9fd4c5;
+            font-weight: 700;
+        }
+
+        .final-ring {
+            width: 170px;
+            height: 170px;
+            border-radius: 999px;
+            margin: 4px auto 10px;
+            display: grid;
+            place-items: center;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 12px 32px rgba(0, 0, 0, 0.34);
+        }
+
+        .final-ring-inner {
+            width: 128px;
+            height: 128px;
+            border-radius: 999px;
+            background: rgba(10, 15, 15, 0.95);
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(24, 227, 164, 0.22);
+            color: #f4fffb;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .final-ring-value {
+            font-size: 34px;
+            font-weight: 800;
+            color: #18E3A4;
+        }
+
+        .final-ring-note {
+            font-size: 12px;
+            color: #9ac9bb;
+        }
+
+        .final-stat-row {
+            margin-bottom: 12px;
+        }
+
+        .final-stat-head {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #d8ece6;
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .final-stat-track {
+            width: 100%;
+            height: 12px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .final-stat-fill {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #18E3A4, #8cf7d5);
+            box-shadow: 0 0 16px rgba(24, 227, 164, 0.4);
+        }
+
+        .final-extra-note {
+            margin-top: 10px;
+            color: #afd6ca;
+            font-size: 13px;
+        }
+
+        .final-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .final-action-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            transition: transform 0.16s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+
+        .final-action-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        .final-action-btn.secondary {
+            color: #d8ece6;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+        }
+
+        .final-action-btn.primary {
+            color: #081210;
+            background: #18E3A4;
+            box-shadow: 0 10px 24px rgba(24, 227, 164, 0.3);
+        }
+
+        @media (max-width: 880px) {
+            .final-charts {
+                grid-template-columns: 1fr;
+            }
+
+            .final-results-shell {
+                padding: 18px;
+            }
+        }
+        
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        #loading-screen h1 {
+            color: #4a4;
+            font-size: 42px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+        }
+        
+        #loading-screen p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 16px;
+            max-width: 760px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        #intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        #intro-overlay.active {
+            display: flex;
+        }
+
+        .intro-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0.45;
+        }
+
+        .intro-backdrop {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.72) 100%);
+            z-index: 1;
+        }
+
+        .intro-card {
+            width: min(900px, 92vw);
+            background: rgba(14, 14, 14, 0.95);
+            border: 3px solid #DDF247;
+            border-radius: 14px;
+            box-shadow: 0 0 35px rgba(221, 242, 71, 0.2);
+            padding: 24px;
+            color: #fff;
+            position: relative;
+            z-index: 2;
+        }
+
+        .intro-title {
+            font-size: 28px;
+            color: #DDF247;
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+
+        .intro-story {
+            font-size: 18px;
+            line-height: 1.7;
+            min-height: 220px;
+            max-height: 50vh;
+            overflow-y: auto;
+            white-space: pre-line;
+            color: #f4f4f4;
+            text-shadow: 0 0 8px rgba(0,0,0,0.45);
+        }
+
+        .intro-controls {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .intro-btn {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .intro-btn.skip {
+            background: #3a3a3a;
+            color: #fff;
+        }
+
+        .intro-btn.next {
+            background: #2a3f66;
+            color: #fff;
+        }
+
+        .intro-btn.start {
+            background: #DDF247;
+            color: #141414;
+            font-weight: bold;
+        }
+        
+        .loading-bar {
+            width: 350px;
+            height: 12px;
+            background: #222;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        
+        .loading-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4a4, #8f8);
+            transition: width 0.3s;
+        }
+        
+        #controls-hint {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.78);
+            color: #f1f1f1;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 14px;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            box-shadow: 0 0 16px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Enemy tooltip */
+        .enemy-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: #f55;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 60;
+            display: none;
+            border: 1px solid #f55;
+        }
+        
+        .enemy:hover .enemy-tooltip {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <video id="world-bg-video" autoplay muted loop playsinline preload="metadata"></video>
+    <div id="world-bg-overlay"></div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <h1>🌍 OVERWORLD</h1>
+        <p id="loading-story-text">Loading adventure...</p>
+        <div class="loading-bar">
+            <div class="loading-bar-fill" id="loading-progress"></div>
+        </div>
+    </div>
+
+    <div id="intro-overlay">
+        <video id="intro-cinematic" class="intro-video" autoplay loop muted playsinline preload="auto"></video>
+        <div class="intro-backdrop"></div>
+        <div class="intro-card">
+            <div class="intro-title">Quest Briefing</div>
+            <div class="intro-story" id="intro-story-text">Preparing your story...</div>
+            <div class="intro-controls">
+                <button class="intro-btn next" id="intro-next-btn">Next Story</button>
+                <button class="intro-btn skip" id="intro-skip-btn">Skip & Start Gameplay</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Wall Collision Indicator -->
+    <div class="wall-indicator" id="wall-indicator">🚫 WALL</div>
+    
+    <!-- HUD -->
+    <div id="hud">
+        <h3>Adventure Status</h3>
+        <div class="hud-item">
+            <span class="hud-label"><span class="hud-symbol">⚔</span> Enemies</span>
+            <span class="hud-value kills" id="kills-display">0 / 3</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label" aria-label="Coins"><span class="coin-emoji">🪙</span></span>
+            <span class="hud-value coins" id="coins-display">0 / 10</span>
+        </div>
+        <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.24);">
+            <button class="hud-new-run" onclick="startNewRun()">New Run</button>
+        </div>
+    </div>
+    
+    <!-- Level Indicator -->
+    <div id="level-indicator">
+        <video id="level-theme-video" class="menu-theme-video" autoplay muted loop playsinline preload="metadata"></video>
+        <div class="menu-theme-overlay"></div>
+        <h2 id="level-name">Level 1: Desert</h2>
+    </div>
+    
+    <!-- Game Canvas -->
+    <div id="game-container">
+        <div id="game-canvas">
+            <img id="map-layer" src="" alt="Map" />
+            <img id="collision-overlay" src="" alt="Collision Map" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:0;z-index:100;object-fit:cover;" />
+            <canvas id="collision-layer"></canvas>
+            <div id="entities-layer">
+                <div id="player" class="entity"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Controls Hint -->
+    <div id="controls-hint">Use WASD or Arrow Keys • Walk into enemies to fight • Collect coins</div>
+    
+    <!-- Collision Map Toggle -->
+    <button id="collision-toggle" onclick="toggleCollision()" style="display:none;position:fixed;top:10px;right:10px;z-index:100;padding:8px 12px;background:#c00;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:inherit;">Toggle Collision Map</button>
+    
+    <!-- Battle Overlay -->
+    <div id="battle-overlay" class="hidden">
+        <div id="battle-container"></div>
+    </div>
+    
+    <!-- Victory Overlay -->
+    <div id="victory-overlay" style="display: none;">
+        <h1>🎉 VICTORY! 🎉</h1>
+        <p>You completed the adventure!</p>
+        <button onclick="closeVictoryAndContinue()">Continue Adventure</button>
+    </div>
+
+    <script>
+        function closeVictoryAndContinue() {
+            document.getElementById('victory-overlay').style.display = 'none';
+        }
+        
+        // Start a new run
+        window.startNewRun = function() {
+            if (confirm('Start a new adventure? All progress will be lost!')) {
+                window.location.href = '/overworld/new-run/' + personnageId;
+            }
+        }
+    </script>
+
+    <!-- Level Complete Overlay -->
+    <div id="level-complete-overlay" style="display: none;">
+        <h1 style="color: #4f4; font-size: 48px; margin-bottom: 20px;">✅ LEVEL COMPLETE!</h1>
+        <p style="color: #fff; font-size: 24px; margin-bottom: 30px;">Find the exit portal to continue!</p>
+        <button onclick="closeLevelComplete()" style="
+            background: linear-gradient(135deg, #4a4, #6b6);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        ">Continue Playing</button>
+    </div>
+
+    <script>
+        function closeLevelComplete() {
+            document.getElementById('level-complete-overlay').style.display = 'none';
+        }
+    </script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Battle System Modules -->
+    <script src="{{ asset('js/adventure/battle.js') }}" onload="console.log('battle.js loaded')" onerror="console.error('battle.js FAILED to load')"></script>
+    <script src="{{ asset('js/adventure/battle-ui.js') }}" onload="console.log('battle-ui.js loaded')" onerror="console.error('battle-ui.js FAILED to load')"></script>
+    <script src="{{ asset('js/adventure/battle-ai.js') }}" onload="console.log('battle-ai.js loaded')" onerror="console.error('battle-ai.js FAILED to load')"></script>
+    <script src="{{ asset('js/adventure/battle-bullets.js') }}" onload="console.log('battle-bullets.js loaded')" onerror="console.error('battle-bullets.js FAILED to load')"></script>
+    
+    <!-- Overworld Game Script -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // Game Configuration
+            const CONFIG = {
+                CANVAS_WIDTH: 800,
+                CANVAS_HEIGHT: 600,
+                PLAYER_SIZE: 48,
+                PLAYER_SPEED: 3.5,
+                ENEMY_SIZE: 44,
+                BOSS_SIZE: 192,
+                COIN_SIZE: 28,
+                EXIT_SIZE: 60,
+                COLLISION_TILE_SIZE: 32,
+                WALL_MARGIN: 50 // Keep entities away from boundaries
+            };
+            
+            // Enemy sprite paths
+            const ENEMY_SPRITES = {
+                enemy1: '{{ asset("assets/adventure/enemies/enemy1.png") }}',
+                enemy2: '{{ asset("assets/adventure/enemies/enemy2.png") }}',
+                enemy3: '{{ asset("assets/adventure/enemies/enemy3.png") }}',
+                boss: '{{ asset("assets/adventure/enemies/boss.png") }}'
+            };
+
+            const OVERWORLD_MUSIC = {
+                1: '{{ asset("assets/adventure/music/DESERT LEVEL.mp3") }}',
+                2: '{{ asset("assets/adventure/music/forest level.mp3") }}',
+                3: '{{ asset("assets/adventure/music/ocean level.mp3") }}'
+            };
+
+            const MENU_THEME_VIDEOS = {
+                1: '{{ asset("assets/adventure/in game menu/desert menu.mp4") }}',
+                2: '{{ asset("assets/adventure/in game menu/forest menu.mp4") }}',
+                3: '{{ asset("assets/adventure/in game menu/water menu.mp4") }}'
+            };
+
+            const STORY_MEDIA = {
+                openingCinematics: [
+                    '{{ asset("assets/adventure/story/opening cinematic.mp4") }}',
+                    '{{ asset("assets/adventure/story/opening cinematic 2.mp4") }}'
+                ],
+                introMusic: '{{ asset("assets/adventure/story/story introduction music.mp3") }}',
+                goodEndingVideo: '{{ asset("assets/adventure/story/good ending.mp4") }}',
+                badEndingVideo: '{{ asset("assets/adventure/story/bad ending.mp4") }}',
+                goodEndingTheme: '{{ asset("assets/adventure/story/good ending theme.mp3") }}'
+            };
+
+            const FINAL_RESULTS_MEDIA = {
+                backgroundVideo: '{{ asset("assets/adventure/maps/forest.mp4") }}',
+                victoryMusic: '{{ asset("assets/adventure/music/victory music.mp3") }}'
+            };
+
+            const COIN_COLLECTION_SOUND = '{{ asset("assets/adventure/music/coin.mp3") }}';
+
+            let overworldAudio = null;
+            let musicUnlocked = false;
+            let coinCollectAudio = null;
+
+            function initOverworldMusic() {
+                if (overworldAudio) return;
+
+                overworldAudio = new Audio();
+                overworldAudio.loop = true;
+                overworldAudio.volume = 0.45;
+
+                const unlockMusic = function() {
+                    musicUnlocked = true;
+                    playLevelMusic(gameState.currentLevel);
+                    document.removeEventListener('keydown', unlockMusic);
+                    document.removeEventListener('click', unlockMusic);
+                };
+
+                document.addEventListener('keydown', unlockMusic);
+                document.addEventListener('click', unlockMusic);
+            }
+
+            function playLevelMusic(levelNum) {
+                if (!overworldAudio || !musicUnlocked) return;
+                const track = OVERWORLD_MUSIC[levelNum] || OVERWORLD_MUSIC[1];
+                if (overworldAudio.src !== new URL(track, window.location.origin).href) {
+                    overworldAudio.src = track;
+                }
+                overworldAudio.play().catch(() => {});
+            }
+
+            function pauseOverworldMusic() {
+                if (overworldAudio) {
+                    overworldAudio.pause();
+                }
+            }
+
+            function resumeOverworldMusic() {
+                playLevelMusic(gameState.currentLevel);
+            }
+
+            function playCoinCollectionSound() {
+                if (!coinCollectAudio) {
+                    coinCollectAudio = new Audio(COIN_COLLECTION_SOUND);
+                    coinCollectAudio.volume = 0.75;
+                }
+
+                coinCollectAudio.currentTime = 0;
+                coinCollectAudio.play().catch(() => {});
+            }
+
+            function applyMenuTheme(levelNum) {
+                const source = MENU_THEME_VIDEOS[levelNum] || MENU_THEME_VIDEOS[1];
+                const levelThemeVideo = document.getElementById('level-theme-video');
+                const worldBgVideo = document.getElementById('world-bg-video');
+
+                [levelThemeVideo, worldBgVideo].forEach(function(videoEl) {
+                    if (!videoEl) return;
+                    const desiredSrc = new URL(source, window.location.origin).href;
+                    if (videoEl.src !== desiredSrc) {
+                        videoEl.src = source;
+                        videoEl.load();
+                    }
+                    videoEl.play().catch(() => {});
+                });
+            }
+            
+            // Level Configuration - Enemies placed away from boundaries
+            // Enemy IDs are prefixed with level number to make them unique
+            const LEVELS = {
+                1: {
+                    name: 'Desert',
+                    mapImage: '{{ asset("assets/adventure/maps/desert map.jpg") }}',
+                    collisionImage: '{{ asset("assets/adventure/maps/desert map collision.png") }}',
+                    requiredKills: 3,
+                    requiredCoins: 10,
+                    // Enemies placed in safe positions (away from walls) - ID format: L{level}_{index}
+                    enemies: [
+                        { id: 'L1_1', x: 280, y: 200, sprite: 'enemy1' },
+                        { id: 'L1_2', x: 520, y: 280, sprite: 'enemy2' },
+                        { id: 'L1_3', x: 400, y: 420, sprite: 'enemy3' }
+                    ],
+                    // Coins placed in safe areas - ID format: L{level}_C{index}
+                    coins: [
+                        { id: 'L1_C1', x: 180, y: 280 },
+                        { id: 'L1_C2', x: 320, y: 150 },
+                        { id: 'L1_C3', x: 450, y: 320 },
+                        { id: 'L1_C4', x: 580, y: 180 },
+                        { id: 'L1_C5', x: 620, y: 350 },
+                        { id: 'L1_C6', x: 200, y: 420 },
+                        { id: 'L1_C7', x: 380, y: 480 },
+                        { id: 'L1_C8', x: 500, y: 420 },
+                        { id: 'L1_C9', x: 250, y: 350 },
+                        { id: 'L1_C10', x: 550, y: 280 }
+                    ],
+                    exit: { x: 720, y: 520 }
+                },
+                2: {
+                    name: 'Forest',
+                    mapImage: '{{ asset("assets/adventure/maps/forest map.png") }}',
+                    collisionImage: '{{ asset("assets/adventure/maps/forest map collision.png") }}',
+                    requiredKills: 5,
+                    requiredCoins: 15,
+                    enemies: [
+                        { id: 'L2_1', x: 180, y: 150, sprite: 'enemy1' },
+                        { id: 'L2_2', x: 420, y: 120, sprite: 'enemy2' },
+                        { id: 'L2_3', x: 650, y: 180, sprite: 'enemy3' },
+                        { id: 'L2_4', x: 280, y: 420, sprite: 'enemy1' },
+                        { id: 'L2_5', x: 580, y: 400, sprite: 'enemy2' }
+                    ],
+                    coins: [
+                        { id: 'L2_C1', x: 120, y: 220 },
+                        { id: 'L2_C2', x: 220, y: 180 },
+                        { id: 'L2_C3', x: 350, y: 200 },
+                        { id: 'L2_C4', x: 480, y: 150 },
+                        { id: 'L2_C5', x: 580, y: 220 },
+                        { id: 'L2_C6', x: 680, y: 320 },
+                        { id: 'L2_C7', x: 620, y: 460 },
+                        { id: 'L2_C8', x: 480, y: 480 },
+                        { id: 'L2_C9', x: 350, y: 440 },
+                        { id: 'L2_C10', x: 220, y: 480 },
+                        { id: 'L2_C11', x: 150, y: 380 },
+                        { id: 'L2_C12', x: 180, y: 280 },
+                        { id: 'L2_C13', x: 420, y: 300 },
+                        { id: 'L2_C14', x: 320, y: 260 },
+                        { id: 'L2_C15', x: 520, y: 360 }
+                    ],
+                    exit: { x: 720, y: 520 }
+                },
+                3: {
+                    name: 'Ocean',
+                    mapImage: '{{ asset("assets/adventure/maps/ocean map.jpg") }}',
+                    collisionImage: '{{ asset("assets/adventure/maps/ocean map collision.png") }}',
+                    requiredKills: 1,
+                    requiredCoins: 0,
+                    enemies: [
+                        { id: 'L3_1', x: 400, y: 300, sprite: 'boss', isBoss: true }
+                    ],
+                    coins: [],
+                    exit: null
+                }
+            };
+            
+            // Game State - Load from database with fallbacks
+            let gameState = {
+                currentLevel: {{ savedLevel|default(1)|default(1) }},
+                kills: {{ savedKills|default(0)|default(0) }},
+                coins: {{ savedCoins|default(0)|default(0) }},
+                health: {{ savedHealth|default(100)|default(100) }},
+                mp: {{ savedMp|default(50)|default(50) }},
+                defeatedEnemies: {{ defeatedEnemies|json_encode|default('[]')|raw }},
+                collectedCoins: {{ collectedCoins|json_encode|default('[]')|raw }}, // Load from database
+                initialLevel: {{ savedLevel|default(1)|default(1) }},
+                initialKills: {{ savedKills|default(0)|default(0) }},
+                initialCoins: {{ savedCoins|default(0)|default(0) }},
+                playerX: 100,
+                playerY: 300,
+                playerDirection: 0, // 0=down, 1=left, 2=right, 3=up
+                playerFrame: 0,
+                playerFrameIndex: 0,
+                enemies: [],
+                coinsOnMap: [],
+                doorVisible: false,
+                doorElement: null,
+                exitVisible: false,
+                battleActive: false,
+                collisionData: null,
+                collisionTransform: null,
+                mapDimensions: null,
+                reachability: null,
+                playerAnimTimer: 0,
+                playerLastDirection: 0,
+                playerLastFrameTime: 0,
+                keysPressed: {},
+                lastWallCollision: 0,
+                levelTransitioning: false,
+                sessionStats: {
+                    battles: 0,
+                    victories: 0,
+                    defeats: 0,
+                    statGains: {
+                        attack: 0,
+                        defense: 0,
+                        magic: 0,
+                        agility: 0,
+                        'restore-hp': 0,
+                        'restore-mp': 0
+                    }
+                }
+            };
+            
+            // Character ID from template
+            const personnageId = {{ personnage.id|default(1) }};
+            const universeId = {{ personnage.universe and personnage.universe.id ? personnage.universe.id : 5 }};
+            const IS_FRESH_RUN = {{ isFreshRun ? 'true' : 'false' }};
+            const GAME_RUN_ID = {{ gameRunId|default(0) }};
+            window.personnageId = personnageId;
+            let generatedLaunchStory = '';
+            let generatedVictoryMessage = '';
+            let generatedStoryPromise = null;
+            let introDismissed = false;
+            let gameplayBootstrapped = false;
+            let introShownOnce = false;
+            const playerName = '{{ personnage.name|default("Hero")|e("js") }}';
+            const playerClass = '{{ personnage.classRole|default("Adventurer")|e("js") }}';
+            let currentLaunchSeed = Date.now();
+            let storyIntroAudio = null;
+            let endingThemeAudio = null;
+            let finalResultsAudio = null;
+            let endingSequenceActive = false;
+            let goodEndingSequenceStarted = false;
+            let introState = 'BOOT'; // BOOT -> STORY -> GAMEPLAY
+            const introStorageKey = 'midgar_overworld_intro_seen_' + personnageId;
+
+            function loadGeneratedUniverseStory(forceRegenerate = false) {
+                const storyText = document.getElementById('loading-story-text');
+                if (introState === 'GAMEPLAY' && !forceRegenerate) {
+                    return Promise.resolve(generatedLaunchStory || '');
+                }
+
+                currentLaunchSeed = Date.now() + Math.floor(Math.random() * 10000);
+
+                return fetch('/api/game/universe/' + universeId + '/generated-story?seed=' + currentLaunchSeed + '&personnageId=' + personnageId)
+                    .then(function(response) {
+                        if (!response.ok) {
+                            throw new Error('Story generation failed');
+                        }
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        if (!data || !data.story) {
+                            return '';
+                        }
+
+                        generatedLaunchStory = data.story;
+                        if (storyText) {
+                            storyText.textContent = generatedLaunchStory;
+                        }
+                        console.log('Generated launch story source:', data.source, 'seed:', data.seed);
+                        return generatedLaunchStory;
+                    })
+                    .catch(function(error) {
+                        console.warn('Could not load generated story:', error);
+                        generatedLaunchStory = playerName + ' the ' + playerClass + ', your quest begins now. Survive this world, gather strength, and uncover what threatens this universe.';
+                        if (storyText) {
+                            storyText.textContent = generatedLaunchStory;
+                        }
+                        return generatedLaunchStory;
+                    });
+            }
+
+            function loadGeneratedVictoryMessage(forceRegenerate = false) {
+                if (generatedVictoryMessage && !forceRegenerate) {
+                    return Promise.resolve(generatedVictoryMessage);
+                }
+
+                const accomplishmentNote = 'Completed the final adventure and saved the realm.';
+
+                return fetch('/api/game/universe/' + universeId + '/generated-story?mode=victory&personnageId=' + personnageId + '&previous=' + encodeURIComponent(accomplishmentNote))
+                    .then(function(response) {
+                        if (!response.ok) {
+                            throw new Error('Victory message generation failed');
+                        }
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        if (data && data.story) {
+                            generatedVictoryMessage = data.story;
+                            return generatedVictoryMessage;
+                        }
+
+                        generatedVictoryMessage = 'Congratulations, ' + playerName + '! You completed the adventure and proved your strength from start to finish.';
+                        return generatedVictoryMessage;
+                    })
+                    .catch(function(error) {
+                        console.warn('Could not load victory message:', error);
+                        generatedVictoryMessage = 'Congratulations, ' + playerName + '! You completed the adventure and proved your strength from start to finish.';
+                        return generatedVictoryMessage;
+                    });
+            }
+
+            function stopIntroMedia() {
+                if (storyIntroAudio) {
+                    storyIntroAudio.pause();
+                    storyIntroAudio.currentTime = 0;
+                }
+
+                const introVideo = document.getElementById('intro-cinematic');
+                if (introVideo) {
+                    introVideo.pause();
+                }
+            }
+
+            function playIntroMedia() {
+                const introVideo = document.getElementById('intro-cinematic');
+                if (introVideo) {
+                    const videos = STORY_MEDIA.openingCinematics;
+                    const index = Math.abs(currentLaunchSeed) % videos.length;
+                    introVideo.src = videos[index];
+                    introVideo.muted = true;
+                    introVideo.load();
+                    introVideo.play().catch(() => {});
+                }
+
+                if (!storyIntroAudio) {
+                    storyIntroAudio = new Audio(STORY_MEDIA.introMusic);
+                    storyIntroAudio.loop = true;
+                    storyIntroAudio.volume = 0.45;
+                }
+                storyIntroAudio.currentTime = 0;
+                storyIntroAudio.play().catch(() => {});
+            }
+
+            function showBadEndingState() {
+                endingSequenceActive = true;
+                pauseOverworldMusic();
+                const overlay = document.getElementById('victory-overlay');
+                if (!overlay) return;
+
+                overlay.style.display = 'flex';
+                overlay.classList.add('active');
+                overlay.innerHTML = `
+                    <div style="text-align:center; max-width:760px; padding:38px 28px; background:rgba(0,0,0,0.9); border:2px solid #9a1f1f; border-radius:16px; box-shadow:0 0 35px rgba(120,0,0,0.55);">
+                        <h1 style="color:#ff5757; font-size:52px; margin-bottom:16px; text-shadow:0 0 25px rgba(255,60,60,0.45);">💀 BAD ENDING</h1>
+                        <p style="color:#f1d0d0; font-size:21px; line-height:1.55; margin-bottom:30px;">
+                            You abandoned your fate, and this world fell into ruin.<br>
+                            The story ends here... unless you begin again.
+                        </p>
+                        <button id="bad-ending-new-run-btn" style="background:#d44; border:none; color:#fff; padding:12px 22px; border-radius:8px; cursor:pointer; font-family:inherit; font-size:16px; font-weight:bold;">🔄 Try Again (New Run)</button>
+                    </div>
+                `;
+
+                const newRunBtn = document.getElementById('bad-ending-new-run-btn');
+                if (newRunBtn) {
+                    newRunBtn.addEventListener('click', function() {
+                        startNewRun();
+                    });
+                }
+            }
+
+            function playEndingCinematic(videoSrc, useVideoAudio = false, endingTheme = null, onContinue = null, options = {}) {
+                endingSequenceActive = true;
+                pauseOverworldMusic();
+                stopIntroMedia();
+
+                const fullBackground = !!options.fullBackground;
+                const fateText = options.fateText || '';
+
+                if (endingThemeAudio) {
+                    endingThemeAudio.pause();
+                    endingThemeAudio.currentTime = 0;
+                }
+
+                const overlay = document.getElementById('victory-overlay');
+                if (!overlay) return;
+
+                overlay.style.display = 'flex';
+                overlay.classList.add('active');
+                if (fullBackground) {
+                    overlay.innerHTML = `
+                        <div style="position:fixed; inset:0; background:#000; overflow:hidden;">
+                            <video id="ending-cinematic-video" autoplay ${useVideoAudio ? '' : 'muted'} playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;"></video>
+                            <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.2) 0%,rgba(0,0,0,0.75) 100%);"></div>
+                            ${fateText ? `<div style="position:absolute;left:50%;bottom:96px;transform:translateX(-50%);max-width:min(980px,92vw);background:rgba(0,0,0,0.62);border:1px solid rgba(255,255,255,0.28);border-radius:14px;padding:18px 22px;text-align:center;color:#fff;font-size:24px;line-height:1.45;text-shadow:0 0 18px rgba(0,0,0,0.9);font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,0.45);backdrop-filter:blur(2px);">${fateText}</div>` : ''}
+                            <div style="position:absolute;bottom:24px;right:24px;display:flex;gap:10px;z-index:2;">
+                                <button id="ending-skip-btn" style="background:#333;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-family:inherit;">Skip</button>
+                                <button id="ending-continue-btn" style="background:#DDF247;color:#141414;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:bold;font-family:inherit;">Continue</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    overlay.innerHTML = `
+                        <div style="position:relative; width:min(920px,92vw); border-radius:16px; overflow:hidden; background:#000; box-shadow:0 0 35px rgba(0,0,0,0.8);">
+                            <video id="ending-cinematic-video" autoplay ${useVideoAudio ? '' : 'muted'} playsinline style="width:100%;height:62vh;object-fit:cover;background:#000;"></video>
+                            <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.88) 75%);display:flex;justify-content:flex-end;gap:10px;">
+                                <button id="ending-skip-btn" style="background:#333;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-family:inherit;">Skip</button>
+                                <button id="ending-continue-btn" style="background:#DDF247;color:#141414;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:bold;font-family:inherit;">Continue</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const videoEl = document.getElementById('ending-cinematic-video');
+                if (videoEl) {
+                    videoEl.src = videoSrc;
+                    videoEl.load();
+                    videoEl.play().catch(() => {});
+                }
+
+                if (endingTheme) {
+                    endingThemeAudio = new Audio(endingTheme);
+                    endingThemeAudio.loop = true;
+                    endingThemeAudio.volume = 0.6;
+                    endingThemeAudio.play().catch(() => {});
+                }
+
+                const closeEnding = function() {
+                    if (videoEl) {
+                        videoEl.pause();
+                    }
+                    if (endingThemeAudio) {
+                        endingThemeAudio.pause();
+                        endingThemeAudio.currentTime = 0;
+                    }
+                    overlay.classList.remove('active');
+                    overlay.style.display = 'none';
+                    if (typeof onContinue === 'function') {
+                        onContinue();
+                    } else {
+                        endingSequenceActive = false;
+                        closeBattle();
+                    }
+                };
+
+                const skipBtn = document.getElementById('ending-skip-btn');
+                const continueBtn = document.getElementById('ending-continue-btn');
+                if (skipBtn) skipBtn.addEventListener('click', closeEnding);
+                if (continueBtn) continueBtn.addEventListener('click', closeEnding);
+            }
+
+            function getSessionSummaryPayload() {
+                const totalDefeats = (gameState.defeatedEnemies || []).filter(function(id) {
+                    return typeof id === 'string' && !id.includes('_C');
+                }).length;
+                const totalCollectedCoins = (gameState.collectedCoins || []).length;
+
+                return {
+                    playerName: playerName,
+                    playerClass: playerClass,
+                    runId: GAME_RUN_ID,
+                    levelReached: gameState.currentLevel,
+                    levelsGained: Math.max(0, gameState.currentLevel - gameState.initialLevel),
+                    totalKills: totalDefeats,
+                    totalCoins: totalCollectedCoins,
+                    killsGained: Math.max(0, totalDefeats - gameState.initialKills),
+                    coinsGained: Math.max(0, totalCollectedCoins - gameState.initialCoins),
+                    health: gameState.health,
+                    mp: gameState.mp,
+                    battles: gameState.sessionStats.battles,
+                    victories: gameState.sessionStats.victories,
+                    defeats: gameState.sessionStats.defeats,
+                    statGains: gameState.sessionStats.statGains
+                };
+            }
+
+            function renderStatBars(statGains) {
+                const statItems = [
+                    { key: 'attack', label: 'Attack +' },
+                    { key: 'defense', label: 'Defense +' },
+                    { key: 'magic', label: 'Magic +' },
+                    { key: 'agility', label: 'Agility +' }
+                ];
+
+                const maxGain = Math.max(1, ...statItems.map(function(item) {
+                    return statGains[item.key] || 0;
+                }));
+
+                return statItems.map(function(item) {
+                    const value = statGains[item.key] || 0;
+                    const widthPercent = Math.max(4, Math.round((value / maxGain) * 100));
+                    return `
+                        <div class="final-stat-row">
+                            <div class="final-stat-head">
+                                <span>${item.label}</span>
+                                <span>+${value}</span>
+                            </div>
+                            <div class="final-stat-track">
+                                <div class="final-stat-fill" style="width:${widthPercent}%;"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            function stopFinalResultsAudio() {
+                if (finalResultsAudio) {
+                    finalResultsAudio.pause();
+                    finalResultsAudio.currentTime = 0;
+                }
+            }
+
+            function playFinalResultsAudio() {
+                if (!finalResultsAudio) {
+                    finalResultsAudio = new Audio(FINAL_RESULTS_MEDIA.victoryMusic);
+                    finalResultsAudio.loop = true;
+                    finalResultsAudio.volume = 0.62;
+                }
+
+                finalResultsAudio.currentTime = 0;
+                finalResultsAudio.play().catch(() => {});
+            }
+
+            function renderPerformanceRing(summary) {
+                const battles = Math.max(0, Number(summary.battles) || 0);
+                const victories = Math.max(0, Number(summary.victories) || 0);
+                const winRate = battles > 0 ? Math.round((victories / battles) * 100) : 100;
+                const ringStyle = `background: conic-gradient(#18E3A4 ${winRate}%, rgba(255,255,255,0.12) ${winRate}%);`;
+
+                return `
+                    <div class="final-ring" style="${ringStyle}">
+                        <div class="final-ring-inner">
+                            <div class="final-ring-value">${winRate}%</div>
+                            <div class="final-ring-note">Win Rate</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function saveResultsAsPdf(summary) {
+                const popup = window.open('', '_blank', 'width=960,height=760');
+                if (!popup) {
+                    alert('Pop-up blocked. Please allow pop-ups, then click Save Result as PDF again.');
+                    return;
+                }
+
+                const statGains = summary.statGains || {};
+                const printableHtml = `
+                    <!doctype html>
+                    <html>
+                    <head>
+                        <meta charset="utf-8" />
+                        <title>Midgar Adventure Result</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; padding: 28px; color: #111; }
+                            h1 { margin: 0 0 8px; }
+                            .muted { color: #555; margin-bottom: 22px; }
+                            .grid { display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 10px 18px; margin-bottom: 24px; }
+                            .card { border: 1px solid #ddd; border-radius: 10px; padding: 10px 12px; }
+                            .label { color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+                            .value { font-size: 18px; font-weight: bold; margin-top: 4px; }
+                            .bar-wrap { margin-bottom: 8px; }
+                            .bar-head { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+                            .bar-track { height: 10px; background: #ececec; border-radius: 999px; overflow: hidden; }
+                            .bar-fill { height: 100%; background: #8cbf1f; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Midgar Adventure - Final Results</h1>
+                        <div class="muted">${summary.playerName} (${summary.playerClass}) · Run #${summary.runId || 'N/A'} · ${new Date().toLocaleString()}</div>
+
+                        <div class="grid">
+                            <div class="card"><div class="label">Level Reached</div><div class="value">${summary.levelReached}</div></div>
+                            <div class="card"><div class="label">Levels Gained</div><div class="value">+${summary.levelsGained}</div></div>
+                            <div class="card"><div class="label">Total Kills</div><div class="value">${summary.totalKills}</div></div>
+                            <div class="card"><div class="label">Total Coins</div><div class="value">${summary.totalCoins}</div></div>
+                            <div class="card"><div class="label">Battles (W/L)</div><div class="value">${summary.battles} (${summary.victories}/${summary.defeats})</div></div>
+                            <div class="card"><div class="label">Final HP / MP</div><div class="value">${summary.health} / ${summary.mp}</div></div>
+                        </div>
+
+                        <h2>Session Stat Gains</h2>
+                        ${['attack','defense','magic','agility'].map(function(key) {
+                            const maxGain = Math.max(1, statGains.attack || 0, statGains.defense || 0, statGains.magic || 0, statGains.agility || 0);
+                            const value = statGains[key] || 0;
+                            const width = Math.max(4, Math.round((value / maxGain) * 100));
+                            return `
+                                <div class="bar-wrap">
+                                    <div class="bar-head"><span>${key.toUpperCase()}</span><span>+${value}</span></div>
+                                    <div class="bar-track"><div class="bar-fill" style="width:${width}%"></div></div>
+                                </div>
+                            `;
+                        }).join('')}
+
+                        <p class="muted" style="margin-top:16px;">Recovery bonuses: HP restores ${statGains['restore-hp'] || 0}, MP restores ${statGains['restore-mp'] || 0}</p>
+                    </body>
+                    </html>
+                `;
+
+                popup.document.open();
+                popup.document.write(printableHtml);
+                popup.document.close();
+                popup.focus();
+                setTimeout(function() {
+                    popup.print();
+                }, 350);
+            }
+
+            function showFinalResultsScreen() {
+                endingSequenceActive = true;
+                pauseOverworldMusic();
+                stopIntroMedia();
+                stopFinalResultsAudio();
+                playFinalResultsAudio();
+
+                const overlay = document.getElementById('victory-overlay');
+                if (!overlay) return;
+
+                const summary = getSessionSummaryPayload();
+                const statBars = renderStatBars(summary.statGains);
+                const ringChart = renderPerformanceRing(summary);
+                const totalEncounters = Math.max(1, summary.battles);
+                const encountersText = summary.victories + ' wins / ' + summary.defeats + ' losses';
+
+                overlay.style.display = 'flex';
+                overlay.classList.add('active');
+                overlay.innerHTML = `
+                    <div class="final-results-root">
+                        <video class="final-results-bg-video" autoplay muted loop playsinline>
+                            <source src="${FINAL_RESULTS_MEDIA.backgroundVideo}" type="video/mp4">
+                        </video>
+                        <div class="final-results-dim"></div>
+
+                        <div class="final-results-shell">
+                            <h1 class="final-results-title">Congratulations</h1>
+                            <p class="final-results-subtitle">${generatedVictoryMessage || 'You completed the adventure. You can continue with a new run or save this result as a PDF.'}</p>
+
+                            <div class="final-kpi-grid">
+                                <div class="final-kpi"><div class="final-kpi-label">Player</div><div class="final-kpi-value">${summary.playerName}</div></div>
+                                <div class="final-kpi"><div class="final-kpi-label">Class</div><div class="final-kpi-value">${summary.playerClass}</div></div>
+                                <div class="final-kpi"><div class="final-kpi-label">Level Reached</div><div class="final-kpi-value">${summary.levelReached}</div></div>
+                                <div class="final-kpi"><div class="final-kpi-label">Kills / Coins</div><div class="final-kpi-value">${summary.totalKills} / ${summary.totalCoins}</div></div>
+                                <div class="final-kpi"><div class="final-kpi-label">Encounters</div><div class="final-kpi-value">${totalEncounters}</div></div>
+                                <div class="final-kpi"><div class="final-kpi-label">Final HP / MP</div><div class="final-kpi-value">${summary.health} / ${summary.mp}</div></div>
+                            </div>
+
+                            <div class="final-charts">
+                                <div class="final-chart-card">
+                                    <h3 class="final-chart-title">Performance</h3>
+                                    ${ringChart}
+                                    <div class="final-extra-note">${encountersText}</div>
+                                </div>
+
+                                <div class="final-chart-card">
+                                    <h3 class="final-chart-title">Stat Increases (Session)</h3>
+                                    ${statBars}
+                                    <div class="final-extra-note">Recovery bonuses: HP restores ${summary.statGains['restore-hp'] || 0} · MP restores ${summary.statGains['restore-mp'] || 0}</div>
+                                </div>
+                            </div>
+
+                            <div class="final-actions">
+                                <button id="final-save-pdf-btn" class="final-action-btn secondary">Save Result as PDF</button>
+                                <button id="final-play-again-btn" class="final-action-btn primary">Play Again</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const playAgainBtn = document.getElementById('final-play-again-btn');
+                if (playAgainBtn) {
+                    playAgainBtn.addEventListener('click', function() {
+                        stopFinalResultsAudio();
+                        window.location.href = '/adventure';
+                    });
+                }
+
+                const savePdfBtn = document.getElementById('final-save-pdf-btn');
+                if (savePdfBtn) {
+                    savePdfBtn.addEventListener('click', function() {
+                        saveResultsAsPdf(summary);
+                    });
+                }
+            }
+
+            async function ensureFreshStartVitals() {
+                const isFreshLevelOneRun = gameState.currentLevel === 1
+                    && gameState.defeatedEnemies.length === 0
+                    && gameState.collectedCoins.length === 0
+                    && gameState.kills === 0
+                    && gameState.coins === 0;
+
+                if (!isFreshLevelOneRun) return;
+
+                try {
+                    const response = await fetch('/api/game/personnage/' + personnageId);
+                    if (!response.ok) return;
+                    const data = await response.json();
+                    const defense = Math.max(0, Number(data?.stats?.defense) || 0);
+                    const magic = Math.max(0, Number(data?.stats?.magic) || 0);
+                    const maxHp = Math.min(999, 120 + (defense * 8));
+                    const maxMp = Math.min(999, 80 + (magic * 8));
+                    gameState.health = maxHp;
+                    gameState.mp = maxMp;
+                    console.log('[VITALS] Fresh start at Level 1, set HP/MP to max:', maxHp, maxMp);
+                } catch (e) {
+                    console.warn('[VITALS] Could not set fresh start vitals:', e);
+                }
+            }
+
+            async function beginGameplayAfterIntro() {
+                if (introDismissed) return;
+                introDismissed = true;
+                introState = 'GAMEPLAY';
+                gameState.battleActive = false;
+                try { localStorage.setItem(introStorageKey, '1'); } catch (e) {}
+                const introOverlay = document.getElementById('intro-overlay');
+                if (introOverlay) {
+                    introOverlay.classList.remove('active');
+                }
+                stopIntroMedia();
+                await ensureFreshStartVitals();
+                bootstrapGameplay();
+            }
+
+            function generateNextIntroStory() {
+                if (introState !== 'STORY') return;
+
+                const nextBtn = document.getElementById('intro-next-btn');
+                const introTextEl = document.getElementById('intro-story-text');
+                if (nextBtn) {
+                    nextBtn.disabled = true;
+                    nextBtn.textContent = 'Generating...';
+                }
+                if (introTextEl) {
+                    introTextEl.textContent = 'Forging a new legend...';
+                }
+
+                loadGeneratedUniverseStory(true)
+                    .then(function(story) {
+                        if (introTextEl) {
+                            introTextEl.textContent = story || generatedLaunchStory;
+                        }
+                        playIntroMedia();
+                    })
+                    .finally(function() {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.textContent = 'Next Story';
+                        }
+                    });
+            }
+
+            function bootstrapGameplay() {
+                if (gameplayBootstrapped) return;
+                gameplayBootstrapped = true;
+
+                // Set canvas size - will be updated when collision map loads
+                collisionCanvas.width = 1;
+                collisionCanvas.height = 1;
+
+                // Load the saved level (or default to level 1)
+                loadLevel({{ savedLevel|default(1) }});
+
+                // Setup overworld music and unlock handler
+                initOverworldMusic();
+
+                // Check if we should show door based on saved progress
+                setTimeout(function() {
+                    checkLevelComplete();
+                }, 1000);
+
+                // Setup input handlers
+                setupInputHandlers();
+
+                // Start game loop
+                requestAnimationFrame(gameLoop);
+            }
+
+            function bindIntroControls() {
+                const skipBtn = document.getElementById('intro-skip-btn');
+                const nextBtn = document.getElementById('intro-next-btn');
+
+                if (skipBtn) skipBtn.addEventListener('click', beginGameplayAfterIntro);
+                if (nextBtn) nextBtn.addEventListener('click', generateNextIntroStory);
+
+                document.addEventListener('keydown', function(e) {
+                    if (!introDismissed && (e.key === ' ' || e.key === 'Enter' || e.key === 'Escape')) {
+                        e.preventDefault();
+                        beginGameplayAfterIntro();
+                    }
+                });
+            }
+
+            function showIntroOverlay(storyText) {
+                if (introShownOnce || introState === 'GAMEPLAY') {
+                    return;
+                }
+                introShownOnce = true;
+                introState = 'STORY';
+
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) {
+                    loadingScreen.style.display = 'none';
+                }
+
+                const overlay = document.getElementById('intro-overlay');
+                const introTextEl = document.getElementById('intro-story-text');
+                if (!overlay || !introTextEl) {
+                    beginGameplayAfterIntro();
+                    return;
+                }
+
+                const finalStory = storyText || generatedLaunchStory || (playerName + ' the ' + playerClass + ', your quest begins now.');
+                introTextEl.textContent = finalStory;
+                overlay.classList.add('active');
+                pauseOverworldMusic();
+                playIntroMedia();
+            }
+            
+            // DOM Elements
+            let gameCanvas, collisionCanvas, collisionCtx, entitiesLayer, playerEl;
+            let loadingProgress, killsDisplay, coinsDisplay, levelName;
+            let battleOverlay, battleIframe, victoryOverlay, levelCompleteOverlay, wallIndicator;
+            
+            // Initialize game
+            function init() {
+                console.log('=== OVERWORLD GAME INITIALIZING ===');
+                console.log('Loading from database - Level:', {{ savedLevel|default(1)|default(1) }}, 'Health:', {{ savedHealth|default(100)|default(100) }}, 'MP:', {{ savedMp|default(50)|default(50) }});
+                console.log('Defeated enemies:', {{ defeatedEnemies|json_encode|default('[]')|raw }});
+                console.log('Loading game assets and setting up...');
+                
+                // Get DOM elements
+                gameCanvas = document.getElementById('game-canvas');
+                collisionCanvas = document.getElementById('collision-layer');
+                collisionCtx = collisionCanvas.getContext('2d');
+                entitiesLayer = document.getElementById('entities-layer');
+                playerEl = document.getElementById('player');
+                
+                // Set default player sprite (facing down)
+                playerEl.style.backgroundImage = "url('{{ asset('assets/adventure/playablecharachter/1F.png') }}')";
+                playerEl.style.backgroundSize = "contain";
+                playerEl.style.backgroundPosition = "center";
+                
+                loadingProgress = document.getElementById('loading-progress');
+                killsDisplay = document.getElementById('kills-display');
+                coinsDisplay = document.getElementById('coins-display');
+                levelName = document.getElementById('level-name');
+                
+                battleOverlay = document.getElementById('battle-overlay');
+                battleIframe = document.getElementById('battle-iframe');
+                victoryOverlay = document.getElementById('victory-overlay');
+                levelCompleteOverlay = document.getElementById('level-complete-overlay');
+                wallIndicator = document.getElementById('wall-indicator');
+
+                if (IS_FRESH_RUN) {
+                    try { localStorage.removeItem(introStorageKey); } catch (e) {}
+                }
+
+                const introAlreadySeen = (() => {
+                    try {
+                        return localStorage.getItem(introStorageKey) === '1';
+                    } catch (e) {
+                        return false;
+                    }
+                })();
+
+                if (introAlreadySeen && !IS_FRESH_RUN) {
+                    introDismissed = true;
+                    introState = 'GAMEPLAY';
+                    gameState.battleActive = false;
+                    const loadingScreen = document.getElementById('loading-screen');
+                    if (loadingScreen) {
+                        loadingScreen.style.display = 'none';
+                    }
+                    bootstrapGameplay();
+                    return;
+                }
+
+                generatedStoryPromise = loadGeneratedUniverseStory();
+                bindIntroControls();
+
+                // Keep gameplay paused and unloaded until the player skips intro
+                gameState.battleActive = true;
+
+                Promise.resolve(generatedStoryPromise)
+                    .then(function(story) {
+                        showIntroOverlay(story);
+                    })
+                    .catch(function() {
+                        showIntroOverlay(generatedLaunchStory);
+                    });
+            }
+            
+            // Load a level
+            function loadLevel(levelNum) {
+                console.log('Loading level:', levelNum);
+                
+                const level = LEVELS[levelNum];
+                if (!level) {
+                    console.error('Level not found:', levelNum);
+                    return;
+                }
+                
+                // Update current level
+                gameState.currentLevel = levelNum;
+                
+                // Reset kills and coins for this level (per-level tracking)
+                // These are "current level" stats that reset when changing levels
+                // But we need to count defeated enemies for THIS level from the database
+                const levelPrefix = 'L' + levelNum + '_';
+                const levelKills = gameState.defeatedEnemies.filter(function(id) {
+                    return id.startsWith('L' + levelNum + '_') && !id.includes('_C');
+                }).length;
+                
+                // Count collected coins for this level
+                const levelCoins = gameState.collectedCoins.filter(function(id) {
+                    return id.startsWith('L' + levelNum + '_C');
+                }).length;
+                
+                gameState.kills = levelKills;
+                gameState.coins = levelCoins;
+                
+                console.log('Level ' + levelNum + ' loaded - Kills: ' + levelKills + ', Coins: ' + levelCoins);
+                console.log('Defeated enemies:', gameState.defeatedEnemies);
+                console.log('Collected coins:', gameState.collectedCoins);
+                // collectedCoins persists - we keep ALL collected coins from all levels
+                // so they don't respawn when changing levels
+                
+                gameState.exitVisible = false;
+                gameState.doorVisible = false;
+                gameState.levelTransitioning = false;
+                if (gameState.doorElement) {
+                    gameState.doorElement.remove();
+                    gameState.doorElement = null;
+                }
+                gameState.playerX = 100;
+                gameState.playerY = 300;
+                
+                // Update HUD
+                updateHUD();
+                levelName.textContent = 'Level ' + levelNum + ': ' + level.name;
+                applyMenuTheme(levelNum);
+                playLevelMusic(levelNum);
+                
+                // Auto-save progress (save level change)
+                saveProgress(0, 0, null, gameState.kills, gameState.coins, gameState.collectedCoins);
+                
+                // Load map image
+                const mapImg = document.getElementById('map-layer');
+                mapImg.src = level.mapImage;
+                
+                // Also load collision map overlay
+                const collisionOverlay = document.getElementById('collision-overlay');
+                collisionOverlay.src = level.collisionImage;
+                
+                // No offset needed - map and collision are same size
+                collisionOverlay.style.left = '0px';
+                
+                // Wait for map to load then load collision
+                mapImg.onload = function() {
+                    gameState.mapDimensions = {
+                        width: mapImg.naturalWidth || CONFIG.CANVAS_WIDTH,
+                        height: mapImg.naturalHeight || CONFIG.CANVAS_HEIGHT
+                    };
+                    updateLoadingProgress(30);
+                    loadCollisionMap(level.collisionImage);
+                };
+            }
+            
+            // Load collision map and scale it the same way the map is drawn (object-fit: cover)
+            function loadCollisionMap(collisionUrl) {
+                console.log('Loading collision map:', collisionUrl);
+
+                const collisionImg = new Image();
+                collisionImg.onload = function() {
+                    const canvasW = CONFIG.CANVAS_WIDTH;
+                    const canvasH = CONFIG.CANVAS_HEIGHT;
+
+                    // Match how the map is rendered with object-fit: cover
+                    const refWidth = (gameState.mapDimensions && gameState.mapDimensions.width) || collisionImg.width;
+                    const refHeight = (gameState.mapDimensions && gameState.mapDimensions.height) || collisionImg.height;
+                    const scale = Math.max(canvasW / refWidth, canvasH / refHeight);
+                    const drawW = refWidth * scale;
+                    const drawH = refHeight * scale;
+                    const offsetX = (canvasW - drawW) / 2;
+                    const offsetY = (canvasH - drawH) / 2;
+
+                    collisionCanvas.width = canvasW;
+                    collisionCanvas.height = canvasH;
+                    collisionCtx.clearRect(0, 0, canvasW, canvasH);
+                    collisionCtx.drawImage(collisionImg, offsetX, offsetY, drawW, drawH);
+
+                    gameState.collisionData = collisionCtx.getImageData(0, 0, canvasW, canvasH);
+                    gameState.collisionTransform = {
+                        scale: scale,
+                        offsetX: offsetX,
+                        offsetY: offsetY,
+                        sourceWidth: collisionImg.width,
+                        sourceHeight: collisionImg.height
+                    };
+
+                    console.log('Collision loaded with cover scaling', gameState.collisionTransform);
+
+                    // Build reachability and ensure player spawn is on a walkable area
+                    const spawnPoint = buildReachabilityFromPoint(gameState.playerX, gameState.playerY);
+                    if (spawnPoint) {
+                        gameState.playerX = spawnPoint.x;
+                        gameState.playerY = spawnPoint.y;
+                    }
+
+                    updateLoadingProgress(60);
+                    spawnEntities();
+                };
+                collisionImg.src = collisionUrl;
+            }
+            
+            // Spawn enemies and coins
+            function spawnEntities() {
+                const level = LEVELS[gameState.currentLevel];
+                
+                console.log('Spawning entities for level:', gameState.currentLevel);
+                console.log('Defeated enemies list:', gameState.defeatedEnemies);
+                console.log('Level enemies:', level.enemies);
+                console.log('Collected coins list:', gameState.collectedCoins);
+                
+                // Clear existing entities (keep player)
+                entitiesLayer.querySelectorAll('.enemy, .coin, .exit-portal').forEach(el => el.remove());
+                
+                // Spawn enemies with real sprites - filter out defeated enemies and wall positions
+                const allEnemies = level.enemies;
+                const defeatedList = gameState.defeatedEnemies;
+                gameState.enemies = allEnemies
+                    .filter(e => {
+                        const isDefeated = defeatedList.includes(e.id);
+                        if (isDefeated) {
+                            console.log('Filtering out defeated enemy:', e.id);
+                        }
+                        return !isDefeated;
+                    })
+                    .map(e => ({
+                        ...e,
+                        alive: true,
+                        element: null
+                    }));
+                
+                console.log('Spawning enemies:', gameState.enemies);
+                
+                gameState.enemies.forEach(enemy => {
+                    const enemySize = enemy.isBoss ? CONFIG.BOSS_SIZE : CONFIG.ENEMY_SIZE;
+                    const spawnPoint = findNearestReachablePoint(enemy.x, enemy.y, enemySize);
+                    enemy.x = spawnPoint.x;
+                    enemy.y = spawnPoint.y;
+                    const el = document.createElement('div');
+                    el.className = 'entity enemy' + (enemy.isBoss ? ' boss' : '');
+                    el.id = 'enemy-' + enemy.id;
+                    el.style.left = enemy.x + 'px';
+                    el.style.top = enemy.y + 'px';
+                    
+                    // Use real enemy sprite
+                    const spritePath = ENEMY_SPRITES[enemy.sprite];
+                    el.innerHTML = '<img src="' + spritePath + '" alt="Enemy" /><div class="enemy-tooltip">' + (enemy.isBoss ? 'BOSS!' : 'Enemy') + '</div>';
+                    
+                    entitiesLayer.appendChild(el);
+                    enemy.element = el;
+                });
+                
+                // Spawn coins with sprite - filter out collected coins and wall positions
+                gameState.coinsOnMap = level.coins
+                    .filter(c => {
+                        const isCollected = gameState.collectedCoins.includes(c.id);
+                        return !isCollected;
+                    })
+                    .map(c => ({
+                        ...c,
+                        collected: false,
+                        element: null
+                    }));
+                
+                console.log('Spawning coins:', gameState.coinsOnMap);
+                
+                gameState.coinsOnMap.forEach(coin => {
+                    const spawnPoint = findNearestReachablePoint(coin.x, coin.y, CONFIG.COIN_SIZE);
+                    coin.x = spawnPoint.x;
+                    coin.y = spawnPoint.y;
+                    const el = document.createElement('div');
+                    el.className = 'entity coin';
+                    el.id = 'coin-' + coin.id;
+                    el.style.left = coin.x + 'px';
+                    el.style.top = coin.y + 'px';
+                    el.textContent = '🪙';
+                    entitiesLayer.appendChild(el);
+                    coin.element = el;
+                });
+                
+                // Spawn door (appears when all enemies and coins are collected)
+                const doorEl = document.createElement('div');
+                doorEl.className = 'entity door hidden';
+                doorEl.id = 'door';
+                const doorPoint = findNearestReachablePoint(650, 300, CONFIG.EXIT_SIZE);
+                doorEl.style.left = doorPoint.x + 'px';
+                doorEl.style.top = doorPoint.y + 'px';
+                entitiesLayer.appendChild(doorEl);
+                gameState.doorElement = doorEl;
+                
+                // Spawn exit portal (hidden, for compatibility)
+                if (level.exit) {
+                    const exitEl = document.createElement('div');
+                    exitEl.className = 'entity exit-portal hidden';
+                    exitEl.id = 'exit-portal';
+                    const exitPoint = findNearestReachablePoint(level.exit.x, level.exit.y, CONFIG.EXIT_SIZE);
+                    exitEl.style.left = exitPoint.x + 'px';
+                    exitEl.style.top = exitPoint.y + 'px';
+                    entitiesLayer.appendChild(exitEl);
+                    gameState.exitElement = exitEl;
+                }
+                
+                updateLoadingProgress(100);
+            }
+            
+            // Update loading progress bar
+            function updateLoadingProgress(percent) {
+                loadingProgress.style.width = percent + '%';
+            }
+
+            function isWallPixel(x, y) {
+                if (!gameState.collisionData) return false;
+
+                const collisionWidth = collisionCanvas.width || CONFIG.CANVAS_WIDTH;
+                const collisionHeight = collisionCanvas.height || CONFIG.CANVAS_HEIGHT;
+
+                const canvasX = Math.floor(Math.max(0, Math.min(collisionWidth - 1, x)));
+                const canvasY = Math.floor(Math.max(0, Math.min(collisionHeight - 1, y)));
+                const index = (canvasY * collisionWidth + canvasX) * 4;
+                const r = gameState.collisionData.data[index];
+                const g = gameState.collisionData.data[index + 1];
+                const b = gameState.collisionData.data[index + 2];
+
+                // Wall color #ED1C24 = RGB(237, 28, 36)
+                const WALL_R = 237;
+                const WALL_G = 28;
+                const WALL_B = 36;
+                const TOLERANCE = 30;
+
+                return (
+                    Math.abs(r - WALL_R) <= TOLERANCE &&
+                    Math.abs(g - WALL_G) <= TOLERANCE &&
+                    Math.abs(b - WALL_B) <= TOLERANCE
+                );
+            }
+
+            function clampToCanvas(point) {
+                return {
+                    x: Math.max(10, Math.min(CONFIG.CANVAS_WIDTH - 10, point.x)),
+                    y: Math.max(10, Math.min(CONFIG.CANVAS_HEIGHT - 10, point.y))
+                };
+            }
+
+            function getCellForPoint(x, y, cellSize) {
+                return {
+                    x: Math.floor(x / cellSize),
+                    y: Math.floor(y / cellSize)
+                };
+            }
+
+            function getCellCenter(cellX, cellY, cellSize) {
+                return {
+                    x: cellX * cellSize + cellSize / 2,
+                    y: cellY * cellSize + cellSize / 2
+                };
+            }
+
+            function findNearestWalkableCell(startCell, walkable, width, height) {
+                const maxRadius = Math.max(width, height);
+                for (let radius = 0; radius <= maxRadius; radius++) {
+                    for (let dy = -radius; dy <= radius; dy++) {
+                        for (let dx = -radius; dx <= radius; dx++) {
+                            if (Math.abs(dx) !== radius && Math.abs(dy) !== radius) {
+                                continue;
+                            }
+                            const cellX = startCell.x + dx;
+                            const cellY = startCell.y + dy;
+                            if (cellX < 0 || cellX >= width || cellY < 0 || cellY >= height) {
+                                continue;
+                            }
+                            const idx = cellY * width + cellX;
+                            if (walkable[idx] === 1) {
+                                return { x: cellX, y: cellY };
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            function buildReachabilityFromPoint(startX, startY) {
+                if (!gameState.collisionData) return null;
+
+                const cellSize = 8;
+                const width = Math.ceil(CONFIG.CANVAS_WIDTH / cellSize);
+                const height = Math.ceil(CONFIG.CANVAS_HEIGHT / cellSize);
+                const walkable = new Uint8Array(width * height);
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const center = getCellCenter(x, y, cellSize);
+                        if (!isWallPixel(center.x, center.y)) {
+                            walkable[y * width + x] = 1;
+                        }
+                    }
+                }
+
+                const startCell = getCellForPoint(startX, startY, cellSize);
+                const safeStart = findNearestWalkableCell(startCell, walkable, width, height);
+
+                const reachable = new Uint8Array(width * height);
+                if (safeStart) {
+                    const queue = [safeStart];
+                    reachable[safeStart.y * width + safeStart.x] = 1;
+                    for (let i = 0; i < queue.length; i++) {
+                        const cell = queue[i];
+                        const neighbors = [
+                            { x: cell.x + 1, y: cell.y },
+                            { x: cell.x - 1, y: cell.y },
+                            { x: cell.x, y: cell.y + 1 },
+                            { x: cell.x, y: cell.y - 1 }
+                        ];
+                        for (const neighbor of neighbors) {
+                            if (neighbor.x < 0 || neighbor.x >= width || neighbor.y < 0 || neighbor.y >= height) {
+                                continue;
+                            }
+                            const idx = neighbor.y * width + neighbor.x;
+                            if (reachable[idx] === 1 || walkable[idx] === 0) {
+                                continue;
+                            }
+                            reachable[idx] = 1;
+                            queue.push(neighbor);
+                        }
+                    }
+                }
+
+                gameState.reachability = {
+                    cellSize: cellSize,
+                    width: width,
+                    height: height,
+                    walkable: walkable,
+                    reachable: reachable,
+                    startCell: safeStart
+                };
+
+                if (!safeStart) {
+                    return null;
+                }
+
+                const startPoint = getCellCenter(safeStart.x, safeStart.y, cellSize);
+                return clampToCanvas(startPoint);
+            }
+
+            function isBlockedForEntity(x, y, size) {
+                const probeSize = Math.max(8, size - 6);
+                return isColliding(x, y, probeSize);
+            }
+
+            function findNearestReachablePoint(x, y, size) {
+                const reachability = gameState.reachability;
+                if (!reachability) {
+                    return { x: x, y: y };
+                }
+
+                const cellSize = reachability.cellSize;
+                const width = reachability.width;
+                const height = reachability.height;
+                const startCell = getCellForPoint(x, y, cellSize);
+
+                const isCellReachable = function(cellX, cellY) {
+                    if (cellX < 0 || cellX >= width || cellY < 0 || cellY >= height) {
+                        return false;
+                    }
+                    return reachability.reachable[cellY * width + cellX] === 1;
+                };
+
+                if (isCellReachable(startCell.x, startCell.y) && !isBlockedForEntity(x, y, size)) {
+                    return { x: x, y: y };
+                }
+
+                const maxRadius = Math.max(width, height);
+                for (let radius = 1; radius <= maxRadius; radius++) {
+                    for (let dy = -radius; dy <= radius; dy++) {
+                        for (let dx = -radius; dx <= radius; dx++) {
+                            if (Math.abs(dx) !== radius && Math.abs(dy) !== radius) {
+                                continue;
+                            }
+                            const cellX = startCell.x + dx;
+                            const cellY = startCell.y + dy;
+                            if (!isCellReachable(cellX, cellY)) {
+                                continue;
+                            }
+                            const center = clampToCanvas(getCellCenter(cellX, cellY, cellSize));
+                            if (!isBlockedForEntity(center.x, center.y, size)) {
+                                return center;
+                            }
+                        }
+                    }
+                }
+
+                return { x: x, y: y };
+            }
+
+            // Toggle collision debug overlay
+            window.toggleCollision = function() {
+                const overlay = document.getElementById('collision-overlay');
+                const canvas = document.getElementById('collision-layer');
+                const shouldShow = overlay.style.display === 'none' || !overlay.style.display;
+
+                overlay.style.display = shouldShow ? 'block' : 'none';
+                canvas.style.display = shouldShow ? 'block' : 'none';
+            };
+            
+            // Setup keyboard input
+            function setupInputHandlers() {
+                document.addEventListener('keydown', function(e) {
+                    gameState.keysPressed[e.key] = true;
+                    gameState.keysPressed[e.code] = true;
+                });
+                
+                document.addEventListener('keyup', function(e) {
+                    gameState.keysPressed[e.key] = false;
+                    gameState.keysPressed[e.code] = false;
+                });
+            }
+            
+            // Main game loop
+            function gameLoop() {
+                if (!gameState.battleActive) {
+                    update();
+                }
+                requestAnimationFrame(gameLoop);
+            }
+            
+            // Update game state
+            function update() {
+                // Handle player movement
+                let dx = 0;
+                let dy = 0;
+                let isMoving = false;
+                
+                if (gameState.keysPressed['ArrowUp'] || gameState.keysPressed['w'] || gameState.keysPressed['W']) {
+                    dy = -CONFIG.PLAYER_SPEED;
+                    gameState.playerDirection = 3; // up
+                    isMoving = true;
+                }
+                if (gameState.keysPressed['ArrowDown'] || gameState.keysPressed['s'] || gameState.keysPressed['S']) {
+                    dy = CONFIG.PLAYER_SPEED;
+                    gameState.playerDirection = 0; // down
+                    isMoving = true;
+                }
+                if (gameState.keysPressed['ArrowLeft'] || gameState.keysPressed['a'] || gameState.keysPressed['A']) {
+                    dx = -CONFIG.PLAYER_SPEED;
+                    gameState.playerDirection = 1; // left
+                    isMoving = true;
+                }
+                if (gameState.keysPressed['ArrowRight'] || gameState.keysPressed['d'] || gameState.keysPressed['D']) {
+                    dx = CONFIG.PLAYER_SPEED;
+                    gameState.playerDirection = 2; // right
+                    isMoving = true;
+                }
+                
+                updatePlayerAnimation(isMoving);
+                
+                // Check collision with walls before moving
+                const playerSize = 12; // Smaller to not bother movement
+                const newX = gameState.playerX + dx;
+                const newY = gameState.playerY + dy;
+                
+                // Only move if no collision
+                if (!isColliding(newX, newY, playerSize)) {
+                    gameState.playerX = newX;
+                    gameState.playerY = newY;
+                }
+                
+                // Keep in bounds
+                gameState.playerX = Math.max(30, Math.min(CONFIG.CANVAS_WIDTH - 30, gameState.playerX));
+                gameState.playerY = Math.max(30, Math.min(CONFIG.CANVAS_HEIGHT - 30, gameState.playerY));
+                
+                // Update player position
+                playerEl.style.left = gameState.playerX + 'px';
+                playerEl.style.top = gameState.playerY + 'px';
+                
+                // Check enemy collisions
+                checkEnemyCollisions();
+                
+                // Check coin collisions
+                checkCoinCollisions();
+                
+                // Check exit collision
+                checkExitCollision();
+                
+                // Check door collision
+                checkDoorCollision();
+            }
+
+            function updatePlayerAnimation(isMoving) {
+                // Down: 1F-4F, Left: 5left-6l, Right: 7r-8r, Up: 10U-13u
+                const frameMap = {
+                    0: ['1F.png', '2F.png', '3F.png', '4F.png'],  // down
+                    1: ['5 left.png', '6 l.png'],                // left
+                    2: ['7r.png', '8r.png'],                     // right
+                    3: ['10 U.png', '11 U.png', '12 U.png', '13 u.png'] // up
+                };
+
+                const dir = gameState.playerDirection || 0;
+                const frames = frameMap[dir];
+                if (!frames || frames.length === 0) {
+                    return;
+                }
+
+                const now = performance.now();
+                const frameDuration = 120;
+
+                if (gameState.playerLastDirection !== dir) {
+                    gameState.playerFrameIndex = 0;
+                    gameState.playerLastDirection = dir;
+                    gameState.playerLastFrameTime = now;
+                }
+
+                if (isMoving) {
+                    if (now - gameState.playerLastFrameTime >= frameDuration) {
+                        gameState.playerFrameIndex = (gameState.playerFrameIndex + 1) % frames.length;
+                        gameState.playerLastFrameTime = now;
+                    }
+                } else {
+                    gameState.playerFrameIndex = 0;
+                    gameState.playerLastFrameTime = now;
+                }
+
+                const frameFile = frames[gameState.playerFrameIndex];
+                const newSprite = "url('{{ asset('assets/adventure/playablecharachter/') }}" + frameFile + "')";
+                if (playerEl.style.backgroundImage !== newSprite) {
+                    playerEl.style.backgroundImage = newSprite;
+                    playerEl.style.backgroundSize = "contain";
+                    playerEl.style.backgroundPosition = "center";
+                }
+            }
+            
+            // Show wall collision indicator
+            function showWallIndicator() {
+                const now = Date.now();
+                if (now - gameState.lastWallCollision > 500) {
+                    gameState.lastWallCollision = now;
+                    wallIndicator.classList.add('active');
+                    setTimeout(function() {
+                        wallIndicator.classList.remove('active');
+                    }, 300);
+                }
+            }
+            
+            // Check if position collides with wall - #ED1C24 is wall color
+            function isColliding(x, y, size) {
+                if (!gameState.collisionData) return false;
+
+                const collisionWidth = collisionCanvas.width || CONFIG.CANVAS_WIDTH;
+                const collisionHeight = collisionCanvas.height || CONFIG.CANVAS_HEIGHT;
+
+                // Wall color #ED1C24 = RGB(237, 28, 36)
+                const WALL_R = 237;
+                const WALL_G = 28;
+                const WALL_B = 36;
+                const TOLERANCE = 30;
+
+                const halfSize = size / 2;
+                const margin = 10;
+
+                // Check multiple points around the player
+                const points = [
+                    { x: x - halfSize + margin, y: y - halfSize + margin },
+                    { x: x + halfSize - margin, y: y - halfSize + margin },
+                    { x: x - halfSize + margin, y: y + halfSize - margin },
+                    { x: x + halfSize - margin, y: y + halfSize - margin },
+                    { x: x, y: y - halfSize + margin },
+                    { x: x, y: y + halfSize - margin },
+                    { x: x - halfSize + margin, y: y },
+                    { x: x + halfSize - margin, y: y }
+                ];
+
+                for (let point of points) {
+                    const canvasX = Math.floor(Math.max(0, Math.min(collisionWidth - 1, point.x)));
+                    const canvasY = Math.floor(Math.max(0, Math.min(collisionHeight - 1, point.y)));
+
+                    const index = (canvasY * collisionWidth + canvasX) * 4;
+                    const r = gameState.collisionData.data[index];
+                    const g = gameState.collisionData.data[index + 1];
+                    const b = gameState.collisionData.data[index + 2];
+
+                    // Check if pixel matches #ED1C24
+                    if (Math.abs(r - WALL_R) <= TOLERANCE && 
+                        Math.abs(g - WALL_G) <= TOLERANCE && 
+                        Math.abs(b - WALL_B) <= TOLERANCE) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            
+            // Check collision with enemies using sprite-sized bounds
+            function checkEnemyCollisions() {
+                if (endingSequenceActive) return;
+                if (Date.now() < battleCooldownUntil) return;
+
+                gameState.enemies.forEach(enemy => {
+                    if (!enemy.alive) return;
+                    if (gameState.battleActive) return;
+                    
+                    const enemySize = enemy.isBoss ? CONFIG.BOSS_SIZE : CONFIG.ENEMY_SIZE;
+                    const playerHalf = CONFIG.PLAYER_SIZE / 2;
+                    const enemyHalf = enemySize / 2;
+                    const dx = Math.abs(gameState.playerX - enemy.x);
+                    const dy = Math.abs(gameState.playerY - enemy.y);
+
+                    // AABB overlap using sprite-sized bounds
+                    if (dx < playerHalf + enemyHalf && dy < playerHalf + enemyHalf) {
+                        triggerBattle(enemy);
+                    }
+                });
+            }
+            
+            // Check collision with coins
+            function checkCoinCollisions() {
+                const playerRadius = CONFIG.PLAYER_SIZE / 2;
+                const coinRadius = CONFIG.COIN_SIZE / 2;
+                
+                gameState.coinsOnMap.forEach(coin => {
+                    if (coin.collected) return;
+                    
+                    const dx = gameState.playerX - coin.x;
+                    const dy = gameState.playerY - coin.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < playerRadius + coinRadius) {
+                        // Collect coin
+                        coin.collected = true;
+                        gameState.collectedCoins.push(coin.id); // Track collected coin ID (string format)
+                        gameState.coins++;
+                        playCoinCollectionSound();
+                        console.log('Coin collected! ID:', coin.id, 'Total coins:', gameState.coins);
+                        coin.element.remove();
+                        updateHUD();
+                        console.log('HUD updated. Current display:', coinsDisplay.textContent);
+                        
+                        // Check if level is complete after collecting coin
+                        checkLevelComplete();
+                        
+                        // Auto-save progress with current kills, coins AND collectedCoins
+                        saveProgress(0, 1, null, gameState.kills, gameState.coins, gameState.collectedCoins);
+                    }
+                });
+            }
+            
+            // Check collision with exit
+            function checkExitCollision() {
+                if (!gameState.exitVisible) return;
+                
+                const level = LEVELS[gameState.currentLevel];
+                if (!level.exit) return;
+                
+                const playerRadius = CONFIG.PLAYER_SIZE / 2;
+                const exitRadius = CONFIG.EXIT_SIZE / 2;
+                
+                const dx = gameState.playerX - level.exit.x;
+                const dy = gameState.playerY - level.exit.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < playerRadius + exitRadius) {
+                    // Go to next level
+                    nextLevel();
+                }
+            }
+            
+            // Check collision with door
+            function checkDoorCollision() {
+                if (!gameState.doorVisible || !gameState.doorElement || gameState.levelTransitioning) return;
+                
+                // Door position (hardcoded in spawnEntities)
+                const doorX = parseFloat(gameState.doorElement.style.left) || 650;
+                const doorY = parseFloat(gameState.doorElement.style.top) || 300;
+                const doorRadius = 40;
+                
+                const playerRadius = CONFIG.PLAYER_SIZE / 2;
+                
+                const dx = gameState.playerX - doorX;
+                const dy = gameState.playerY - doorY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < playerRadius + doorRadius) {
+                    console.log('Door collision! Going to next level...');
+                    gameState.doorVisible = false;
+                    gameState.doorElement.classList.add('hidden');
+                    gameState.doorElement.style.display = 'none';
+                    gameState.doorElement.remove();
+                    gameState.doorElement = null;
+                    goToNextLevelViaDoor();
+                }
+            }
+            
+            // Trigger battle - integrate battle system directly
+            let battleController = null;
+            let battleResultHandled = false;
+            let battleCooldownUntil = 0;
+
+            function triggerBattle(enemy, options = {}) {
+                const forceStart = !!options.force;
+                const now = Date.now();
+
+                if (!enemy || !enemy.alive) {
+                    console.log('[BATTLE DEBUG] triggerBattle blocked: invalid/dead enemy', enemy?.id);
+                    return;
+                }
+
+                if (!forceStart && endingSequenceActive) {
+                    console.log('[BATTLE DEBUG] triggerBattle blocked: endingSequenceActive', enemy.id);
+                    return;
+                }
+
+                if (!forceStart && gameState.battleActive) {
+                    console.log('[BATTLE DEBUG] triggerBattle blocked: battle already active', enemy.id);
+                    return;
+                }
+
+                if (!forceStart && now < battleCooldownUntil) {
+                    console.log('[BATTLE DEBUG] triggerBattle blocked: cooldown', enemy.id, 'remaining', battleCooldownUntil - now, 'ms');
+                    return;
+                }
+
+                console.log('Starting battle with enemy:', enemy.id);
+                
+                // Store current enemy for completion handler
+                currentEnemy = enemy;
+                
+                // Pause game loop
+                gameState.battleActive = true;
+                battleResultHandled = false;
+                endingSequenceActive = false;
+                battleCooldownUntil = 0;
+                pauseOverworldMusic();
+                
+                // Show battle overlay
+                const battleOverlay = document.getElementById('battle-overlay');
+                battleOverlay.classList.remove('hidden');
+                battleOverlay.style.display = 'flex';
+                
+                // Initialize battle controller
+                const battleEnemyData = {
+                    id: enemy.id,
+                    sprite: enemy.sprite,
+                    isBoss: enemy.isBoss || false,
+                    level: gameState.currentLevel // Pass current level for background
+                };
+                battleController = new BattleController();
+                
+                // Initialize battle in the container
+                battleController.init(personnageId, universeId, gameState.health, gameState.mp, battleEnemyData)
+                    .then(function(success) {
+                        if (success) {
+                            console.log('Battle initialized successfully');
+                        } else {
+                            console.error('Battle initialization failed');
+                            // Fallback to redirect
+                            window.location.href = '/adventure/play/' + personnageId + '/' + universeId;
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Battle error:', error);
+                        // Fallback to redirect
+                        window.location.href = '/adventure/play/' + personnageId + '/' + universeId;
+                    });
+            }
+            
+            // Handle battle completion via postMessage
+            window.addEventListener('message', function(event) {
+                console.log('=== POST MESSAGE RECEIVED ===', event.data);
+                if (event.data && event.data.type === 'battle-complete') {
+                    console.log('Battle complete via postMessage!');
+                    handleBattleComplete(null, event.data);
+                }
+            });
+            
+            // Handle battle completion via jQuery event
+            $(document).on('battleComplete', function(event, result) {
+                console.log('=== BATTLE COMPLETE EVENT FIRED ===');
+                console.log('Battle result:', result);
+                handleBattleComplete(null, result);
+            });
+            
+            // Handle battle completion
+            let currentEnemy = null;
+            function handleBattleComplete(enemy, result) {
+                if (battleResultHandled) {
+                    console.log('Battle result already handled, ignoring duplicate event.');
+                    return;
+                }
+                battleResultHandled = true;
+
+                console.log('=== BATTLE COMPLETE ===');
+                console.log('Full result:', result);
+                console.log('[BATTLE DEBUG] completion payload flags', {
+                    retry: !!result.retry,
+                    giveUp: !!result.giveUp,
+                    badEnding: !!result.badEnding,
+                    victory: !!result.victory
+                });
+                console.log('Victory flag:', result.victory);
+                console.log('Current enemy stored:', currentEnemy);
+                console.log('Game state enemies:', gameState.enemies);
+                
+                // Use the enemy from result or currentEnemy
+                let targetEnemy = enemy || currentEnemy;
+                
+                // If enemyId is provided in result, find the enemy by id (could be string or number)
+                if (result.enemyId && !targetEnemy) {
+                    targetEnemy = gameState.enemies.find(e => e.id === result.enemyId || e.id === String(result.enemyId));
+                    console.log('Found enemy by ID:', result.enemyId, targetEnemy);
+                }
+                
+                console.log('Target enemy for save:', targetEnemy);
+                
+                // Show results overlay with stats
+                const battleOverlay = document.getElementById('battle-overlay');
+                
+                // Update game state with new health/MP from battle result
+                if (result.health !== undefined) {
+                    gameState.health = result.health;
+                }
+                if (result.mp !== undefined) {
+                    gameState.mp = result.mp;
+                }
+
+                gameState.sessionStats.battles += 1;
+                
+                if (result.victory) {
+                    gameState.sessionStats.victories += 1;
+                    console.log('Victory! Saving enemy defeat...');
+                    // Mark enemy as defeated
+                    if (targetEnemy) {
+                        targetEnemy.alive = false;
+                        if (targetEnemy.element) targetEnemy.element.remove();
+                        gameState.defeatedEnemies.push(targetEnemy.id);
+                        console.log('Enemy marked as defeated:', targetEnemy.id);
+                    }
+                    gameState.kills++;
+                    console.log('Kills incremented to:', gameState.kills);
+                    
+                    // Check if level is complete after killing enemy
+                    checkLevelComplete();
+                    
+                    // Save progress with defeated enemy, kills, coins AND collectedCoins
+                    saveProgress(
+                        0, 
+                        0, 
+                        targetEnemy ? targetEnemy.id : null,
+                        gameState.kills,
+                        gameState.coins,
+                        gameState.collectedCoins
+                    );
+                } else {
+                    gameState.sessionStats.defeats += 1;
+                    // Even if defeated, save current health/mp and collectedCoins
+                    saveProgress(0, 0, null, gameState.kills, gameState.coins, gameState.collectedCoins);
+                }
+
+                const isBossBattle = !!(targetEnemy && targetEnemy.isBoss);
+                if (result.giveUp || result.badEnding) {
+                    closeBattle(false, 1200, targetEnemy);
+                    playEndingCinematic(
+                        STORY_MEDIA.badEndingVideo,
+                        true,
+                        null,
+                        showBadEndingState,
+                        {
+                            fullBackground: true,
+                            fateText: 'Your fate was sealed in fear. The world remembers your surrender... and falls into darkness.'
+                        }
+                    );
+                    return;
+                }
+                if (!result.victory && isBossBattle) {
+                    closeBattle(false, 1200, targetEnemy);
+                    playEndingCinematic(
+                        STORY_MEDIA.badEndingVideo,
+                        true,
+                        null,
+                        showBadEndingState,
+                        {
+                            fullBackground: true,
+                            fateText: 'Defeated at the final hour, your legend fades and the realm sinks into endless night.'
+                        }
+                    );
+                    return;
+                }
+
+                if (result.retry) {
+                    console.log('[BATTLE DEBUG] Retry selected: returning to overworld with half HP/MP');
+                    closeBattle(true, 1400, targetEnemy);
+                    return;
+                }
+                
+                // Update game state with new health/MP from battle result
+                if (result.health !== undefined) {
+                    gameState.health = result.health;
+                }
+                if (result.mp !== undefined) {
+                    gameState.mp = result.mp;
+                }
+                
+                // Update HUD
+                updateHUD();
+                
+                // Show stats overlay
+                let rewardText = 'Reward applied!';
+                if (!result.victory) {
+                    rewardText = 'No reward this time.';
+                } else if (result.statUpgrade === 'restore-hp') {
+                    rewardText = 'HP restored!';
+                } else if (result.statUpgrade === 'restore-mp') {
+                    rewardText = 'MP restored!';
+                } else if (result.statUpgrade) {
+                    rewardText = result.statUpgrade.toUpperCase() + ' increased!';
+                }
+
+                if (result.victory && result.statUpgrade && gameState.sessionStats.statGains[result.statUpgrade] !== undefined) {
+                    gameState.sessionStats.statGains[result.statUpgrade] += 1;
+                }
+
+                battleOverlay.innerHTML = `
+                    <div style="text-align: center; padding: 40px; background: #1a1a1a; border-radius: 16px; max-width: 500px;">
+                        <h2 style="color: ${result.victory ? '#4f4' : '#f44'}; font-size: 32px; margin-bottom: 20px;">
+                            ${result.victory ? '🎉 VICTORY!' : '💀 DEFEATED'}
+                        </h2>
+                        <div style="color: #fff; margin-bottom: 10px;">${rewardText}</div>
+                        <div style="color: #888; margin: 20px 0; font-size: 14px;">Your character stats carry forward.</div>
+                    </div>
+                `;
+                
+                // Auto-close battle instantly; on victory, force refresh to reflect latest state
+                closeBattle(true, 1000, targetEnemy);
+            }
+            
+            // Close battle overlay and return to overworld
+            function closeBattle(shouldResumeMusic = true, cooldownMs = 800, enemyToDisengage = null) {
+                // Destroy battle controller
+                if (battleController) {
+                    try {
+                        battleController.destroy();
+                    } catch (e) {
+                        console.warn('Battle destroy error:', e);
+                    }
+                    battleController = null;
+                }
+                
+                // Just hide the battle overlay, don't navigate away
+                const battleOverlay = document.getElementById('battle-overlay');
+                battleOverlay.style.display = 'none';
+                battleOverlay.innerHTML = '';
+                gameState.battleActive = false;
+                battleCooldownUntil = Date.now() + Math.max(0, cooldownMs);
+
+                if (enemyToDisengage && enemyToDisengage.alive) {
+                    const dx = gameState.playerX - enemyToDisengage.x;
+                    const dy = gameState.playerY - enemyToDisengage.y;
+                    const dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+                    const pushDist = (enemyToDisengage.isBoss ? CONFIG.BOSS_SIZE : CONFIG.ENEMY_SIZE) * 0.8;
+                    gameState.playerX = Math.max(30, Math.min(CONFIG.CANVAS_WIDTH - 30, gameState.playerX + (dx / dist) * pushDist));
+                    gameState.playerY = Math.max(30, Math.min(CONFIG.CANVAS_HEIGHT - 30, gameState.playerY + (dy / dist) * pushDist));
+                    playerEl.style.left = gameState.playerX + 'px';
+                    playerEl.style.top = gameState.playerY + 'px';
+                    console.log('[BATTLE DEBUG] player disengaged from enemy', enemyToDisengage.id, 'pos=', gameState.playerX, gameState.playerY);
+                }
+
+                console.log('[BATTLE DEBUG] closeBattle state', {
+                    shouldResumeMusic,
+                    endingSequenceActive,
+                    cooldownMs,
+                    battleCooldownUntil,
+                    battleActive: gameState.battleActive
+                });
+
+                if (shouldResumeMusic && !endingSequenceActive) {
+                    resumeOverworldMusic();
+                }
+                
+                // Check if level is complete
+                checkLevelComplete();
+            }
+            
+            // Make closeBattle available globally for button onclick
+            window.closeBattle = closeBattle;
+            
+            // Save progress to server
+            function saveProgress(xp, coins, defeatedEnemyId = null, killsOverride = null, coinsOverride = null, collectedCoinsOverride = null) {
+                // Use overrides if provided, otherwise use game state
+                const killsToSave = killsOverride !== null ? killsOverride : gameState.kills;
+                const coinsToSave = coinsOverride !== null ? coinsOverride : gameState.coins;
+                const collectedCoinsToSave = collectedCoinsOverride !== null ? collectedCoinsOverride : gameState.collectedCoins;
+                
+                console.log('SAVING - Health:', gameState.health, 'MP:', gameState.mp, 'Level:', gameState.currentLevel, 'Kills:', killsToSave, 'Coins:', coinsToSave, 'CollectedCoins:', collectedCoinsToSave);
+                fetch('/overworld/save-progress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        personnageId: personnageId,
+                        gameRunId: GAME_RUN_ID,
+                        xp: xp,
+                        coins: coins,
+                        health: gameState.health,
+                        mp: gameState.mp,
+                        currentLevel: gameState.currentLevel,
+                        kills: killsToSave,
+                        coinsCollected: coinsToSave,
+                        defeatedEnemyId: defeatedEnemyId,
+                        collectedCoins: collectedCoinsToSave
+                    })
+                }).then(response => {
+                    console.log('Save response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error('HTTP ' + response.status);
+                    }
+                    return response.json();
+                })
+                  .then(data => {
+                      console.log('Progress saved:', data);
+                      if (!data.success) {
+                          console.error('Save failed:', data.message);
+                      }
+                  })
+                  .catch(error => console.error('Error saving progress:', error));
+            }
+            
+            // Update HUD display
+            function updateHUD() {
+                const level = LEVELS[gameState.currentLevel];
+                killsDisplay.textContent = gameState.kills + ' / ' + level.requiredKills;
+                coinsDisplay.textContent = gameState.coins + ' / ' + level.requiredCoins;
+            }
+            
+            // Check if level is complete
+            function checkLevelComplete() {
+                const level = LEVELS[gameState.currentLevel];
+                console.log('=== CHECKING LEVEL COMPLETE ===');
+                console.log('Current level:', gameState.currentLevel);
+                console.log('Kills:', gameState.kills, 'Required:', level.requiredKills);
+                console.log('Coins:', gameState.coins, 'Required:', level.requiredCoins);
+                
+                // Check if requirements met
+                if (gameState.kills >= level.requiredKills && gameState.coins >= level.requiredCoins) {
+                    console.log('Level complete! Showing door...');
+                    
+                    // Show the door!
+                    if (gameState.doorElement) {
+                        gameState.doorElement.classList.remove('hidden');
+                        gameState.doorVisible = true;
+                        console.log('Door is now visible!');
+                    }
+                    
+                    // Hide any overlays
+                    if (levelCompleteOverlay) {
+                        levelCompleteOverlay.style.display = 'none';
+                    }
+                }
+            }
+            
+            // Go to next level when door is clicked
+            function goToNextLevelViaDoor() {
+                if (gameState.levelTransitioning) {
+                    console.log('[LEVEL] Transition already in progress, ignoring duplicate door trigger.');
+                    return;
+                }
+                gameState.levelTransitioning = true;
+                const nextLevelNum = gameState.currentLevel + 1;
+                
+                if (nextLevelNum > 3) {
+                    showVictory();
+                } else {
+                    loadLevel(nextLevelNum);
+                }
+            }
+            
+            // Go to next level (called from button)
+            window.goToNextLevel = function() {
+                const nextLevelNum = gameState.currentLevel + 1;
+                
+                if (nextLevelNum > 3) {
+                    // Victory!
+                    if (levelCompleteOverlay) {
+                        levelCompleteOverlay.style.display = 'none';
+                    }
+                    showVictory();
+                } else {
+                    if (levelCompleteOverlay) {
+                        levelCompleteOverlay.style.display = 'none';
+                    }
+                    loadLevel(nextLevelNum);
+                }
+            };
+            
+            // Go to next level
+            function nextLevel() {
+                const nextLevelNum = gameState.currentLevel + 1;
+                
+                if (nextLevelNum > 3) {
+                    // Victory!
+                    showVictory();
+                } else {
+                    loadLevel(nextLevelNum);
+                }
+            }
+            
+            // Show victory screen
+            function showVictory() {
+                if (goodEndingSequenceStarted) {
+                    console.log('[ENDING] Good ending already running, ignoring duplicate trigger.');
+                    return;
+                }
+                goodEndingSequenceStarted = true;
+
+                loadGeneratedVictoryMessage(true)
+                    .then(function(endingStory) {
+                        const finalText = endingStory
+                            || (playerName + ' the ' + playerClass + ' fulfilled the quest, and peace returned to the realm.');
+
+                        playEndingCinematic(
+                            STORY_MEDIA.goodEndingVideo,
+                            false,
+                            STORY_MEDIA.goodEndingTheme,
+                            showFinalResultsScreen,
+                            {
+                                fullBackground: true,
+                                fateText: finalText
+                            }
+                        );
+                    })
+                    .catch(function() {
+                        const fallbackText = playerName + ' the ' + playerClass + ' fulfilled the quest, and peace returned to the realm.';
+                        playEndingCinematic(
+                            STORY_MEDIA.goodEndingVideo,
+                            false,
+                            STORY_MEDIA.goodEndingTheme,
+                            showFinalResultsScreen,
+                            {
+                                fullBackground: true,
+                                fateText: fallbackText
+                            }
+                        );
+                    });
+            }
+            
+            // Start game when DOM is ready
+            document.addEventListener('DOMContentLoaded', init);
+            
+        })();
+    </script>
+</body>
+</html>

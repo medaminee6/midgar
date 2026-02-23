@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil - Midgar</title>
+    
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
+    
+    <style>
+        /* ===== VARIABLES & RESET ===== */
+        :root {
+            --primary-color: #18E3A4;
+            --primary-dark: #13c891;
+            --text-color: #E6FFF6;
+            --text-secondary: #B0B9B6;
+            --bg-primary: #1A1F1E;
+            --bg-dark: #0D0F0F;
+            --card-bg: rgba(26, 31, 30, 0.7);
+            --glass-bg: rgba(26, 31, 30, 0.5);
+            --border-radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* ===== BOUTONS ANIMÉS SANS CLIGNOTEMENT ===== */
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            color: #000;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        /* ===== BOUTONS MAGIQUES (magic-btn) SANS CLIGNOTEMENT ===== */
+        .magic-btn {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid transparent;
+        }
+        
+        .magic-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        .magic-btn.active {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        /* ===== ANIMATION PARTICULES ===== */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, var(--primary-color), var(--primary-dark));
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fly 0.6s forwards;
+            opacity: 0.8;
+            z-index: 1;
+        }
+        
+        @keyframes fly {
+            0% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translate(var(--x), var(--y)) scale(0); 
+                opacity: 0; 
+            }
+        }
+        
+        /* ===== VIDEO BACKGROUND ===== */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            pointer-events: none;
+        }
+        
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+        
+        .gradient-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-dark) 100%);
+            z-index: -3;
+            pointer-events: none;
+            display: none;
+        }
+        
+        /* ===== HEADER MISE À JOUR ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(26, 31, 30, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .logo svg {
+            width: 32px;
+            height: 32px;
+        }
+        
+        nav ul {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.3rem 0.6rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .profile-link:hover {
+            background: rgba(24, 227, 164, 0.1);
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary-color);
+            transition: transform 0.3s;
+        }
+        
+        .avatar:hover {
+            transform: scale(1.1);
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* ===== MAIN CONTENT ===== */
+        main {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+        
+        .site-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section {
+            padding: 4rem 0;
+            background-color: var(--glass-bg);
+            border-radius: 16px;
+            margin: 2rem auto;
+            backdrop-filter: blur(10px);
+            max-width: 1200px;
+            border: 1px solid rgba(24, 227, 164, 0.1);
+            transition: border-color 0.3s;
+        }
+        
+        .section:hover {
+            border-color: rgba(24, 227, 164, 0.3);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            position: relative;
+            color: var(--primary-color);
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+        
+        /* ===== CARDS ===== */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            height: 100%;
+            position: relative;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6),
+                        0 0 20px rgba(24, 227, 164, 0.3);
+            border-color: rgba(24, 227, 164, 0.2);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(24, 227, 164, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .card:hover::before {
+            left: 100%;
+        }
+        
+        .card-image {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .card:hover .card-image img {
+            transform: scale(1.1);
+        }
+        
+        .card-body {
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card-body h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+        
+        .card-body p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            flex-grow: 1;
+        }
+        
+        .card-tags {
+            margin: 0.5rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            justify-content: center;
+        }
+        
+        .tag {
+            background-color: var(--primary-color);
+            color: #000;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+        
+        .tag:hover {
+            transform: scale(1.1);
+        }
+        
+        /* ===== PROFILE SPECIFIC ===== */
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .avatar-container {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #18E3A4, #0DCF92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .content-grid {
+            display: grid;
+            gap: 3rem;
+        }
+        
+        .content-section {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(24, 227, 164, 0.1);
+        }
+        
+        .content-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        /* ===== MODAL STYLES ===== */
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: #0B0F0E;
+            margin: 10% auto; 
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            color: #fff;
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 0 30px rgba(24, 227, 164, 0.3);
+            position: relative;
+            animation: slideIn 0.4s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            color: var(--primary-color);
+            float: right;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            transition: all 0.3s ease;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .close:hover {
+            color: #000;
+            background-color: var(--primary-color);
+            transform: rotate(90deg);
+        }
+        
+        .modal h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-right: 2rem;
+        }
+        
+        /* ===== MODALES DÉTAILLÉES ===== */
+        .modal-detail {
+            max-width: 800px;
+            width: 95%;
+        }
+        
+        .modal-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(24, 227, 164, 0.2);
+        }
+        
+        .modal-header h2 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .modal-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .modal-image {
+            width: 100%;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-image img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .modal-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .info-group {
+            margin-bottom: 1rem;
+        }
+        
+        .info-label {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+        
+        .info-value {
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .modal-description {
+            grid-column: 1 / -1;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .modal-description h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .modal-description p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(24, 227, 164, 0.2);
+        }
+        
+        /* ===== FORM STYLES ===== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(24, 227, 164, 0.3);
+            border-radius: 6px;
+            color: var(--text-color);
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(24, 227, 164, 0.3);
+        }
+        
+        /* ===== FOOTER ===== */
+        footer {
+            background-color: rgba(13, 15, 15, 0.5);
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            text-align: center;
+            border-top: 1px solid rgba(24, 227, 164, 0.1);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                justify-content: center;
+            }
+            
+            .auth-buttons {
+                justify-content: center;
+            }
+            
+            .section {
+                margin: 1rem;
+                padding: 2rem 0;
+            }
+            
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: 20% auto;
+                padding: 1.5rem;
+            }
+            
+            .modal-body {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .modal-image img {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- VIDEO BACKGROUND -->
+    <div class="gradient-background" id="gradient-bg"></div>
+    <div class="video-overlay"></div>
+    <video id="bg-video" class="video-background" autoplay muted loop playsinline>
+        <source src="{{ asset('uploads/dragon.mp4') }}" type="video/mp4">
+        Votre navigateur ne supporte pas la vidéo HTML5.
+    </video>
+
+    <!-- SITE CONTENT -->
+    <div class="site-content">
+        <!-- HEADER -->
+        <header>
+            <div class="logo">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20,80 Q20,30 50,20 Q80,30 80,80 Z" fill="none" stroke="#18E3A4" stroke-width="2"/>
+                    <line x1="50" y1="20" x2="50" y2="50" stroke="#18E3A4" stroke-width="1.5"/>
+                    <circle cx="35" cy="40" r="3" fill="#18E3A4"/>
+                    <circle cx="65" cy="40" r="3" fill="#18E3A4"/>
+                    <circle cx="50" cy="60" r="4" fill="#18E3A4"/>
+                    <circle cx="50" cy="70" r="3" fill="#18E3A4"/>
+                </svg>
+                Midgar
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="{{ path('home') }}" class="magic-btn">Accueil</a></li>
+                    <li><a href="/discover" class="magic-btn">Découvrir</a></li>
+                    <li><a href="/universes" class="magic-btn">Univers</a></li>
+                    <li><a href="/personnages" class="magic-btn">Personnages</a></li>
+                    <li><a href="/oeuvre" class="magic-btn">Œuvre</a></li>
+                    <li><a href="/artefact" class="magic-btn">Artefacts</a></li>
+                    <li><a href="/shop" class="magic-btn">Boutique</a></li>
+                    <li><a href="/challenges" class="magic-btn">Défis</a></li>
+                </ul>
+            </nav>
+            
+            <div class="auth-buttons">
+                {% if app.user %}
+                    <a href="{{ path('profile') }}" class="profile-link magic-btn">
+                        <div class="avatar">
+                            {% if app.user.avatar %}
+                                <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" alt="{{ app.user.username }}">
+                            {% else %}
+                                <img src="{{ asset('images/default-avatar.png') }}" alt="{{ app.user.username }}">
+                            {% endif %}
+                        </div>
+                        <span>{{ app.user.username }}</span>
+                    </a>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin_users') }}" class="btn btn-warning btn-sm magic-btn">Dashboard Admin</a>
+                    {% endif %}
+                    <a href="{{ path('app_logout') }}" class="btn btn-secondary btn-sm magic-btn">Déconnexion</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="btn btn-secondary btn-sm magic-btn">Connexion</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm magic-btn">S'inscrire</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main>
+            {% if app.user %}
+            <section class="section">
+                <div class="container">
+                    <h1 class="section-title">Mon Profil</h1>
+                    
+                    <div class="profile-layout">
+                        <!-- SIDEBAR -->
+                        <div>
+                            <div class="card">
+                                <div class="card-body" style="text-align: center;">
+                                    <div style="
+                                        width: 100px;
+                                        height: 100px;
+                                        margin: 0 auto 1rem;
+                                        border-radius: 50%;
+                                        background: linear-gradient(135deg, #18E3A4, #0DCF92);
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        overflow: hidden;
+                                    ">
+                                        {% if app.user.avatar %}
+                                            <img
+                                                src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}"
+                                                alt="Avatar de {{ app.user.username }}"
+                                                style="
+                                                    width: 100%;
+                                                    height: 100%;
+                                                    object-fit: cover;
+                                                "
+                                            >
+                                        {% else %}
+                                            <span style="font-size: 3rem;">🧙</span>
+                                        {% endif %}
+                                    </div>
+                                    <h3 style="margin-bottom: 0.5rem;">{{ app.user.username }}</h3>
+                                    <p style="color: #B0B9B6; margin-bottom: 1rem;">{{ '@' ~ app.user.username|lower }}</p>
+                                    <p style="color: #B0B9B6; margin-bottom: 1rem;">{{ app.user.email }}</p>
+                                    <button class="btn btn-secondary btn-sm" style="width: 100%; margin-bottom: 1rem;" onclick="openModal('editProfileModal')">Éditer le Profil</button>
+                                    <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="openModal('settingsModal')">Paramètres</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MAIN CONTENT AVEC NOUVELLES MODALES -->
+                        <div class="content-grid">
+                            <!-- MES UNIVERS -->
+                            <div class="content-section">
+                                <h2>Mes Univers</h2>
+                                <div class="items-grid">
+                                    <div class="card" onclick="openUniverseModal('universe-1')">
+                                        <div class="card-image" style="font-size: 3rem; display: flex; align-items: center; justify-content: center;">🌙</div>
+                                        <div class="card-body">
+                                            <h3 class="card-title">Nuit Éternelle</h3>
+                                            <p class="card-text">Un monde plongé dans une nuit perpétuelle</p>
+                                            <div class="card-tags">
+                                                <span class="tag">Sombre</span>
+                                                <span class="tag">Mystère</span>
+                                            </div>
+                                            <p style="color: var(--primary-color); font-size: 0.9rem; margin: 1rem 0;">📊 1,240 favoris</p>
+                                            <button class="btn btn-primary btn-sm magic-btn" style="width: 100%;">Voir</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card" onclick="openUniverseModal('universe-2')">
+                                        <div class="card-image" style="font-size: 3rem; display: flex; align-items: center; justify-content: center;">🏰</div>
+                                        <div class="card-body">
+                                            <h3 class="card-title">Châteaux Flottants</h3>
+                                            <p class="card-text">Des forteresses dans les nuages</p>
+                                            <div class="card-tags">
+                                                <span class="tag">Épic</span>
+                                                <span class="tag">Magie</span>
+                                            </div>
+                                            <p style="color: var(--primary-color); font-size: 0.9rem; margin: 1rem 0;">📊 892 favoris</p>
+                                            <button class="btn btn-primary btn-sm magic-btn" style="width: 100%;">Voir</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="/universes" class="btn btn-secondary magic-btn" style="margin-top: 1rem;">Voir tous mes univers (12)</a>
+                            </div>
+
+                            <!-- MES ŒUVRES -->
+                            <div class="content-section">
+                                <h2>Mes Œuvres Récentes</h2>
+                                <div class="items-grid">
+                                    {% if oeuvres is defined and oeuvres|length > 0 %}
+                                        {% for o in oeuvres %}
+                                            <div class="card" onclick="openOeuvreModal({{ o.id|default(loop.index0) }})">
+                                                <div class="card-image">
+                                                    {% if o.imageUrl is defined and o.imageUrl %}
+                                                        <img src="{{ asset(o.imageUrl) }}" alt="{{ o.title|default('Œuvre') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            🎨
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3 class="card-title">{{ o.title|default('Sans titre') }}</h3>
+                                                    <p class="card-text">{{ o.description|default('Aucune description')|slice(0, 100) ~ (o.description|default('')|length > 100 ? '...' : '') }}</p>
+                                                    <small style="color: var(--text-secondary);">
+                                                        {% if o.createdAt is defined and o.createdAt %}
+                                                            {{ o.createdAt|date('d/m/Y') }}
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="card" onclick="openOeuvreModal('empty')">
+                                            <div class="card-image" style="display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                                                📝
+                                            </div>
+                                            <div class="card-body">
+                                                <h3 class="card-title">Aucune œuvre</h3>
+                                                <p class="card-text">Vous n'avez pas encore créé d'œuvre</p>
+                                                <button class="btn btn-primary btn-sm magic-btn" style="width: 100%; margin-top: 1rem;">Créer une œuvre</button>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <a href="/oeuvre" class="btn btn-secondary magic-btn" style="margin-top: 1rem;">
+                                    Voir toutes mes œuvres ({{ oeuvresCount|default(oeuvres|length)|default(0) }})
+                                </a>
+                            </div>
+
+                            <!-- MES ARTEFACTS -->
+                            <div class="content-section">
+                                <h2>Mes Artefacts</h2>
+                                <div class="items-grid">
+                                    {% if artefacts is defined and artefacts|length > 0 %}
+                                        {% for a in artefacts %}
+                                            <div class="card" onclick="openArtefactModal({{ a.id|default(loop.index0) }})">
+                                                <div class="card-image">
+                                                    {% if a.imageUrl is defined and a.imageUrl %}
+                                                        <img src="{{ asset(a.imageUrl) }}" alt="{{ a.name|default('Artefact') }}">
+                                                    {% else %}
+                                                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size: 2rem;">
+                                                            ⚔️
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body">
+                                                    <h3 class="card-title">{{ a.name|default('Sans nom') }}</h3>
+                                                    <p class="card-text">{{ a.origins|default('Aucune description')|slice(0, 100) ~ (a.origins|default('')|length > 100 ? '...' : '') }}</p>
+                                                    <small style="color: var(--text-secondary);">
+                                                        {% if a.createdAt is defined and a.createdAt %}
+                                                            {{ a.createdAt|date('d/m/Y') }}
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="card" onclick="openArtefactModal('empty')">
+                                            <div class="card-image" style="display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                                                🏺
+                                            </div>
+                                            <div class="card-body">
+                                                <h3 class="card-title">Aucun artefact</h3>
+                                                <p class="card-text">Vous n'avez pas encore créé d'artefact</p>
+                                                <button class="btn btn-primary btn-sm magic-btn" style="width: 100%; margin-top: 1rem;">Créer un artefact</button>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {% else %}
+                <section class="section">
+                    <div class="container" style="text-align: center; padding: 4rem 2rem;">
+                        <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">Accès non autorisé</h2>
+                        <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
+                            Vous devez être connecté pour accéder à votre profil.
+                        </p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <a href="{{ path('app_login') }}" class="btn btn-primary magic-btn">Se connecter</a>
+                            <a href="{{ path('app_register') }}" class="btn btn-secondary magic-btn">S'inscrire</a>
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
+        </main>
+
+        <!-- MODAL ÉDITER PROFIL -->
+        <div id="editProfileModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('editProfileModal')">&times;</span>
+                <h2>Éditer votre profil</h2>
+                {{ form_start(profileForm, {'attr': {'class': 'profile-form'}}) }}
+                    <div class="form-group">
+                        <label class="form-label">Nom d'utilisateur</label>
+                        {{ form_widget(profileForm.username, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        {{ form_widget(profileForm.email, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Avatar</label>
+                        {{ form_widget(profileForm.avatar, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                    <button class="btn btn-primary" type="submit" style="width: 100%;">Enregistrer</button>
+                {{ form_end(profileForm) }}
+            </div>
+        </div>
+
+        <!-- MODAL PARAMÈTRES -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('settingsModal')">&times;</span>
+                <h2>Paramètres</h2>
+
+                <button class="btn btn-primary" onclick="document.getElementById('passwordForm').style.display='block'" style="width: 100%; margin-bottom: 1.5rem;">
+                    Changer le mot de passe
+                </button>
+
+                <div id="passwordForm" style="display:none; margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                    <h3 style="color: #18E3A4; margin-bottom: 1rem;">Changement de mot de passe</h3>
+                    {{ form_start(passwordForm, {'attr': {'class': 'password-form'}}) }}
+                        <div class="form-group">
+                            <label class="form-label">Mot de passe actuel</label>
+                            {{ form_widget(passwordForm.oldPassword, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nouveau mot de passe</label>
+                            {{ form_widget(passwordForm.newPassword, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmer le nouveau mot de passe</label>
+                            {{ form_widget(passwordForm.confirmPassword, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <button class="btn btn-success" type="submit" style="width: 100%;">Modifier le mot de passe</button>
+                    {{ form_end(passwordForm) }}
+                </div>
+
+                <button class="btn btn-danger" onclick="document.getElementById('deleteForm').style.display='block'" style="width: 100%;">
+                    Supprimer mon compte
+                </button>
+
+                <div id="deleteForm" style="display:none; margin-top: 1.5rem; padding: 1.5rem; background: rgba(220,53,69,0.1); border-radius: 8px; border: 1px solid rgba(220,53,69,0.3);">
+                    <h3 style="color: #dc3545; margin-bottom: 1rem;">Suppression du compte</h3>
+                    <p style="color: #B0B9B6; margin-bottom: 1rem;">Cette action est irréversible. Toutes vos données seront définitivement supprimées.</p>
+                    <form action="{{ path('profile_delete') }}" method="POST" onsubmit="return confirm('Êtes-vous certain de vouloir supprimer votre compte ? Cette action est irréversible.');">
+                        <div class="form-group">
+                            <label class="form-label">Confirmez avec votre mot de passe :</label>
+                            <input type="password" name="password" required class="form-control">
+                        </div>
+                        <button class="btn btn-danger" type="submit" style="width: 100%;">Supprimer définitivement mon compte</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALE POUR ŒUVRES -->
+        <div id="oeuvreModal" class="modal">
+            <div class="modal-content modal-detail">
+                <span class="close" onclick="closeModal('oeuvreModal')">&times;</span>
+                <div class="modal-header">
+                    <h2 id="oeuvreTitle">Titre de l'Œuvre</h2>
+                    <div class="modal-subtitle" id="oeuvreAuthor">Par Auteur</div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-image">
+                        <img id="oeuvreImage" src="" alt="Image de l'œuvre">
+                    </div>
+                    <div class="modal-info">
+                        <div class="info-group">
+                            <span class="info-label">Type</span>
+                            <div class="info-value" id="oeuvreType">Roman</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Date de création</span>
+                            <div class="info-value" id="oeuvreDate">01/01/2024</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Statut</span>
+                            <div class="info-value" id="oeuvreStatus">Publié</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Tags</span>
+                            <div class="card-tags" id="oeuvreTags">
+                                <span class="tag">Fantasy</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-description">
+                        <h3>Description</h3>
+                        <p id="oeuvreDescription">Description détaillée de l'œuvre...</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary magic-btn" onclick="closeModal('oeuvreModal')">Fermer</button>
+                    <button class="btn btn-primary magic-btn">Éditer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALE POUR ARTEFACTS -->
+        <div id="artefactModal" class="modal">
+            <div class="modal-content modal-detail">
+                <span class="close" onclick="closeModal('artefactModal')">&times;</span>
+                <div class="modal-header">
+                    <h2 id="artefactName">Nom de l'Artefact</h2>
+                    <div class="modal-subtitle" id="artefactType">Type d'artefact</div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-image">
+                        <img id="artefactImage" src="" alt="Image de l'artefact">
+                    </div>
+                    <div class="modal-info">
+                        <div class="info-group">
+                            <span class="info-label">Rareté</span>
+                            <div class="info-value" id="artefactRarity">Légendaire</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Pouvoirs</span>
+                            <div class="info-value" id="artefactPowers">Magie élémentaire</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Date de création</span>
+                            <div class="info-value" id="artefactDate">01/01/2024</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Origine</span>
+                            <div class="info-value" id="artefactOrigin">Ancienne civilisation</div>
+                        </div>
+                    </div>
+                    <div class="modal-description">
+                        <h3>Histoire & Description</h3>
+                        <p id="artefactDescription">Description détaillée de l'artefact...</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary magic-btn" onclick="closeModal('artefactModal')">Fermer</button>
+                    <button class="btn btn-primary magic-btn">Éditer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALE POUR UNIVERS -->
+        <div id="universeModal" class="modal">
+            <div class="modal-content modal-detail">
+                <span class="close" onclick="closeModal('universeModal')">&times;</span>
+                <div class="modal-header">
+                    <h2 id="universeName">Nom de l'Univers</h2>
+                    <div class="modal-subtitle" id="universeCreator">Créé par Utilisateur</div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-image">
+                        <img id="universeImage" src="" alt="Image de l'univers">
+                    </div>
+                    <div class="modal-info">
+                        <div class="info-group">
+                            <span class="info-label">Thèmes</span>
+                            <div class="card-tags" id="universeThemes">
+                                <span class="tag">Fantasy</span>
+                                <span class="tag">Médiéval</span>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Favoris</span>
+                            <div class="info-value" id="universeFavorites">1,240</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Date de création</span>
+                            <div class="info-value" id="universeDate">01/01/2024</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Statut</span>
+                            <div class="info-value" id="universeStatus">Public</div>
+                        </div>
+                    </div>
+                    <div class="modal-description">
+                        <h3>Description</h3>
+                        <p id="universeDescription">Description détaillée de l'univers...</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary magic-btn" onclick="closeModal('universeModal')">Fermer</button>
+                    <button class="btn btn-primary magic-btn">Éditer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="container">
+                <p>&copy; 2026 Midgar Fantasy Platform. Créez, partagez, vivez la magie.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Magic Button Particle Effect
+        document.querySelectorAll('.magic-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                for(let i = 0; i < 8; i++) {
+                    const particle = document.createElement('span');
+                    particle.classList.add('particle');
+                    const x = (Math.random() - 0.5) * 80 + 'px';
+                    const y = (Math.random() - 0.5) * 80 + 'px';
+                    particle.style.setProperty('--x', x);
+                    particle.style.setProperty('--y', y);
+                    
+                    const rect = btn.getBoundingClientRect();
+                    particle.style.left = (e.clientX - rect.left) + 'px';
+                    particle.style.top = (e.clientY - rect.top) + 'px';
+                    
+                    const hue = Math.floor(Math.random() * 60) + 140;
+                    particle.style.background = `radial-gradient(circle, hsl(${hue}, 100%, 60%), hsl(${hue}, 100%, 30%))`;
+                    
+                    btn.appendChild(particle);
+                    setTimeout(() => particle.remove(), 600);
+                }
+            });
+        });
+
+        // Highlight active nav link
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('nav .magic-btn').forEach(link => {
+            const homePath = '{{ path('home') }}';
+            if (link.getAttribute('href') === currentPath || 
+                (link.getAttribute('href') === homePath && currentPath === '/')) {
+                link.classList.add('active');
+            }
+        });
+
+        // Background initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const bgVideo = document.getElementById('bg-video');
+            const gradientBg = document.getElementById('gradient-bg');
+            
+            if (bgVideo) {
+                bgVideo.addEventListener('error', function() {
+                    console.log('Background video failed to load, using gradient fallback');
+                    if (gradientBg) {
+                        gradientBg.style.display = 'block';
+                    }
+                });
+                
+                bgVideo.play().catch(function(error) {
+                    console.log('Video autoplay prevented:', error);
+                    if (gradientBg) {
+                        gradientBg.style.display = 'block';
+                    }
+                });
+            }
+            
+            document.addEventListener('visibilitychange', function() {
+                if (bgVideo) {
+                    if (document.hidden) {
+                        bgVideo.pause();
+                    } else {
+                        bgVideo.play().catch(e => console.log('Video play error:', e));
+                    }
+                }
+            });
+        });
+
+        // Fonctions modales
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Fermer si clic en dehors de la modal
+        window.onclick = function(event) {
+            const modals = ['editProfileModal', 'settingsModal', 'oeuvreModal', 'artefactModal', 'universeModal'];
+            modals.forEach(id => {
+                const modal = document.getElementById(id);
+                if (event.target == modal) {
+                    closeModal(id);
+                }
+            });
+        }
+
+        // Fermer modales avec Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal('editProfileModal');
+                closeModal('settingsModal');
+                closeModal('oeuvreModal');
+                closeModal('artefactModal');
+                closeModal('universeModal');
+            }
+        });
+
+        // Fonction pour ouvrir la modale d'œuvre
+        function openOeuvreModal(id) {
+            {% if oeuvres is defined and oeuvres|length > 0 %}
+                {% set oeuvre = oeuvres[0] %}
+                const oeuvreData = {
+                    title: "{{ oeuvre.title|default('Titre de l\'œuvre')|e('js') }}",
+                    author: "{{ app.user.username|e('js') }}",
+                    image: "{{ oeuvre.imageUrl|default('')|e('js') }}",
+                    type: "{{ oeuvre.type|default('Roman')|e('js') }}",
+                    date: "{{ oeuvre.createdAt ? oeuvre.createdAt|date('d/m/Y') : '01/01/2024' }}",
+                    status: "{{ oeuvre.status|default('Publié')|e('js') }}",
+                    tags: {{ oeuvre.tags|default(['Fantasy', 'Aventure'])|json_encode|raw }},
+                    description: "{{ oeuvre.description|default('Description de l\'œuvre...')|e('js') }}"
+                };
+            {% else %}
+                const oeuvreData = {
+                    title: "Aucune œuvre",
+                    author: "{{ app.user.username|e('js') }}",
+                    image: "",
+                    type: "-",
+                    date: "-",
+                    status: "-",
+                    tags: [],
+                    description: "Vous n'avez pas encore créé d'œuvre. Commencez dès maintenant !"
+                };
+            {% endif %}
+            
+            document.getElementById('oeuvreTitle').textContent = oeuvreData.title;
+            document.getElementById('oeuvreAuthor').textContent = "Par " + oeuvreData.author;
+            document.getElementById('oeuvreImage').src = oeuvreData.image;
+            document.getElementById('oeuvreType').textContent = oeuvreData.type;
+            document.getElementById('oeuvreDate').textContent = oeuvreData.date;
+            document.getElementById('oeuvreStatus').textContent = oeuvreData.status;
+            document.getElementById('oeuvreDescription').textContent = oeuvreData.description;
+            
+            const tagsContainer = document.getElementById('oeuvreTags');
+            tagsContainer.innerHTML = '';
+            if (oeuvreData.tags && oeuvreData.tags.length > 0) {
+                oeuvreData.tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = tag;
+                    tagsContainer.appendChild(tagElement);
+                });
+            } else {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'tag';
+                tagElement.textContent = 'Non catégorisé';
+                tagsContainer.appendChild(tagElement);
+            }
+            
+            openModal('oeuvreModal');
+        }
+
+        // Fonction pour ouvrir la modale d'artefact
+        function openArtefactModal(id) {
+            {% if artefacts is defined and artefacts|length > 0 %}
+                {% set artefact = artefacts[0] %}
+                const artefactData = {
+                    name: "{{ artefact.name|default('Nom de l\'artefact')|e('js') }}",
+                    type: "{{ artefact.type|default('Artefact mystérieux')|e('js') }}",
+                    image: "{{ artefact.imageUrl|default('')|e('js') }}",
+                    rarity: "{{ artefact.rarity|default('Légendaire')|e('js') }}",
+                    powers: "{{ artefact.powers|default('Pouvoirs inconnus')|e('js') }}",
+                    date: "{{ artefact.createdAt ? artefact.createdAt|date('d/m/Y') : '01/01/2024' }}",
+                    origin: "{{ artefact.origins|default('Origine inconnue')|e('js') }}",
+                    description: "{{ artefact.description|default(artefact.origins)|default('Description de l\'artefact...')|e('js') }}"
+                };
+            {% else %}
+                const artefactData = {
+                    name: "Aucun artefact",
+                    type: "-",
+                    image: "",
+                    rarity: "-",
+                    powers: "-",
+                    date: "-",
+                    origin: "-",
+                    description: "Vous n'avez pas encore créé d'artefact. Commencez dès maintenant !"
+                };
+            {% endif %}
+            
+            document.getElementById('artefactName').textContent = artefactData.name;
+            document.getElementById('artefactType').textContent = artefactData.type;
+            document.getElementById('artefactImage').src = artefactData.image;
+            document.getElementById('artefactRarity').textContent = artefactData.rarity;
+            document.getElementById('artefactPowers').textContent = artefactData.powers;
+            document.getElementById('artefactDate').textContent = artefactData.date;
+            document.getElementById('artefactOrigin').textContent = artefactData.origin;
+            document.getElementById('artefactDescription').textContent = artefactData.description;
+            
+            openModal('artefactModal');
+        }
+
+        // Fonction pour ouvrir la modale d'univers
+        function openUniverseModal(universeId) {
+            let universeData;
+            
+            if (universeId === 'universe-1') {
+                universeData = {
+                    name: 'Nuit Éternelle',
+                    creator: "{{ app.user.username|e('js') }}",
+                    image: "",
+                    themes: ['Sombre', 'Mystère'],
+                    favorites: '1,240',
+                    date: '01/01/2024',
+                    status: 'Public',
+                    description: 'Un monde plongé dans une nuit perpétuelle, où la lune ne se couche jamais et les créatures nocturnes règnent en maître.'
+                };
+            } else if (universeId === 'universe-2') {
+                universeData = {
+                    name: 'Châteaux Flottants',
+                    creator: "{{ app.user.username|e('js') }}",
+                    image: "",
+                    themes: ['Épic', 'Magie'],
+                    favorites: '892',
+                    date: '01/01/2024',
+                    status: 'Public',
+                    description: 'Des forteresses majestueuses flottant dans les nuages, où la magie est omniprésente et les chevaliers combattent à dos de griffons.'
+                };
+            } else {
+                universeData = {
+                    name: 'Univers inconnu',
+                    creator: "{{ app.user.username|e('js') }}",
+                    image: "",
+                    themes: [],
+                    favorites: '0',
+                    date: '01/01/2024',
+                    status: 'Privé',
+                    description: 'Description non disponible.'
+                };
+            }
+            
+            document.getElementById('universeName').textContent = universeData.name;
+            document.getElementById('universeCreator').textContent = "Créé par " + universeData.creator;
+            document.getElementById('universeImage').src = universeData.image;
+            document.getElementById('universeFavorites').textContent = universeData.favorites;
+            document.getElementById('universeDate').textContent = universeData.date;
+            document.getElementById('universeStatus').textContent = universeData.status;
+            document.getElementById('universeDescription').textContent = universeData.description;
+            
+            const themesContainer = document.getElementById('universeThemes');
+            themesContainer.innerHTML = '';
+            if (universeData.themes && universeData.themes.length > 0) {
+                universeData.themes.forEach(theme => {
+                    const themeElement = document.createElement('span');
+                    themeElement.className = 'tag';
+                    themeElement.textContent = theme;
+                    themesContainer.appendChild(themeElement);
+                });
+            } else {
+                const themeElement = document.createElement('span');
+                themeElement.className = 'tag';
+                themeElement.textContent = 'Non catégorisé';
+                themesContainer.appendChild(themeElement);
+            }
+            
+            openModal('universeModal');
+        }
+
+        // Form submission feedback
+        document.querySelectorAll('.profile-form, .password-form').forEach(form => {
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        const originalText = submitBtn.textContent;
+                        submitBtn.textContent = 'Enregistrement...';
+                        submitBtn.disabled = true;
+                        
+                        setTimeout(() => {
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        }, 1500);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

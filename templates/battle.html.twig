@@ -1,0 +1,144 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Battle - {{ app.user.username | default('Guest') }}{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 2rem; margin-bottom: 2rem;">
+  <div class="section">
+    <!-- Battle UI Container -->
+    <div id="battleContainer">
+      <div style="text-align: center; padding: 2rem;">
+        <h2 style="color: var(--accent-primary); margin-bottom: 1rem;">Loading Battle...</h2>
+        <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <p style="color: var(--text-secondary); margin: 0;">Initializing game data...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Battle History / Results -->
+    <div id="battleResults" style="margin-top: 2rem; display: none;">
+      <!-- Results will be displayed here -->
+    </div>
+  </div>
+</div>
+
+<!-- Game Scripts -->
+<script src="{{ asset('assets/js/api.js') }}"></script>
+<script src="{{ asset('assets/js/ai.js') }}"></script>
+<script src="{{ asset('assets/js/battle.js') }}"></script>
+<script src="{{ asset('assets/js/ui.js') }}"></script>
+<script src="{{ asset('assets/js/game.js') }}"></script>
+
+<!-- Battle CSS -->
+<link rel="stylesheet" href="{{ asset('css/battle.css') }}">
+
+<script>
+  // Initialize game on page load
+  document.addEventListener('DOMContentLoaded', async function() {
+    try {
+      // Get personnage ID from URL or data attribute
+      const personnageId = {{ personnageId | default('null') }};
+      const profileId = {{ profileId | default('null') }};
+
+      if (!personnageId) {
+        document.getElementById('battleContainer').innerHTML = `
+          <div style="text-align: center; padding: 2rem; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-color);">
+            <h3 style="color: #ff4444;">Error: No Personnage Selected</h3>
+            <p style="color: var(--text-secondary);">Please select a personnage before starting a battle.</p>
+            <a href="/personnages" class="btn btn-primary" style="display: inline-block; margin-top: 1rem;">Back to Personnages</a>
+          </div>
+        `;
+        return;
+      }
+
+      // Create game instance
+      const game = new MidgarGame({
+        personnageId: personnageId,
+        profileId: profileId,
+        battleContainer: '#battleContainer',
+        onGameEnd: function(result) {
+          showBattleResult(result);
+        }
+      });
+
+      // Wait for game to be ready
+      while (game.state === 'loading') {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      if (game.state === 'error') {
+        document.getElementById('battleContainer').innerHTML = `
+          <div style="text-align: center; padding: 2rem;">
+            <h3 style="color: #ff4444;">Failed to Load Battle</h3>
+            <p style="color: var(--text-secondary);">Please try again later.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Start the battle
+      await game.startBattle();
+
+      // Function to show battle results
+      function showBattleResult(result) {
+        const resultsContainer = document.getElementById('battleResults');
+        const resultHTML = `
+          <div class="card" style="margin-top: 2rem; background: ${result.victory ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 0, 0, 0.1)'}; border-color: ${result.victory ? '#00ff00' : '#ff4444'};">
+            <div class="card-body">
+              <h3 style="color: ${result.victory ? '#00ff00' : '#ff4444'}; margin-bottom: 1.5rem; text-align: center;">
+                ${result.victory ? '🎉 Victory!' : '💀 Defeat'}
+              </h3>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border-color);">
+                  <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.9rem;">Enemy Defeated</p>
+                  <p style="color: var(--text-primary); margin: 0; font-weight: 700; font-size: 1.2rem;">${result.enemyName}</p>
+                </div>
+                
+                <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border-color);">
+                  <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.9rem;">Damage Dealt</p>
+                  <p style="color: var(--accent-primary); margin: 0; font-weight: 700; font-size: 1.2rem;">${result.damageDealt} HP</p>
+                </div>
+                
+                <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border-color);">
+                  <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.9rem;">Damage Taken</p>
+                  <p style="color: #ff8844; margin: 0; font-weight: 700; font-size: 1.2rem;">${result.damageTaken} HP</p>
+                </div>
+              </div>
+
+              ${result.victory ? `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                  <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border-color); text-align: center;">
+                    <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.9rem;">XP Gained</p>
+                    <p style="color: var(--accent-primary); margin: 0; font-weight: 700; font-size: 1.4rem;">+${result.xpGained}</p>
+                  </div>
+                  
+                  <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border-color); text-align: center;">
+                    <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.9rem;">Gold Gained</p>
+                    <p style="color: #ffd700; margin: 0; font-weight: 700; font-size: 1.4rem;">+${result.goldGained}</p>
+                  </div>
+                </div>
+              ` : ''}
+
+              <div style="text-align: center; margin-top: 2rem;">
+                <a href="/personnages" class="btn btn-primary">Back to Personnages</a>
+              </div>
+            </div>
+          </div>
+        `;
+        resultsContainer.innerHTML = resultHTML;
+        resultsContainer.style.display = 'block';
+      }
+
+    } catch (error) {
+      console.error('Failed to initialize battle:', error);
+      document.getElementById('battleContainer').innerHTML = `
+        <div style="text-align: center; padding: 2rem;">
+          <h3 style="color: #ff4444;">Error Loading Battle</h3>
+          <p style="color: var(--text-secondary);">${error.message}</p>
+        </div>
+      `;
+    }
+  });
+</script>
+{% endblock %}

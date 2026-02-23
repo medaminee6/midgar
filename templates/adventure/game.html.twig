@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Battle - {{ personnage.name|default('Hero') }}</title>
+		<meta charset="utf-8" />
+		<meta name="description" content="Midgar Adventure Battle" />
+		
+		<!-- jQuery -->
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		
+		<!-- Battle System Modules -->
+		<script src="{{ asset('js/adventure/battle.js') }}"></script>
+		<script src="{{ asset('js/adventure/battle-ui.js') }}"></script>
+		<script src="{{ asset('js/adventure/battle-ai.js') }}"></script>
+		<script src="{{ asset('js/adventure/battle-bullets.js') }}"></script>
+	</head>
+	
+	<body>
+		<!-- Loading Screen -->
+		<div id="loading-screen">
+			<h1>⚔️ BATTLE ⚔️</h1>
+			<p>Preparing battle...</p>
+			<div class="loading-bar">
+				<div class="loading-bar-fill"></div>
+			</div>
+			<div id="error-message" class="hidden"></div>
+		</div>
+		
+		<script>
+			// Get character and universe IDs from URL or data attributes
+			const personnageId = {{ personnage.id|default(1) }};
+			const universeId = {{ universe.id|default(1) }};
+			
+			// Debug: Log the IDs
+			console.log('Battle starting with:', { personnageId, universeId });
+			
+			// Initialize battle when page loads
+			$(document).ready(function() {
+				// Create battle controller
+				const battle = new BattleController();
+				
+				// Initialize battle with character and universe
+				battle.init(personnageId, universeId)
+					.then(function(success) {
+						console.log('Battle init result:', success);
+						if (success) {
+							// Hide loading, show battle
+							$('#loading-screen').fadeOut(500, function() {
+								$(this).remove();
+							});
+						} else {
+							$('#loading-screen').find('p').hide();
+							$('#loading-screen').find('.loading-bar').hide();
+							$('#error-message').removeClass('hidden').text('Failed to load battle data. Please check console for details.');
+						}
+					})
+					.catch(function(error) {
+						console.error('Battle initialization error:', error);
+						$('#loading-screen').find('p').hide();
+						$('#loading-screen').find('.loading-bar').hide();
+						$('#error-message').removeClass('hidden').text('Error: ' + error.message);
+					});
+			});
+			
+			// Handle page unload - cleanup
+			$(window).on('beforeunload', function() {
+				if (typeof battle !== 'undefined') {
+					battle.destroy();
+				}
+			});
+		</script>
+		
+		<style>
+			html, body {
+				margin: 0;
+				padding: 0;
+				background: #0a0a0a;
+				overflow: hidden;
+				font-family: 'Courier New', monospace;
+			}
+			
+			#loading-screen {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: #0a0a0a;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				z-index: 999999;
+			}
+			
+			#loading-screen h1 {
+				color: #DDF247;
+				font-size: 32px;
+				margin-bottom: 20px;
+				text-shadow: 0 0 20px rgba(221, 242, 71, 0.5);
+				animation: loadPulse 1.5s infinite;
+			}
+			
+			@keyframes loadPulse {
+				0%, 100% { opacity: 1; transform: scale(1); }
+				50% { opacity: 0.7; transform: scale(1.05); }
+			}
+			
+			#loading-screen p {
+				color: #888;
+				font-size: 14px;
+			}
+			
+			.loading-bar {
+				width: 200px;
+				height: 8px;
+				background: #222;
+				border-radius: 4px;
+				margin-top: 20px;
+				overflow: hidden;
+			}
+			
+			.loading-bar-fill {
+				height: 100%;
+				width: 30%;
+				background: linear-gradient(90deg, #DDF247, #88ff00);
+				border-radius: 4px;
+				animation: loadingMove 1s infinite linear;
+			}
+			
+			@keyframes loadingMove {
+				0% { transform: translateX(-100%); }
+				100% { transform: translateX(400%); }
+			}
+			
+			#error-message {
+				color: #ff4444;
+				margin-top: 20px;
+				padding: 20px;
+				background: rgba(255, 68, 68, 0.1);
+				border: 1px solid #ff4444;
+				border-radius: 8px;
+				max-width: 400px;
+				text-align: center;
+			}
+			
+			.hidden { display: none !important; }
+		</style>
+	</body>
+</html>
